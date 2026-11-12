@@ -1,0 +1,24 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<defs>
+<linearGradient id="bg" x2="0" y2="1">
+<stop stop-color="#176b4a"/>
+<stop offset="1" stop-color="#06452f"/>
+</linearGradient>
+<linearGradient id="bread" x2="0" y2="1">
+<stop stop-color="#f8d99c"/>
+<stop offset="1" stop-color="#bd7132"/>
+</linearGradient>
+</defs>
+<rect width="512" height="512" rx="112" fill="url(#bg)"/>
+<circle cx="256" cy="218" r="166" fill="#fff5df"/>
+<path d="M102 251c0-91 69-158 154-158s154 67 154 158v28H102z" fill="url(#bread)" stroke="#9c5527" stroke-width="9"/>
+<path d="M145 215c15-65 58-98 111-98s96 33 111 98" fill="none" stroke="#ffe8b9" stroke-width="13" stroke-linecap="round"/>
+<g fill="none" stroke="#8b4b25" stroke-width="9" stroke-linecap="round">
+<path d="m190 173 13-17m47 2 5-22m45 22 5-22m42 53 13-17"/>
+</g>
+<path d="M94 291h324" stroke="#e8b84c" stroke-width="10" stroke-linecap="round"/>
+<text x="256" y="375" text-anchor="middle" font-family="Arial,sans-serif" font-size="91" font-weight="bold" fill="#fff5df">لُقمة</text>
+<path d="M132 402h248" stroke="#e8b84c" stroke-width="5" stroke-linecap="round"/>
+<text x="256" y="442" text-anchor="middle" font-family="Arial,sans-serif" font-size="23" fill="#fff5df">عيش طازج لباب بيتك</text>
+</svg>
