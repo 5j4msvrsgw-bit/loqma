@@ -1,5 +1,14 @@
-const CACHE_NAME = "loqma-v2";
-const APP_SHELL = ["./", "./index.html", "./manifest.json", "./icon.svg"];
+
+const CACHE_NAME = "loqma-v3";
+
+const APP_SHELL = [
+  "./",
+  "./index.html",
+  "./manifest.json",
+  "./icon.svg",
+  "./loqma-icon-180.png",
+  "./loqma-icon-512.png"
+];
 
 self.addEventListener("install", event => {
   event.waitUntil(
@@ -12,7 +21,9 @@ self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
-        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
+        keys
+          .filter(key => key !== CACHE_NAME)
+          .map(key => caches.delete(key))
       )
     )
   );
@@ -25,6 +36,7 @@ self.addEventListener("fetch", event => {
   event.respondWith(
     caches.match(event.request).then(cached => {
       if (cached) return cached;
+
       return fetch(event.request).then(response => {
         if (
           response &&
@@ -36,6 +48,7 @@ self.addEventListener("fetch", event => {
             cache.put(event.request, copy)
           );
         }
+
         return response;
       });
     })
