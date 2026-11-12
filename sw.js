@@ -1,5 +1,5 @@
-const CACHE_NAME = "loqma-v1";
-const APP_SHELL = ["./", "./index.html", "./manifest.json"];
+const CACHE_NAME = "loqma-v2";
+const APP_SHELL = ["./", "./index.html", "./manifest.json", "./icon.svg"];
 
 self.addEventListener("install", event => {
   event.waitUntil(
