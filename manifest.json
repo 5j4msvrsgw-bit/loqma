@@ -1,0 +1,13 @@
+{
+  "name": "لُقمة - عيشك لحد باب بيتك",
+  "short_name": "لُقمة",
+  "description": "مخبوزات طازجة لحد باب بيتك في أكتوبر الجديدة",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f7faf8",
+  "theme_color": "#176b4a",
+  "icons": []
+}
