@@ -1,5 +1,5 @@
 
-const CACHE_NAME = "loqma-v5";
+const CACHE_NAME = "loqma-v6";
 
 const APP_SHELL = [
   "./",
