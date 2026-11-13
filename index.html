@@ -116,16 +116,43 @@ function unitFor(unit){
  if(unit==="pack")return "للباكت";
  return "للقطعة";
 }
+
 async function loadProducts(){
  const box=document.getElementById("products");
- box.innerHTML='<div class="status">بنحمّل الأصناف والأسعار…</div>';
+ const cacheKey="loqma_products_cache_v1";
+ let hasCache=false;
+
+ // عرض آخر قائمة محفوظة على الجهاز
+ try{
+  const saved=localStorage.getItem(cacheKey);
+  if(saved){
+   const cached=JSON.parse(saved);
+   if(Array.isArray(cached)&&cached.length){
+    products=cached;
+    hasCache=true;
+    render();
+    document.getElementById("count").textContent=products.length+" صنف • نسخة محفوظة";
+   }
+  }
+ }catch(error){
+  console.warn("Loqma cache:",error);
+ }
+
+ if(!hasCache){
+  box.innerHTML='<div class="status">بنحمّل الأصناف والأسعار…</div>';
+ }
+
  try{
   const url=SUPABASE_URL+"/rest/v1/product_catalog?select=id,product_name,weight_grams,sale_unit,price_piasters,is_active,display_order&is_active=eq.true&order=display_order.asc";
-  const response=await fetch(url,{headers:{apikey:SUPABASE_KEY,Accept:"application/json"}});
+  const response=await fetch(url,{
+   headers:{apikey:SUPABASE_KEY,Accept:"application/json"}
+  });
+
   if(!response.ok)throw new Error("تعذر تحميل الأصناف ("+response.status+")");
   const rows=await response.json();
   if(!Array.isArray(rows))throw new Error("استجابة غير متوقعة من قاعدة البيانات");
-  products=rows.map(row=>({
+
+  const freshProducts=rows.map(row=>({
    id:String(row.id),
    name:String(row.product_name||""),
    price:Number(row.price_piasters)/100,
@@ -133,14 +160,26 @@ async function loadProducts(){
    icon:iconFor(row.product_name),
    unit:unitFor(row.sale_unit)
   })).filter(p=>p.name&&Number.isFinite(p.price)&&p.price>=0);
-  if(!products.length)throw new Error("لا توجد أصناف مفعّلة حاليًا");
+
+  if(!freshProducts.length)throw new Error("لا توجد أصناف مفعّلة حاليًا");
+
+  products=freshProducts;
+  localStorage.setItem(cacheKey,JSON.stringify(products));
   render();
+
  }catch(error){
   console.error("Loqma catalog:",error);
-  document.getElementById("count").textContent="تعذر التحميل";
-  box.innerHTML='<div class="status">مش قادرين نحمّل الأصناف دلوقتي.<br>'+escapeHTML(error.message||"راجع اتصال الإنترنت وحاول تاني.")+'<br><button class="primary" id="retry-products" style="margin-top:12px">إعادة المحاولة</button></div>';
+
+  if(hasCache){
+   render();
+   document.getElementById("count").textContent=products.length+" صنف • نسخة محفوظة";
+  }else{
+   document.getElementById("count").textContent="تعذر التحميل";
+   box.innerHTML='<div class="status">مش قادرين نحمّل الأصناف دلوقتي.<br>'+escapeHTML(error.message||"راجع اتصال الإنترنت وحاول تاني.")+'<br><button class="primary" id="retry-products" style="margin-top:12px">إعادة المحاولة</button></div>';
+  }
  }
 }
+
 function render(){
  const search=document.getElementById("search").value.trim();
  const filtered=products.filter(p=>(currentCategory==="all"||p.category===currentCategory)&&p.name.includes(search));
@@ -156,6 +195,7 @@ function render(){
  </article>`).join(""):'<div class="empty">مفيش أصناف مطابقة للبحث</div>';
  updateCart();
 }
+
 function updateCart(){
  let count=0,total=0;
  products.forEach(p=>{count+=cart[p.id]||0;total+=p.price*(cart[p.id]||0)});
@@ -164,6 +204,7 @@ function updateCart(){
  document.getElementById("open-cart").disabled=!count;
  document.getElementById("grand-total").textContent=money(total);
 }
+
 document.getElementById("products").addEventListener("click",e=>{
  const retry=e.target.closest("#retry-products");
  if(retry){loadProducts();return}
@@ -174,6 +215,7 @@ document.getElementById("products").addEventListener("click",e=>{
  if(!cart[id])delete cart[id];
  render();
 });
+
 document.getElementById("categories").addEventListener("click",e=>{
  const button=e.target.closest("[data-cat]");
  if(!button)return;
@@ -181,7 +223,9 @@ document.getElementById("categories").addEventListener("click",e=>{
  document.querySelectorAll(".category").forEach(b=>b.classList.toggle("active",b===button));
  render();
 });
+
 document.getElementById("search").addEventListener("input",render);
+
 const modal=document.getElementById("modal");
 document.getElementById("open-cart").onclick=()=>{
  document.getElementById("cart-items").innerHTML=products.filter(p=>cart[p.id]).map(p=>'<div class="cart-row"><span>'+escapeHTML(p.name)+'<br>'+cart[p.id]+' × '+money(p.price)+'</span><b>'+money(p.price*cart[p.id])+'</b></div>').join("");
@@ -194,8 +238,17 @@ document.getElementById("clear-cart").onclick=()=>{
  modal.classList.remove("show");
  render();
 };
+
+// تحديث القائمة عند عودة الإنترنت
+window.addEventListener("online",()=>loadProducts());
+
 loadProducts();
-if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}))}
+
+if("serviceWorker" in navigator){
+ window.addEventListener("load",()=>{
+  navigator.serviceWorker.register("./sw.js").catch(error=>console.warn("Service Worker:",error));
+ });
+}
 </script>
 </body>
 </html>
