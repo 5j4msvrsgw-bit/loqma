@@ -357,21 +357,39 @@ n.includes("عيش")
 return"🥖";
 }
 
-/* ربط صور المنتجات الموجودة في ملفات الموقع */
+/* ربط صور المنتجات */
 function imageFor(name){
 const n=String(name||"");
 
-if(n.includes("شامي"))return"./shami.jpg";
-if(n.includes("بلدي"))return"./baladi.jpg";
-if(n.includes("سياحي"))return"./seyahi.jpg";
+if(n.includes("شامي"))return "./shami.jpg";
+if(n.includes("بلدي"))return "./baladi.jpg";
+if(n.includes("سياحي"))return "./seyahi.jpg";
 
 if(n.includes("شوفان")&&n.includes("فينو"))
-return"./whole-wheat-oats.jpg";
+return "./whole-wheat-oats.jpg";
+
+if(n.includes("حبة كاملة طري"))
+return "./whole-wheat-soft.jpg";
+
+if(n.includes("فينو كبير سمسم"))
+return "./fino-sesame.jpg";
+
+if(n.includes("بيتي باني سمسم"))
+return "./baiti-bani-sesame.jpg";
+
+if(n.includes("توست قالب"))
+return "./toast-loaf.jpg";
 
 if(n==="فينو ميني")
-return"./fino.jpg";
+return "./fino-mini.jpg";
 
-return"";
+if(n.includes("كيزر"))
+return "./kaiser.jpg";
+
+if(n.includes("فطيرة"))
+return "./small-pie.jpg";
+
+return "";
 }
 
 function unitFor(unit){
