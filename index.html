@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -15,7 +16,6 @@
 body{margin:0;font-family:Cairo,sans-serif;background:var(--bg);color:var(--text);padding-bottom:100px}
 button,input{font-family:inherit}
 .container{max-width:760px;margin:auto;padding:0 16px}
-
 header{background:var(--green);color:white;padding:20px 0 25px;border-radius:0 0 25px 25px}
 .top{display:flex;justify-content:space-between;align-items:center}
 .logo{font-size:28px;font-weight:900}
@@ -23,41 +23,21 @@ header{background:var(--green);color:white;padding:20px 0 25px;border-radius:0 0
 .account-chip{border:1px solid #ffffff44}
 .hero h1{font-size:23px;margin:22px 0 4px}
 .hero p{font-size:13px;color:#e1eee7;margin:0}
-
 .search{margin-top:18px;background:white;border-radius:13px;padding:0 13px}
 .search input{width:100%;border:0;outline:0;padding:14px 0;font-size:14px}
-
 .notice{background:var(--light);color:var(--green);padding:13px;border-radius:13px;margin-top:17px;font-size:12px;line-height:1.9}
 .install-box{display:none;background:white;border:1px solid #e4ebe6;color:var(--text)}
 .install-box button{margin-top:9px}
-
 .section{display:flex;justify-content:space-between;align-items:center;margin:23px 0 12px}
 .section h2{font-size:18px;margin:0}
 .section span{font-size:12px;color:var(--muted)}
-
 .categories{display:flex;gap:8px;overflow:auto;padding-bottom:12px}
 .category{border:1px solid #e4ebe6;background:white;border-radius:25px;padding:8px 17px;white-space:nowrap;font-size:12px}
 .category.active{background:var(--green);color:white}
-
 .products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
 .product{background:white;border:1px solid #e8eee9;border-radius:17px;padding:12px}
-
-.product-image{
-height:125px;
-background:#edf5ef;
-border-radius:13px;
-display:grid;
-place-items:center;
-overflow:hidden;
-margin-bottom:9px
-}
-.product-image img{
-width:100%;
-height:100%;
-object-fit:contain;
-display:block
-}
-
+.product-image{height:125px;background:#edf5ef;border-radius:13px;display:grid;place-items:center;overflow:hidden;margin-bottom:9px}
+.product-image img{width:100%;height:100%;object-fit:contain;display:block}
 .product h3{font-size:13px;min-height:42px;margin:0;line-height:1.7}
 .unit{color:var(--muted);font-size:10px}
 .product-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
@@ -65,16 +45,13 @@ display:block
 .add,.qty button{border:0;width:33px;height:33px;border-radius:10px;background:var(--light);color:var(--green);font-size:20px}
 .qty{display:flex;align-items:center;gap:8px}
 .qty button{background:var(--green);color:white}
-
 .empty,.status{grid-column:1/-1;background:white;padding:25px;text-align:center;border-radius:15px;color:var(--muted);line-height:2}
 .footer{text-align:center;color:var(--muted);font-size:11px;margin:25px 0}
-
 .cart-bar{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #e8eee9;padding:13px 16px;padding-bottom:calc(13px + env(safe-area-inset-bottom));z-index:5}
 .cart-inner{max-width:728px;margin:auto;display:flex;justify-content:space-between;align-items:center}
 .cart-inner small{display:block;color:var(--muted);font-size:11px}
 .primary{background:var(--green);color:white;border:0;padding:12px 20px;border-radius:12px;font-weight:800}
 .primary:disabled{opacity:.4}
-
 .modal{display:none;position:fixed;inset:0;background:#10251b88;align-items:flex-end;z-index:10}
 .modal.show{display:flex}
 .sheet{background:white;width:100%;max-width:760px;margin:auto auto 0;border-radius:22px 22px 0 0;padding:20px;max-height:80vh;overflow:auto}
@@ -84,7 +61,6 @@ display:block
 .total{display:flex;justify-content:space-between;margin:18px 0;font-weight:900}
 .warning{background:#fff7e8;color:#805b1b;border-radius:12px;padding:13px;font-size:12px;line-height:1.9}
 .clear{background:none;border:0;color:#a24c42;margin-top:12px}
-
 .auth-gate{position:fixed;inset:0;z-index:50;background:var(--bg);display:grid;place-items:center;padding:22px}
 .auth-card{width:100%;max-width:430px;background:white;border:1px solid #e5ece7;border-radius:22px;padding:24px;box-shadow:0 12px 40px #183b2810}
 .auth-logo{font-size:48px}
@@ -95,10 +71,7 @@ display:block
 .auth-message{font-size:12px;line-height:1.9;margin-top:13px;color:var(--green);min-height:24px;overflow-wrap:anywhere}
 .auth-note{font-size:11px!important;margin:12px 0 0!important}
 body.auth-locked{overflow:hidden}
-
-@media(min-width:600px){
-.products{grid-template-columns:repeat(3,1fr)}
-}
+@media(min-width:600px){.products{grid-template-columns:repeat(3,1fr)}}
 </style>
 </head>
 
@@ -109,12 +82,10 @@ body.auth-locked{overflow:hidden}
 <div class="auth-logo">🥖</div>
 <h1>أهلاً بيك في لُقمة</h1>
 <p>عيشِك ومخبوزاتك الطازجة لحد باب بيتك. اكتب بريدك الإلكتروني وهنبعت لك رابط آمن لتسجيل الدخول.</p>
-
 <form id="auth-form">
 <input id="auth-email" type="email" inputmode="email" autocomplete="email" placeholder="name@example.com" required>
 <button class="primary" id="auth-submit" type="submit">إرسال رابط الدخول</button>
 </form>
-
 <div class="auth-message" id="auth-message" aria-live="polite"></div>
 <p class="auth-note">افتح رسالة البريد واضغط رابط الدخول للعودة إلى المتجر.</p>
 </div>
@@ -129,12 +100,10 @@ body.auth-locked{overflow:hidden}
 <button class="account-chip" id="sign-out">خروج</button>
 </div>
 </div>
-
 <div class="hero">
 <h1>صباحك يبدأ بعيش طازة ☀️</h1>
 <p>اختار مخبوزاتك وإحنا نوصلها لحد باب البيت</p>
 </div>
-
 <div class="search">
 <input id="search" placeholder="بتدور على إيه؟" autocomplete="off">
 </div>
@@ -142,7 +111,6 @@ body.auth-locked{overflow:hidden}
 </header>
 
 <main class="container" id="store-main" hidden>
-
 <div class="notice">
 🚚 خدمة لُقمة تستهدف أكتوبر الجديدة وغرب المطار. تفاصيل مواعيد التوصيل والرسوم سيتم تأكيدها قبل استقبال الطلبات.
 </div>
@@ -218,13 +186,11 @@ SUPABASE_KEY,
 );
 
 const $=id=>document.getElementById(id);
-
 const authGate=$("auth-gate");
 const authForm=$("auth-form");
 const authEmail=$("auth-email");
 const authMessage=$("auth-message");
 const authSubmit=$("auth-submit");
-
 const storeHeader=$("store-header");
 const storeMain=$("store-main");
 const cartBar=$("cart-bar");
@@ -232,7 +198,6 @@ const cartBar=$("cart-bar");
 let products=[];
 let currentCategory="all";
 let cooldownTimer=null;
-
 const cart={};
 
 const money=n=>(Number(n)||0).toFixed(2)+" ج";
@@ -257,10 +222,8 @@ if(!ok)$("modal").classList.remove("show");
 function startLoginCooldown(seconds=60){
 let remaining=seconds;
 authSubmit.disabled=true;
-
 const tick=()=>{
 authSubmit.textContent=`انتظر ${remaining} ثانية`;
-
 if(remaining<=0){
 clearInterval(cooldownTimer);
 cooldownTimer=null;
@@ -270,14 +233,12 @@ return;
 }
 remaining--;
 };
-
 tick();
 cooldownTimer=setInterval(tick,1000);
 }
 
 authForm.addEventListener("submit",async event=>{
 event.preventDefault();
-
 const email=authEmail.value.trim();
 if(!email)return;
 
@@ -285,7 +246,6 @@ if(!navigator.onLine){
 authMessage.textContent="لازم تتصل بالإنترنت لإرسال رابط الدخول.";
 return;
 }
-
 if(authSubmit.disabled)return;
 
 authSubmit.disabled=true;
@@ -299,34 +259,27 @@ options:{
 emailRedirectTo:window.location.origin+window.location.pathname
 }
 });
-
 if(error)throw error;
 
 authMessage.textContent="تم طلب إرسال رابط الدخول. راجع بريدك الإلكتروني، وافتح الرسالة واضغط الرابط للعودة إلى لُقمة.";
 startLoginCooldown(60);
-
 }catch(error){
 console.error("Login error:",error);
-
 const msg=error.message||"حاول مرة أخرى.";
-
 authMessage.textContent=
 msg.includes("after")||msg.includes("seconds")
 ?"لسه بدري على طلب رابط جديد. انتظر دقيقة ثم حاول مرة واحدة."
 :"تعذر إرسال رابط الدخول: "+msg;
-
 startLoginCooldown(60);
 }
 });
 
 $("sign-out").addEventListener("click",async()=>{
 const {error}=await supabaseClient.auth.signOut();
-
 if(error){
 alert("تعذر تسجيل الخروج. حاول مرة أخرى.");
 return;
 }
-
 Object.keys(cart).forEach(k=>delete cart[k]);
 setSignedIn(false);
 authMessage.textContent="";
@@ -341,19 +294,11 @@ return"other";
 
 function iconFor(name){
 const n=String(name||"");
-
 if(n.includes("توست"))return"🍞";
 if(n.includes("فطيرة"))return"🥧";
 if(n.includes("كيزر"))return"🍔";
 if(n.includes("باني"))return"🥯";
-
-if(
-n.includes("شامي")||
-n.includes("بلدي")||
-n.includes("حبة كاملة")||
-n.includes("عيش")
-)return"🫓";
-
+if(n.includes("شامي")||n.includes("بلدي")||n.includes("حبة كاملة")||n.includes("عيش"))return"🫓";
 return"🥖";
 }
 
@@ -368,10 +313,16 @@ if(n.includes("سياحي"))return "./seyahi.jpg";
 if(n.includes("شوفان")&&n.includes("فينو"))
 return "./whole-wheat-oats.jpg";
 
+if(n==="فينو حبة كاملة ميني")
+return "./fino-whole-mini.jpg";
+
+if(n==="فينو حبة كاملة كبير")
+return "./fino-whole-large.jpg";
+
 if(n.includes("حبة كاملة طري"))
 return "./whole-wheat-soft.jpg";
 
-if(n.includes("فينو كبير سمسم"))
+if(n==="فينو كبير سمسم")
 return "./fino-sesame.jpg";
 
 if(n.includes("بيتي باني سمسم"))
@@ -399,18 +350,14 @@ return"للقطعة";
 }
 
 async function loadProducts(){
-
 const box=$("products");
 const cacheKey="loqma_products_cache_v1";
-
 let hasCache=false;
 
 try{
 const saved=localStorage.getItem(cacheKey);
-
 if(saved){
 const cached=JSON.parse(saved);
-
 if(Array.isArray(cached)&&cached.length){
 products=cached;
 hasCache=true;
@@ -418,7 +365,6 @@ render();
 $("count").textContent=products.length+" صنف • نسخة محفوظة";
 }
 }
-
 }catch(e){
 console.warn("Loqma cache:",e);
 }
@@ -428,7 +374,6 @@ box.innerHTML='<div class="status">بنحمّل الأصناف والأسعار�
 }
 
 try{
-
 if(!navigator.onLine){
 if(hasCache)return;
 throw new Error("لا يوجد اتصال بالإنترنت ولا توجد نسخة محفوظة.");
@@ -450,7 +395,6 @@ throw new Error("تعذر تحميل الأصناف ("+response.status+")");
 }
 
 const rows=await response.json();
-
 if(!Array.isArray(rows)){
 throw new Error("استجابة غير متوقعة من قاعدة البيانات.");
 }
@@ -469,23 +413,16 @@ throw new Error("لا توجد أصناف مفعّلة حاليًا.");
 }
 
 products=fresh;
-
 localStorage.setItem(cacheKey,JSON.stringify(products));
-
 render();
 
 }catch(error){
-
 console.error("Loqma catalog:",error);
-
 if(hasCache){
 render();
 $("count").textContent=products.length+" صنف • نسخة محفوظة";
-
 }else{
-
 $("count").textContent="تعذر التحميل";
-
 box.innerHTML=
 '<div class="status">مش قادرين نحمّل الأصناف دلوقتي.<br>'+
 escapeHTML(error.message)+
@@ -495,9 +432,7 @@ escapeHTML(error.message)+
 }
 
 function render(){
-
 const search=$("search").value.trim();
-
 const filtered=products.filter(p=>
 (currentCategory==="all"||p.category===currentCategory)&&
 p.name.includes(search)
@@ -507,12 +442,9 @@ $("count").textContent=filtered.length+" صنف";
 
 $("products").innerHTML=filtered.length
 ?filtered.map(p=>{
-
 const image=imageFor(p.name);
-
 return `
 <article class="product">
-
 <div class="product-image">
 ${
 image
@@ -520,15 +452,10 @@ image
 :p.icon
 }
 </div>
-
 <h3>${escapeHTML(p.name)}</h3>
-
 <div class="unit">${escapeHTML(p.unit)}</div>
-
 <div class="product-bottom">
-
 <div class="price">${money(p.price)}</div>
-
 ${
 cart[p.id]
 ?`
@@ -542,7 +469,6 @@ ${cart[p.id]}
 <button class="add" data-action="plus" data-id="${escapeHTML(p.id)}">+</button>
 `
 }
-
 </div>
 </article>
 `;
@@ -553,7 +479,6 @@ updateCart();
 }
 
 function updateCart(){
-
 let count=0;
 let total=0;
 
@@ -562,49 +487,34 @@ count+=cart[p.id]||0;
 total+=p.price*(cart[p.id]||0);
 });
 
-$("cart-count").textContent=
-count?count+" قطعة في السلة":"السلة فاضية";
-
-$("cart-total").textContent=
-count?"الإجمالي "+money(total):"ابدأ بإضافة الأصناف";
-
+$("cart-count").textContent=count?count+" قطعة في السلة":"السلة فاضية";
+$("cart-total").textContent=count?"الإجمالي "+money(total):"ابدأ بإضافة الأصناف";
 $("open-cart").disabled=!count;
 $("grand-total").textContent=money(total);
 }
 
 $("products").addEventListener("click",event=>{
-
 if(event.target.closest("#retry-products")){
 loadProducts();
 return;
 }
-
 const button=event.target.closest("[data-action]");
 if(!button)return;
 
 const id=button.dataset.id;
-
-cart[id]=Math.max(
-0,
-(cart[id]||0)+(button.dataset.action==="plus"?1:-1)
-);
-
+cart[id]=Math.max(0,(cart[id]||0)+(button.dataset.action==="plus"?1:-1));
 if(!cart[id])delete cart[id];
-
 render();
 });
 
 $("categories").addEventListener("click",event=>{
-
 const button=event.target.closest("[data-cat]");
 if(!button)return;
 
 currentCategory=button.dataset.cat;
-
 document.querySelectorAll(".category").forEach(b=>
 b.classList.toggle("active",b===button)
 );
-
 render();
 });
 
@@ -613,7 +523,6 @@ $("search").addEventListener("input",render);
 const modal=$("modal");
 
 $("open-cart").onclick=()=>{
-
 $("cart-items").innerHTML=products
 .filter(p=>cart[p.id])
 .map(p=>`
@@ -626,7 +535,6 @@ ${cart[p.id]} × ${money(p.price)}
 </div>
 `)
 .join("");
-
 modal.classList.add("show");
 };
 
@@ -649,110 +557,71 @@ if(!storeMain.hidden)loadProducts();
 let initialSessionHandled=false;
 
 async function initializeAuth(){
-
 try{
-
 const {data,error}=await supabaseClient.auth.getSession();
-
 if(error)throw error;
 
 initialSessionHandled=true;
-
 setSignedIn(!!data.session);
-
 if(data.session)loadProducts();
 
 }catch(error){
-
 console.error("Session error:",error);
-
-authMessage.textContent=
-"تعذر التحقق من تسجيل الدخول. تأكد من الإنترنت وحاول تحديث الصفحة.";
+authMessage.textContent="تعذر التحقق من تسجيل الدخول. تأكد من الإنترنت وحاول تحديث الصفحة.";
 }
 }
 
 supabaseClient.auth.onAuthStateChange((event,session)=>{
-
 if(!initialSessionHandled)return;
-
 setSignedIn(!!session);
-
 if(session)loadProducts();
-
 });
 
 /* تثبيت لُقمة على أندرويد والأجهزة المدعومة */
-
 let installPromptEvent=null;
-
 const installHelp=$("install-help");
 const installButton=$("install-app");
 const installText=$("install-text");
 
 window.addEventListener("beforeinstallprompt",event=>{
-
 event.preventDefault();
-
 installPromptEvent=event;
-
 installHelp.style.display="block";
 installButton.style.display="inline-block";
-
-installText.textContent=
-"اضغط تثبيت لإضافة لُقمة للشاشة الرئيسية.";
-
+installText.textContent="اضغط تثبيت لإضافة لُقمة للشاشة الرئيسية.";
 });
 
 installButton.addEventListener("click",async()=>{
-
 if(!installPromptEvent)return;
-
 installPromptEvent.prompt();
-
 await installPromptEvent.userChoice;
-
 installPromptEvent=null;
-
 installButton.style.display="none";
-
 });
 
 window.addEventListener("appinstalled",()=>{
-
 installHelp.style.display="block";
-
-installText.textContent=
-"تم تثبيت لُقمة على جهازك بنجاح ❤️";
-
+installText.textContent="تم تثبيت لُقمة على جهازك بنجاح ❤️";
 installButton.style.display="none";
-
 });
 
 function showManualInstallHelp(){
-
 if(window.matchMedia("(display-mode: standalone)").matches)return;
-
 installHelp.style.display="block";
-
 installText.textContent=/Android/i.test(navigator.userAgent)
 ?"من Chrome اضغط ⋮ ثم (تثبيت التطبيق) أو (إضافة إلى الشاشة الرئيسية). لو ظهر أن تخطيط الشاشة الرئيسية مقفول، افتح إعدادات الشاشة الرئيسية في هاتفك وأوقف قفل التخطيط."
 :"افتح خيارات المتصفح واختر إضافة إلى الشاشة الرئيسية.";
 }
 
 window.addEventListener("load",showManualInstallHelp);
-
 initializeAuth();
 
 if("serviceWorker"in navigator){
-
 window.addEventListener("load",()=>{
-
 navigator.serviceWorker
 .register("./sw.js")
 .catch(error=>console.warn("Service Worker:",error));
-
 });
-
 }
 </script>
 
