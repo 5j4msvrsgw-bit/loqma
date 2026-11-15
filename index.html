@@ -205,7 +205,7 @@ body.auth-locked{overflow:hidden}
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0"></script>
 <script>
 "use strict";
 
@@ -323,8 +323,37 @@ async function loadProducts(){
     if(saved){
       const cached=JSON.parse(saved);
       if(Array.isArray(cached)&&cached.length){
-        products=cached;hasCache=true;render();
-        $("count").textContent=products.length+" صنف • نسخة محفوظة";
+        products=cached.map(item=>{
+          const name=String(item?.name??"").slice(0,120);
+          const id=String(item?.id??"");
+          const price=Number(item?.price);
+          const allowedUnits=["للقطعة","للقالب كامل","للباكت"];
+          const unit=allowedUnits.includes(item?.unit)
+            ? item.unit
+            : "للقطعة";
+
+          if(
+            !name ||
+            !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id) ||
+            !Number.isFinite(price) ||
+            price<0
+          ) return null;
+
+          return {
+            id,
+            name,
+            price,
+            category:categoryFor(name),
+            icon:iconFor(name),
+            unit
+          };
+        }).filter(Boolean);
+
+        if(products.length){
+          hasCache=true;
+          render();
+          $("count").textContent=products.length+" صنف • نسخة محفوظة";
+        }
       }
     }
   }catch(e){console.warn("Loqma cache:",e);}
@@ -465,7 +494,13 @@ function countdownTick(){
     ?"لسه عندك وقت تحجز عيشك الطازة قبل إغلاق الحجز الساعة "+cutoff.slice(0,5)+"."
     :"طلبات اليوم اتقفلت. احجز دلوقتي للتوصيل في اليوم اللي بعده.";
   const dateLabel=formatLocalDate(deliveryDate);
-  $("delivery-line").innerHTML=`موعد التوصيل المتوقع: <b>${dateLabel} من ${start.slice(0,5)} إلى ${end.slice(0,5)}</b>`;
+  const deliveryLine=$("delivery-line");
+  const deliveryTime=document.createElement("b");
+  deliveryTime.textContent=`${dateLabel} من ${start.slice(0,5)} إلى ${end.slice(0,5)}`;
+  deliveryLine.replaceChildren(
+    document.createTextNode("موعد التوصيل المتوقع: "),
+    deliveryTime
+  );
 }
 async function loadAppSettings(){
   try{
