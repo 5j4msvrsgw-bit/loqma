@@ -15,9 +15,10 @@
 
 <style>
 :root{
-  --green:#123b2d;--green2:#1d6048;--gold:#c6a66b;--cream:#f7f5ef;
-  --paper:#fffefa;--ink:#1c2922;--muted:#7e8981;--line:#e9e6dc;
-  --soft:#edf3ed;--shadow:0 14px 40px rgba(18,59,45,.08)
+--green:#123b2d;--green2:#1d6048;--gold:#c6a66b;
+--cream:#f7f5ef;--paper:#fffefa;--ink:#1c2922;
+--muted:#7e8981;--line:#e9e6dc;--soft:#edf3ed;
+--shadow:0 14px 40px rgba(18,59,45,.08)
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -27,10 +28,9 @@ button{cursor:pointer}
 .container{max-width:780px;margin:auto;padding:0 17px}
 [hidden]{display:none!important}
 header{
-  color:#fff;background:
-  radial-gradient(circle at 90% 5%,rgba(198,166,107,.18),transparent 32%),
-  linear-gradient(135deg,#0d281f,#174a37 70%,#1d6048);
-  padding:19px 0 25px;border-radius:0 0 30px 30px;position:relative;overflow:hidden
+color:#fff;
+background:radial-gradient(circle at 90% 5%,rgba(198,166,107,.18),transparent 32%),linear-gradient(135deg,#0d281f,#174a37 70%,#1d6048);
+padding:19px 0 25px;border-radius:0 0 30px 30px;position:relative;overflow:hidden
 }
 header:after{content:"";position:absolute;width:230px;height:230px;border:1px solid #ffffff12;border-radius:50%;left:-100px;bottom:-150px}
 .top{display:flex;justify-content:space-between;align-items:center;gap:10px;position:relative;z-index:1}
@@ -45,11 +45,7 @@ header:after{content:"";position:absolute;width:230px;height:230px;border:1px so
 .search{margin-top:18px;background:#fff;border-radius:15px;padding:0 14px;box-shadow:0 8px 25px #081d151c}
 .search input{width:100%;border:0;outline:0;padding:14px 0;font-size:13px;color:var(--ink);background:transparent}
 .notice{background:#edf3ed;color:var(--green);padding:12px 14px;border:1px solid #dfe9df;border-radius:15px;margin-top:16px;font-size:11px;line-height:1.9}
-.countdown{
-  margin-top:16px;padding:17px;border-radius:20px;color:#fff;
-  background:linear-gradient(125deg,#153c2d,#1d6048);box-shadow:var(--shadow);
-  position:relative;overflow:hidden;animation:rise .65s ease both
-}
+.countdown{margin-top:16px;padding:17px;border-radius:20px;color:#fff;background:linear-gradient(125deg,#153c2d,#1d6048);box-shadow:var(--shadow);position:relative;overflow:hidden;animation:rise .65s ease both}
 .countdown:after{content:"";position:absolute;width:170px;height:170px;border:1px solid #ffffff15;border-radius:50%;left:-65px;top:-100px}
 .count-head{display:flex;justify-content:space-between;align-items:center;gap:8px;position:relative;z-index:1}
 .count-head strong{font-size:14px}
@@ -184,7 +180,6 @@ body.auth-locked{overflow:hidden}
   </div>
 
   <div class="products" id="products"><div class="status">بنحمّل الأصناف والأسعار…</div></div>
-
   <div class="footer">لُقمة — عيشك ومخبوزاتك لحد باب بيتك ❤️<br>الأسعار المعروضة من قائمة الأصناف المسجلة.</div>
 </main>
 
@@ -200,6 +195,7 @@ body.auth-locked{overflow:hidden}
     <div class="sheet-header"><h3>🛒 سلة مشترياتك</h3><button id="close-cart">إغلاق ×</button></div>
     <div id="cart-items"></div>
     <div class="total"><span>إجمالي المنتجات</span><span id="grand-total">0.00 ج</span></div>
+    <div class="notice" id="minimum-order-note">الحد الأدنى لقيمة الطلب 30 جنيه.</div>
     <div class="warning">🚧 الطلبات والدفع والتوصيل غير مفعّلين حتى الآن. هذه نسخة تجريبية ولا يتم إرسال طلب أو خصم أي رصيد.</div>
     <button class="clear" id="clear-cart">إفراغ السلة</button>
   </div>
@@ -213,10 +209,12 @@ body.auth-locked{overflow:hidden}
 const SUPABASE_URL="https://dvidxumpkgthubassfxm.supabase.co";
 const SUPABASE_KEY="sb_publishable_d5hFIwK_aLxzsF2WZt7uvg_iHZCESFs";
 const TIME_ZONE="Africa/Cairo";
+const MIN_ORDER_TOTAL=30;
 
 const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{
   auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
 });
+
 const $=id=>document.getElementById(id);
 const authGate=$("auth-gate"),authForm=$("auth-form"),authEmail=$("auth-email");
 const authMessage=$("auth-message"),authSubmit=$("auth-submit");
@@ -225,7 +223,9 @@ const storeHeader=$("store-header"),storeMain=$("store-main"),cartBar=$("cart-ba
 let products=[],currentCategory="all",cooldownTimer=null,initialSessionHandled=false;
 let appSettings=null,countdownInterval=null;
 const cart={};
+
 const money=n=>(Number(n)||0).toFixed(2)+" ج";
+
 const escapeHTML=value=>String(value??"").replace(/[&<>"']/g,char=>({
   "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
 }[char]));
@@ -233,29 +233,52 @@ const escapeHTML=value=>String(value??"").replace(/[&<>"']/g,char=>({
 function setSignedIn(ok){
   authGate.style.display=ok?"none":"grid";
   document.body.classList.toggle("auth-locked",!ok);
-  storeHeader.hidden=!ok;storeMain.hidden=!ok;cartBar.hidden=!ok;
-  if(!ok){$("modal").classList.remove("show");stopCountdown();}
+  storeHeader.hidden=!ok;
+  storeMain.hidden=!ok;
+  cartBar.hidden=!ok;
+  if(!ok){
+    $("modal").classList.remove("show");
+    stopCountdown();
+  }
 }
+
 function startLoginCooldown(seconds=60){
-  let remaining=seconds;authSubmit.disabled=true;
+  let remaining=seconds;
+  authSubmit.disabled=true;
   const tick=()=>{
     authSubmit.textContent=`انتظر ${remaining} ثانية`;
-    if(remaining<=0){clearInterval(cooldownTimer);cooldownTimer=null;authSubmit.disabled=false;authSubmit.textContent="إرسال رابط الدخول";return;}
+    if(remaining<=0){
+      clearInterval(cooldownTimer);
+      cooldownTimer=null;
+      authSubmit.disabled=false;
+      authSubmit.textContent="إرسال رابط الدخول";
+      return;
+    }
     remaining--;
   };
   if(cooldownTimer)clearInterval(cooldownTimer);
-  tick();cooldownTimer=setInterval(tick,1000);
+  tick();
+  cooldownTimer=setInterval(tick,1000);
 }
+
 authForm.addEventListener("submit",async event=>{
   event.preventDefault();
   const email=authEmail.value.trim();
   if(!email)return;
-  if(!navigator.onLine){authMessage.textContent="لازم تتصل بالإنترنت لإرسال رابط الدخول.";return;}
+  if(!navigator.onLine){
+    authMessage.textContent="لازم تتصل بالإنترنت لإرسال رابط الدخول.";
+    return;
+  }
   if(authSubmit.disabled)return;
-  authSubmit.disabled=true;authSubmit.textContent="جاري إرسال الرابط…";authMessage.textContent="";
+
+  authSubmit.disabled=true;
+  authSubmit.textContent="جاري إرسال الرابط…";
+  authMessage.textContent="";
+
   try{
     const {error}=await supabaseClient.auth.signInWithOtp({
-      email,options:{emailRedirectTo:window.location.origin+window.location.pathname}
+      email,
+      options:{emailRedirectTo:window.location.origin+window.location.pathname}
     });
     if(error)throw error;
     authMessage.textContent="تم طلب إرسال رابط الدخول. راجع بريدك الإلكتروني واضغط الرابط للعودة إلى لُقمة.";
@@ -269,10 +292,16 @@ authForm.addEventListener("submit",async event=>{
     startLoginCooldown(60);
   }
 });
+
 $("sign-out").addEventListener("click",async()=>{
   const {error}=await supabaseClient.auth.signOut();
-  if(error){alert("تعذر تسجيل الخروج. حاول مرة أخرى.");return;}
-  Object.keys(cart).forEach(k=>delete cart[k]);setSignedIn(false);authMessage.textContent="";
+  if(error){
+    alert("تعذر تسجيل الخروج. حاول مرة أخرى.");
+    return;
+  }
+  Object.keys(cart).forEach(k=>delete cart[k]);
+  setSignedIn(false);
+  authMessage.textContent="";
 });
 
 function categoryFor(name){
@@ -281,6 +310,7 @@ function categoryFor(name){
   if(n.includes("عيش"))return "bread";
   return "other";
 }
+
 function iconFor(name){
   const n=String(name||"");
   if(n.includes("توست"))return "🍞";
@@ -309,6 +339,7 @@ function imageFor(name){
   if(n.includes("فطيرة"))return "./small-pie.jpg";
   return "";
 }
+
 function unitFor(unit){
   if(unit==="loaf")return "للقالب كامل";
   if(unit==="pack")return "للباكت";
@@ -318,6 +349,7 @@ function unitFor(unit){
 async function loadProducts(){
   const box=$("products"),cacheKey="loqma_products_cache_v1";
   let hasCache=false;
+
   try{
     const saved=localStorage.getItem(cacheKey);
     if(saved){
@@ -328,21 +360,16 @@ async function loadProducts(){
           const id=String(item?.id??"");
           const price=Number(item?.price);
           const allowedUnits=["للقطعة","للقالب كامل","للباكت"];
-          const unit=allowedUnits.includes(item?.unit)
-            ? item.unit
-            : "للقطعة";
+          const unit=allowedUnits.includes(item?.unit)?item.unit:"للقطعة";
 
           if(
-            !name ||
-            !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id) ||
-            !Number.isFinite(price) ||
-            price<0
-          ) return null;
+            !name||
+            !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)||
+            !Number.isFinite(price)||price<0
+          )return null;
 
           return {
-            id,
-            name,
-            price,
+            id,name,price,
             category:categoryFor(name),
             icon:iconFor(name),
             unit
@@ -356,25 +383,48 @@ async function loadProducts(){
         }
       }
     }
-  }catch(e){console.warn("Loqma cache:",e);}
+  }catch(e){
+    console.warn("Loqma cache:",e);
+  }
+
   if(!hasCache)box.innerHTML='<div class="status">بنحمّل الأصناف والأسعار…</div>';
+
   try{
-    if(!navigator.onLine){if(hasCache)return;throw new Error("لا يوجد اتصال بالإنترنت ولا توجد نسخة محفوظة.");}
+    if(!navigator.onLine){
+      if(hasCache)return;
+      throw new Error("لا يوجد اتصال بالإنترنت ولا توجد نسخة محفوظة.");
+    }
+
     const url=SUPABASE_URL+"/rest/v1/product_catalog?select=id,product_name,weight_grams,sale_unit,price_piasters,is_active,display_order&is_active=eq.true&order=display_order.asc";
-    const response=await fetch(url,{headers:{apikey:SUPABASE_KEY,Accept:"application/json"}});
+    const response=await fetch(url,{
+      headers:{apikey:SUPABASE_KEY,Accept:"application/json"}
+    });
+
     if(!response.ok)throw new Error("تعذر تحميل الأصناف ("+response.status+")");
+
     const rows=await response.json();
     if(!Array.isArray(rows))throw new Error("استجابة غير متوقعة من قاعدة البيانات.");
+
     const fresh=rows.map(row=>({
-      id:String(row.id),name:String(row.product_name||""),price:Number(row.price_piasters)/100,
-      category:categoryFor(row.product_name),icon:iconFor(row.product_name),unit:unitFor(row.sale_unit)
+      id:String(row.id),
+      name:String(row.product_name||""),
+      price:Number(row.price_piasters)/100,
+      category:categoryFor(row.product_name),
+      icon:iconFor(row.product_name),
+      unit:unitFor(row.sale_unit)
     })).filter(p=>p.name&&Number.isFinite(p.price)&&p.price>=0);
+
     if(!fresh.length)throw new Error("لا توجد أصناف مفعّلة حاليًا.");
-    products=fresh;localStorage.setItem(cacheKey,JSON.stringify(products));render();
+
+    products=fresh;
+    localStorage.setItem(cacheKey,JSON.stringify(products));
+    render();
   }catch(error){
     console.error("Loqma catalog:",error);
-    if(hasCache){render();$("count").textContent=products.length+" صنف • نسخة محفوظة";}
-    else{
+    if(hasCache){
+      render();
+      $("count").textContent=products.length+" صنف • نسخة محفوظة";
+    }else{
       $("count").textContent="تعذر التحميل";
       box.innerHTML='<div class="status">مش قادرين نحمّل الأصناف دلوقتي.<br>'+escapeHTML(error.message)+'<br><button class="primary" id="retry-products" style="margin-top:12px">إعادة المحاولة</button></div>';
     }
@@ -383,134 +433,240 @@ async function loadProducts(){
 
 function render(){
   const search=$("search").value.trim();
-  const filtered=products.filter(p=>(currentCategory==="all"||p.category===currentCategory)&&p.name.includes(search));
+  const filtered=products.filter(p=>
+    (currentCategory==="all"||p.category===currentCategory)&&p.name.includes(search)
+  );
+
   $("count").textContent=filtered.length+" صنف";
+
   $("products").innerHTML=filtered.length?filtered.map(p=>{
     const image=imageFor(p.name);
     return `<article class="product">
       <div class="product-image">${image
         ?`<img src="${image}" alt="${escapeHTML(p.name)}" loading="lazy" decoding="async" onerror="this.style.display='none';this.parentElement.textContent='${p.icon}'">`
         :p.icon}</div>
-      <h3>${escapeHTML(p.name)}</h3><div class="unit">${escapeHTML(p.unit)}</div>
-      <div class="product-bottom"><div class="price">${money(p.price)}</div>
-      ${cart[p.id]?`<div class="qty"><button data-action="minus" data-id="${escapeHTML(p.id)}">−</button>${cart[p.id]}<button data-action="plus" data-id="${escapeHTML(p.id)}">+</button></div>`
-      :`<button class="add" data-action="plus" data-id="${escapeHTML(p.id)}">+</button>`}</div>
+      <h3>${escapeHTML(p.name)}</h3>
+      <div class="unit">${escapeHTML(p.unit)}</div>
+      <div class="product-bottom">
+        <div class="price">${money(p.price)}</div>
+        ${cart[p.id]
+          ?`<div class="qty"><button data-action="minus" data-id="${escapeHTML(p.id)}">−</button>${cart[p.id]}<button data-action="plus" data-id="${escapeHTML(p.id)}">+</button></div>`
+          :`<button class="add" data-action="plus" data-id="${escapeHTML(p.id)}">+</button>`}
+      </div>
     </article>`;
   }).join(""):'<div class="empty">مفيش أصناف مطابقة للبحث</div>';
+
   updateCart();
 }
+
+/* حساب السلة والحد الأدنى */
 function updateCart(){
   let count=0,total=0;
-  products.forEach(p=>{count+=cart[p.id]||0;total+=p.price*(cart[p.id]||0);});
-  $("cart-count").textContent=count?count+" قطعة في السلة":"السلة فاضية";
-  $("cart-total").textContent=count?"الإجمالي "+money(total):"ابدأ بإضافة الأصناف";
-  $("open-cart").disabled=!count;$("grand-total").textContent=money(total);
+
+  products.forEach(p=>{
+    count+=cart[p.id]||0;
+    total+=p.price*(cart[p.id]||0);
+  });
+
+  $("cart-count").textContent=count
+    ?count+" قطعة في السلة"
+    :"السلة فاضية";
+
+  $("cart-total").textContent=!count
+    ?"ابدأ بإضافة الأصناف"
+    :total<MIN_ORDER_TOTAL
+      ?"باقي "+money(MIN_ORDER_TOTAL-total)+" للوصول للحد الأدنى"
+      :"وصلت للحد الأدنى للطلب";
+
+  $("open-cart").disabled=!count;
+  $("grand-total").textContent=money(total);
+
+  const note=$("minimum-order-note");
+
+  if(note){
+    note.textContent=total<MIN_ORDER_TOTAL
+      ?"الحد الأدنى لقيمة الطلب "+money(MIN_ORDER_TOTAL)+
+        " — أضف "+money(MIN_ORDER_TOTAL-total)+
+        " لإكمال الحد الأدنى."
+      :"ممتاز! وصلت للحد الأدنى لقيمة الطلب ("+money(MIN_ORDER_TOTAL)+").";
+  }
 }
+
 $("products").addEventListener("click",event=>{
-  if(event.target.closest("#retry-products")){loadProducts();return;}
-  const button=event.target.closest("[data-action]");if(!button)return;
+  if(event.target.closest("#retry-products")){
+    loadProducts();
+    return;
+  }
+
+  const button=event.target.closest("[data-action]");
+  if(!button)return;
+
   const id=button.dataset.id;
   cart[id]=Math.max(0,(cart[id]||0)+(button.dataset.action==="plus"?1:-1));
-  if(!cart[id])delete cart[id];render();
-});
-$("categories").addEventListener("click",event=>{
-  const button=event.target.closest("[data-cat]");if(!button)return;
-  currentCategory=button.dataset.cat;
-  document.querySelectorAll(".category").forEach(b=>b.classList.toggle("active",b===button));
+  if(!cart[id])delete cart[id];
   render();
 });
+
+$("categories").addEventListener("click",event=>{
+  const button=event.target.closest("[data-cat]");
+  if(!button)return;
+
+  currentCategory=button.dataset.cat;
+  document.querySelectorAll(".category").forEach(b=>
+    b.classList.toggle("active",b===button)
+  );
+  render();
+});
+
 $("search").addEventListener("input",render);
+
 const modal=$("modal");
+
 $("open-cart").onclick=()=>{
   $("cart-items").innerHTML=products.filter(p=>cart[p.id]).map(p=>
-    `<div class="cart-row"><span>${escapeHTML(p.name)}<br>${cart[p.id]} × ${money(p.price)}</span><b>${money(p.price*cart[p.id])}</b></div>`
+    `<div class="cart-row">
+      <span>${escapeHTML(p.name)}<br>${cart[p.id]} × ${money(p.price)}</span>
+      <b>${money(p.price*cart[p.id])}</b>
+    </div>`
   ).join("");
+
   modal.classList.add("show");
 };
-$("close-cart").onclick=()=>modal.classList.remove("show");
-modal.addEventListener("click",event=>{if(event.target===modal)modal.classList.remove("show");});
-$("clear-cart").onclick=()=>{Object.keys(cart).forEach(k=>delete cart[k]);modal.classList.remove("show");render();};
-window.addEventListener("online",()=>{if(!storeMain.hidden)loadProducts();});
 
-/* حساب المواعيد حسب توقيت القاهرة حتى لو ساعة الهاتف مختلفة */
+$("close-cart").onclick=()=>modal.classList.remove("show");
+
+modal.addEventListener("click",event=>{
+  if(event.target===modal)modal.classList.remove("show");
+});
+
+$("clear-cart").onclick=()=>{
+  Object.keys(cart).forEach(k=>delete cart[k]);
+  modal.classList.remove("show");
+  render();
+};
+
+window.addEventListener("online",()=>{
+  if(!storeMain.hidden)loadProducts();
+});
+
+/* حساب المواعيد حسب توقيت القاهرة */
 function zonedParts(date){
   const parts=new Intl.DateTimeFormat("en-CA",{
     timeZone:TIME_ZONE,year:"numeric",month:"2-digit",day:"2-digit",
     hour:"2-digit",minute:"2-digit",second:"2-digit",hourCycle:"h23"
   }).formatToParts(date);
-  const o={};parts.forEach(p=>{if(p.type!=="literal")o[p.type]=Number(p.value);});
-  return {year:o.year,month:o.month,day:o.day,hour:o.hour,minute:o.minute,second:o.second};
+
+  const o={};
+  parts.forEach(p=>{
+    if(p.type!=="literal")o[p.type]=Number(p.value);
+  });
+
+  return {
+    year:o.year,month:o.month,day:o.day,
+    hour:o.hour,minute:o.minute,second:o.second
+  };
 }
+
 function localDateString(p){
   return `${p.year}-${String(p.month).padStart(2,"0")}-${String(p.day).padStart(2,"0")}`;
 }
+
 function addDays(dateString,days){
   const [y,m,d]=dateString.split("-").map(Number);
   const x=new Date(Date.UTC(y,m-1,d+days));
   return `${x.getUTCFullYear()}-${String(x.getUTCMonth()+1).padStart(2,"0")}-${String(x.getUTCDate()).padStart(2,"0")}`;
 }
+
 function localToUtc(dateString,timeString){
   const [y,m,d]=dateString.split("-").map(Number);
   const [hh,mm,ss=0]=String(timeString).split(":").map(Number);
   const target=Date.UTC(y,m-1,d,hh,mm,ss);
   let guess=target;
+
   for(let i=0;i<3;i++){
     const p=zonedParts(new Date(guess));
     const represented=Date.UTC(p.year,p.month-1,p.day,p.hour,p.minute,p.second);
     guess+=target-represented;
   }
+
   return new Date(guess);
 }
+
 function formatLocalDate(dateString){
   const [y,m,d]=dateString.split("-").map(Number);
-  return new Intl.DateTimeFormat("ar-EG",{timeZone:TIME_ZONE,weekday:"long",day:"numeric",month:"long"})
-    .format(new Date(Date.UTC(y,m-1,d,12)));
+  return new Intl.DateTimeFormat("ar-EG",{
+    timeZone:TIME_ZONE,weekday:"long",day:"numeric",month:"long"
+  }).format(new Date(Date.UTC(y,m-1,d,12)));
 }
-function stopCountdown(){if(countdownInterval){clearInterval(countdownInterval);countdownInterval=null;}}
+
+function stopCountdown(){
+  if(countdownInterval){
+    clearInterval(countdownInterval);
+    countdownInterval=null;
+  }
+}
+
 function countdownTick(){
   if(!appSettings)return;
+
   const now=new Date(),p=zonedParts(now),today=localDateString(p);
   const cutoff=appSettings.order_cutoff_time||"22:00:00";
   const start=appSettings.delivery_start_time||"06:00:00";
   const end=appSettings.delivery_end_time||"08:00:00";
+
   const todayCutoff=localToUtc(today,cutoff);
   const isBefore=now<todayCutoff;
   const closeDate=isBefore?today:addDays(today,1);
   const deliveryDate=isBefore?addDays(today,1):addDays(today,2);
   const closeAt=localToUtc(closeDate,cutoff);
-  const deliveryStart=localToUtc(deliveryDate,start);
-  const deliveryEnd=localToUtc(deliveryDate,end);
+
   let remaining=Math.max(0,closeAt-now);
-  const days=Math.floor(remaining/86400000);remaining%=86400000;
-  const hours=Math.floor(remaining/3600000);remaining%=3600000;
-  const minutes=Math.floor(remaining/60000);remaining%=60000;
+  const days=Math.floor(remaining/86400000);
+  remaining%=86400000;
+  const hours=Math.floor(remaining/3600000);
+  remaining%=3600000;
+  const minutes=Math.floor(remaining/60000);
+  remaining%=60000;
   const seconds=Math.floor(remaining/1000);
+
   $("cd-days").textContent=String(days).padStart(2,"0");
   $("cd-hours").textContent=String(hours).padStart(2,"0");
   $("cd-minutes").textContent=String(minutes).padStart(2,"0");
   $("cd-seconds").textContent=String(seconds).padStart(2,"0");
-  $("count-title").textContent=isBefore?"الحجز المسبق لبكرة":"الحجز المسبق لليوم التالي";
+
+  $("count-title").textContent=isBefore
+    ?"الحجز المسبق لبكرة"
+    :"الحجز المسبق لليوم التالي";
+
   $("count-message").textContent=isBefore
     ?"لسه عندك وقت تحجز عيشك الطازة قبل إغلاق الحجز الساعة "+cutoff.slice(0,5)+"."
     :"طلبات اليوم اتقفلت. احجز دلوقتي للتوصيل في اليوم اللي بعده.";
+
   const dateLabel=formatLocalDate(deliveryDate);
   const deliveryLine=$("delivery-line");
   const deliveryTime=document.createElement("b");
+
   deliveryTime.textContent=`${dateLabel} من ${start.slice(0,5)} إلى ${end.slice(0,5)}`;
+
   deliveryLine.replaceChildren(
     document.createTextNode("موعد التوصيل المتوقع: "),
     deliveryTime
   );
 }
+
 async function loadAppSettings(){
   try{
     const {data,error}=await supabaseClient.from("app_settings")
       .select("order_cutoff_time,delivery_start_time,delivery_end_time,timezone")
       .limit(1).maybeSingle();
+
     if(error)throw error;
     if(!data)throw new Error("لا توجد إعدادات مواعيد مسجلة.");
+
     appSettings=data;
-    stopCountdown();countdownTick();countdownInterval=setInterval(countdownTick,1000);
+    stopCountdown();
+    countdownTick();
+    countdownInterval=setInterval(countdownTick,1000);
   }catch(error){
     console.warn("Loqma app settings:",error);
     $("count-message").textContent="مواعيد الحجز والتوصيل غير متاحة حاليًا. حاول مرة أخرى لاحقًا.";
@@ -518,47 +674,71 @@ async function loadAppSettings(){
     ["cd-days","cd-hours","cd-minutes","cd-seconds"].forEach(id=>$(id).textContent="--");
   }
 }
+
 async function initializeAuth(){
   try{
     const {data,error}=await supabaseClient.auth.getSession();
     if(error)throw error;
-    initialSessionHandled=true;setSignedIn(!!data.session);
-    if(data.session){loadProducts();loadAppSettings();}
+
+    initialSessionHandled=true;
+    setSignedIn(!!data.session);
+
+    if(data.session){
+      loadProducts();
+      loadAppSettings();
+    }
   }catch(error){
     console.error("Session error:",error);
     authMessage.textContent="تعذر التحقق من تسجيل الدخول. تأكد من الإنترنت وحاول تحديث الصفحة.";
   }
 }
+
 supabaseClient.auth.onAuthStateChange((event,session)=>{
   if(!initialSessionHandled)return;
   setSignedIn(!!session);
-  if(session){loadProducts();loadAppSettings();}
+  if(session){
+    loadProducts();
+    loadAppSettings();
+  }
 });
 
 /* تثبيت لُقمة على الأجهزة المدعومة */
 let installPromptEvent=null;
-const installHelp=$("install-help"),installButton=$("install-app"),installText=$("install-text");
+const installHelp=$("install-help");
+const installButton=$("install-app");
+const installText=$("install-text");
+
 window.addEventListener("beforeinstallprompt",event=>{
-  event.preventDefault();installPromptEvent=event;
-  installHelp.style.display="block";installButton.style.display="inline-block";
+  event.preventDefault();
+  installPromptEvent=event;
+  installHelp.style.display="block";
+  installButton.style.display="inline-block";
   installText.textContent="اضغط تثبيت لإضافة لُقمة للشاشة الرئيسية.";
 });
+
 installButton.addEventListener("click",async()=>{
   if(!installPromptEvent)return;
-  installPromptEvent.prompt();await installPromptEvent.userChoice;
-  installPromptEvent=null;installButton.style.display="none";
-});
-window.addEventListener("appinstalled",()=>{
-  installHelp.style.display="block";installText.textContent="تم تثبيت لُقمة على جهازك بنجاح ❤️";
+  installPromptEvent.prompt();
+  await installPromptEvent.userChoice;
+  installPromptEvent=null;
   installButton.style.display="none";
 });
+
+window.addEventListener("appinstalled",()=>{
+  installHelp.style.display="block";
+  installText.textContent="تم تثبيت لُقمة على جهازك بنجاح ❤️";
+  installButton.style.display="none";
+});
+
 function showManualInstallHelp(){
   if(window.matchMedia("(display-mode: standalone)").matches)return;
+
   installHelp.style.display="block";
   installText.textContent=/Android/i.test(navigator.userAgent)
     ?"من Chrome اضغط ⋮ ثم (تثبيت التطبيق) أو (إضافة إلى الشاشة الرئيسية)."
     :"من Safari اضغط زر المشاركة ثم (إضافة إلى الشاشة الرئيسية).";
 }
+
 window.addEventListener("load",showManualInstallHelp);
 initializeAuth();
 
