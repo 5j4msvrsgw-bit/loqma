@@ -4,626 +4,533 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#176b4a">
+<meta name="theme-color" content="#102d23">
+<meta name="description" content="لُقمة - عيشك ومخبوزاتك الطازجة لحد باب بيتك في أكتوبر الجديدة وغرب المطار.">
 <title>لُقمة | عيشك لحد باب بيتك</title>
 <link rel="manifest" href="./manifest.json">
 <link rel="apple-touch-icon" href="./loqma-icon-180.png">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 <style>
-:root{--green:#176b4a;--light:#eaf5ef;--bg:#f7faf8;--text:#17231d;--muted:#78847d}
+:root{
+  --green:#123b2d;--green2:#1d6048;--gold:#c6a66b;--cream:#f7f5ef;
+  --paper:#fffefa;--ink:#1c2922;--muted:#7e8981;--line:#e9e6dc;
+  --soft:#edf3ed;--shadow:0 14px 40px rgba(18,59,45,.08)
+}
 *{box-sizing:border-box}
-body{margin:0;font-family:Cairo,sans-serif;background:var(--bg);color:var(--text);padding-bottom:100px}
-button,input{font-family:inherit}
-.container{max-width:760px;margin:auto;padding:0 16px}
-header{background:var(--green);color:white;padding:20px 0 25px;border-radius:0 0 25px 25px}
-.top{display:flex;justify-content:space-between;align-items:center}
-.logo{font-size:28px;font-weight:900}
-.location,.account-chip{background:#ffffff22;padding:8px 12px;border-radius:12px;font-size:12px;color:white}
-.account-chip{border:1px solid #ffffff44}
-.hero h1{font-size:23px;margin:22px 0 4px}
-.hero p{font-size:13px;color:#e1eee7;margin:0}
-.search{margin-top:18px;background:white;border-radius:13px;padding:0 13px}
-.search input{width:100%;border:0;outline:0;padding:14px 0;font-size:14px}
-.notice{background:var(--light);color:var(--green);padding:13px;border-radius:13px;margin-top:17px;font-size:12px;line-height:1.9}
-.install-box{display:none;background:white;border:1px solid #e4ebe6;color:var(--text)}
-.install-box button{margin-top:9px}
-.section{display:flex;justify-content:space-between;align-items:center;margin:23px 0 12px}
-.section h2{font-size:18px;margin:0}
-.section span{font-size:12px;color:var(--muted)}
-.categories{display:flex;gap:8px;overflow:auto;padding-bottom:12px}
-.category{border:1px solid #e4ebe6;background:white;border-radius:25px;padding:8px 17px;white-space:nowrap;font-size:12px}
-.category.active{background:var(--green);color:white}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Cairo,sans-serif;background:var(--cream);color:var(--ink);padding-bottom:105px}
+button,input{font:inherit}
+button{cursor:pointer}
+.container{max-width:780px;margin:auto;padding:0 17px}
+[hidden]{display:none!important}
+header{
+  color:#fff;background:
+  radial-gradient(circle at 90% 5%,rgba(198,166,107,.18),transparent 32%),
+  linear-gradient(135deg,#0d281f,#174a37 70%,#1d6048);
+  padding:19px 0 25px;border-radius:0 0 30px 30px;position:relative;overflow:hidden
+}
+header:after{content:"";position:absolute;width:230px;height:230px;border:1px solid #ffffff12;border-radius:50%;left:-100px;bottom:-150px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;position:relative;z-index:1}
+.logo{font-size:29px;font-weight:900;letter-spacing:-1px}
+.logo small{font-size:10px;color:#e2c990;display:block;letter-spacing:2px;margin-top:-8px}
+.top-actions{display:flex;align-items:center;gap:7px}
+.location,.account-chip{background:#ffffff16;border:1px solid #ffffff25;padding:8px 11px;border-radius:13px;font-size:11px;color:white}
+.account-chip{background:transparent}
+.hero{position:relative;z-index:1;margin-top:24px}
+.hero h1{font-size:24px;line-height:1.55;margin:0 0 5px;font-weight:900}
+.hero p{font-size:12px;color:#e0eae4;margin:0}
+.search{margin-top:18px;background:#fff;border-radius:15px;padding:0 14px;box-shadow:0 8px 25px #081d151c}
+.search input{width:100%;border:0;outline:0;padding:14px 0;font-size:13px;color:var(--ink);background:transparent}
+.notice{background:#edf3ed;color:var(--green);padding:12px 14px;border:1px solid #dfe9df;border-radius:15px;margin-top:16px;font-size:11px;line-height:1.9}
+.countdown{
+  margin-top:16px;padding:17px;border-radius:20px;color:#fff;
+  background:linear-gradient(125deg,#153c2d,#1d6048);box-shadow:var(--shadow);
+  position:relative;overflow:hidden;animation:rise .65s ease both
+}
+.countdown:after{content:"";position:absolute;width:170px;height:170px;border:1px solid #ffffff15;border-radius:50%;left:-65px;top:-100px}
+.count-head{display:flex;justify-content:space-between;align-items:center;gap:8px;position:relative;z-index:1}
+.count-head strong{font-size:14px}
+.live-dot{font-size:10px;color:#f0d9a8;background:#ffffff13;border:1px solid #ffffff22;padding:5px 9px;border-radius:20px}
+.count-message{font-size:11px;color:#e2ece5;margin:8px 0 13px;line-height:1.8;position:relative;z-index:1}
+.timer{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;position:relative;z-index:1}
+.time-cell{text-align:center;background:#ffffff12;border:1px solid #ffffff17;border-radius:13px;padding:9px 3px}
+.time-cell b{display:block;font-size:23px;line-height:1.3;color:#f0d9a8;font-variant-numeric:tabular-nums}
+.time-cell span{font-size:9px;color:#e1e9e3}
+.delivery-line{border-top:1px solid #ffffff25;margin-top:13px;padding-top:10px;font-size:10px;color:#e3ebe5;position:relative;z-index:1}
+.delivery-line b{color:#f0d9a8}
+.section{display:flex;justify-content:space-between;align-items:center;margin:25px 0 12px}
+.section h2{font-size:17px;margin:0;font-weight:900}
+.section span{font-size:10px;color:var(--muted)}
+.categories{display:flex;gap:8px;overflow:auto;padding:0 0 12px;scrollbar-width:none}
+.categories::-webkit-scrollbar{display:none}
+.category{border:1px solid var(--line);background:var(--paper);border-radius:30px;padding:8px 17px;white-space:nowrap;font-size:11px;color:#58665d;transition:.2s}
+.category.active{background:var(--green);border-color:var(--green);color:white;box-shadow:0 5px 14px #123b2d22}
 .products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
-.product{background:white;border:1px solid #e8eee9;border-radius:17px;padding:12px}
-.product-image{height:125px;background:#edf5ef;border-radius:13px;display:grid;place-items:center;overflow:hidden;margin-bottom:9px}
+.product{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:11px;min-width:0;box-shadow:0 4px 15px #15291d08;animation:rise .45s ease both;transition:transform .2s,box-shadow .2s}
+.product:active{transform:scale(.985)}
+.product-image{height:125px;background:linear-gradient(145deg,#f0f3ec,#e8eee7);border-radius:13px;display:grid;place-items:center;overflow:hidden;margin-bottom:9px;color:var(--green);font-size:37px}
 .product-image img{width:100%;height:100%;object-fit:contain;display:block}
-.product h3{font-size:13px;min-height:42px;margin:0;line-height:1.7}
-.unit{color:var(--muted);font-size:10px}
-.product-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
-.price{color:var(--green);font-weight:900;font-size:16px}
-.add,.qty button{border:0;width:33px;height:33px;border-radius:10px;background:var(--light);color:var(--green);font-size:20px}
-.qty{display:flex;align-items:center;gap:8px}
+.product h3{font-size:12px;min-height:42px;margin:0;line-height:1.8;font-weight:800}
+.unit{color:var(--muted);font-size:9px}
+.product-bottom{display:flex;justify-content:space-between;align-items:center;gap:5px;margin-top:10px}
+.price{color:var(--green2);font-weight:900;font-size:15px;white-space:nowrap}
+.add,.qty button{border:0;width:32px;height:32px;border-radius:11px;background:#e9f0e9;color:var(--green);font-size:20px;transition:.2s}
+.add:active,.qty button:active{transform:scale(.9)}
+.qty{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:800}
 .qty button{background:var(--green);color:white}
-.empty,.status{grid-column:1/-1;background:white;padding:25px;text-align:center;border-radius:15px;color:var(--muted);line-height:2}
-.footer{text-align:center;color:var(--muted);font-size:11px;margin:25px 0}
-.cart-bar{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #e8eee9;padding:13px 16px;padding-bottom:calc(13px + env(safe-area-inset-bottom));z-index:5}
-.cart-inner{max-width:728px;margin:auto;display:flex;justify-content:space-between;align-items:center}
-.cart-inner small{display:block;color:var(--muted);font-size:11px}
-.primary{background:var(--green);color:white;border:0;padding:12px 20px;border-radius:12px;font-weight:800}
-.primary:disabled{opacity:.4}
-.modal{display:none;position:fixed;inset:0;background:#10251b88;align-items:flex-end;z-index:10}
+.empty,.status{grid-column:1/-1;background:var(--paper);padding:25px;text-align:center;border-radius:16px;color:var(--muted);line-height:2;font-size:12px}
+.footer{text-align:center;color:var(--muted);font-size:10px;margin:26px 0}
+.cart-bar{position:fixed;bottom:0;left:0;right:0;background:#fffefaee;backdrop-filter:blur(16px);border-top:1px solid var(--line);padding:12px 16px;padding-bottom:calc(12px + env(safe-area-inset-bottom));z-index:5}
+.cart-inner{max-width:744px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.cart-inner b{font-size:13px}
+.cart-inner small{display:block;color:var(--muted);font-size:10px}
+.primary{background:linear-gradient(135deg,var(--green),var(--green2));color:white;border:0;padding:12px 19px;border-radius:13px;font-weight:800;font-size:12px;box-shadow:0 6px 15px #123b2d22}
+.primary:disabled{opacity:.4;box-shadow:none}
+.modal{display:none;position:fixed;inset:0;background:#10251b88;align-items:flex-end;z-index:10;backdrop-filter:blur(3px)}
 .modal.show{display:flex}
-.sheet{background:white;width:100%;max-width:760px;margin:auto auto 0;border-radius:22px 22px 0 0;padding:20px;max-height:80vh;overflow:auto}
+.sheet{background:var(--paper);width:100%;max-width:780px;margin:auto auto 0;border-radius:25px 25px 0 0;padding:20px;max-height:82vh;overflow:auto;animation:sheetUp .3s ease}
 .sheet-header{display:flex;justify-content:space-between;align-items:center}
-.sheet-header button{border:0;background:#f1f5f2;padding:8px 12px;border-radius:10px}
-.cart-row{display:flex;justify-content:space-between;padding:13px 0;border-bottom:1px solid #eee;font-size:13px}
-.total{display:flex;justify-content:space-between;margin:18px 0;font-weight:900}
-.warning{background:#fff7e8;color:#805b1b;border-radius:12px;padding:13px;font-size:12px;line-height:1.9}
-.clear{background:none;border:0;color:#a24c42;margin-top:12px}
-.auth-gate{position:fixed;inset:0;z-index:50;background:var(--bg);display:grid;place-items:center;padding:22px}
-.auth-card{width:100%;max-width:430px;background:white;border:1px solid #e5ece7;border-radius:22px;padding:24px;box-shadow:0 12px 40px #183b2810}
+.sheet-header h3{font-size:16px}
+.sheet-header button{border:0;background:#f0f1eb;padding:8px 12px;border-radius:10px}
+.cart-row{display:flex;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid var(--line);font-size:12px;line-height:1.8}
+.total{display:flex;justify-content:space-between;margin:18px 0;font-weight:900;font-size:14px}
+.warning{background:#fbf2df;color:#795d2e;border:1px solid #f0e3c7;border-radius:13px;padding:12px;font-size:11px;line-height:1.9}
+.clear{background:none;border:0;color:#a24c42;margin-top:12px;font-size:11px}
+.auth-gate{position:fixed;inset:0;z-index:50;background:var(--cream);display:grid;place-items:center;padding:22px}
+.auth-card{width:100%;max-width:430px;background:var(--paper);border:1px solid var(--line);border-radius:25px;padding:25px;box-shadow:var(--shadow);animation:rise .5s ease}
 .auth-logo{font-size:48px}
-.auth-card h1{font-size:25px;margin:5px 0 8px;color:var(--green)}
-.auth-card p{font-size:13px;color:var(--muted);line-height:1.9;margin:0 0 18px}
-.auth-card input{width:100%;border:1px solid #dce7df;border-radius:12px;padding:14px;font-size:16px;direction:ltr;text-align:left;margin-bottom:12px;background:white}
-.auth-card button{width:100%;font-size:15px}
-.auth-message{font-size:12px;line-height:1.9;margin-top:13px;color:var(--green);min-height:24px;overflow-wrap:anywhere}
-.auth-note{font-size:11px!important;margin:12px 0 0!important}
+.auth-card h1{font-size:24px;margin:5px 0 8px;color:var(--green);font-weight:900}
+.auth-card p{font-size:12px;color:var(--muted);line-height:2;margin:0 0 18px}
+.auth-card input{width:100%;border:1px solid #dce4da;border-radius:13px;padding:14px;font-size:16px;direction:ltr;text-align:left;margin-bottom:12px;background:white}
+.auth-card button{width:100%;font-size:14px}
+.auth-message{font-size:11px;line-height:1.9;margin-top:13px;color:var(--green);min-height:24px;overflow-wrap:anywhere}
+.auth-note{font-size:10px!important;margin:12px 0 0!important}
 body.auth-locked{overflow:hidden}
-@media(min-width:600px){.products{grid-template-columns:repeat(3,1fr)}}
+.install-box{display:none;background:var(--paper);color:var(--ink)}
+.install-box button{margin-top:8px}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes sheetUp{from{transform:translateY(35px);opacity:.6}to{transform:translateY(0);opacity:1}}
+@media(min-width:600px){.products{grid-template-columns:repeat(3,1fr)}.product-image{height:145px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
 </head>
 
 <body class="auth-locked">
-
 <div class="auth-gate" id="auth-gate">
-<div class="auth-card">
-<div class="auth-logo">🥖</div>
-<h1>أهلاً بيك في لُقمة</h1>
-<p>عيشِك ومخبوزاتك الطازجة لحد باب بيتك. اكتب بريدك الإلكتروني وهنبعت لك رابط آمن لتسجيل الدخول.</p>
-<form id="auth-form">
-<input id="auth-email" type="email" inputmode="email" autocomplete="email" placeholder="name@example.com" required>
-<button class="primary" id="auth-submit" type="submit">إرسال رابط الدخول</button>
-</form>
-<div class="auth-message" id="auth-message" aria-live="polite"></div>
-<p class="auth-note">افتح رسالة البريد واضغط رابط الدخول للعودة إلى المتجر.</p>
-</div>
+  <div class="auth-card">
+    <div class="auth-logo">🥖</div>
+    <h1>أهلاً بيك في لُقمة</h1>
+    <p>عيشِك ومخبوزاتك الطازجة لحد باب بيتك. اكتب بريدك الإلكتروني وهنبعت لك رابط آمن لتسجيل الدخول.</p>
+    <form id="auth-form">
+      <input id="auth-email" type="email" inputmode="email" autocomplete="email" placeholder="name@example.com" required>
+      <button class="primary" id="auth-submit" type="submit">إرسال رابط الدخول</button>
+    </form>
+    <div class="auth-message" id="auth-message" aria-live="polite"></div>
+    <p class="auth-note">افتح رسالة البريد واضغط رابط الدخول للعودة إلى المتجر.</p>
+  </div>
 </div>
 
 <header id="store-header" hidden>
-<div class="container">
-<div class="top">
-<div class="logo">لُقمة.</div>
-<div style="display:flex;gap:7px;align-items:center">
-<div class="location">📍 أكتوبر الجديدة</div>
-<button class="account-chip" id="sign-out">خروج</button>
-</div>
-</div>
-<div class="hero">
-<h1>صباحك يبدأ بعيش طازة ☀️</h1>
-<p>اختار مخبوزاتك وإحنا نوصلها لحد باب البيت</p>
-</div>
-<div class="search">
-<input id="search" placeholder="بتدور على إيه؟" autocomplete="off">
-</div>
-</div>
+  <div class="container">
+    <div class="top">
+      <div class="logo">لُقمة.<small>طازة لحد باب بيتك</small></div>
+      <div class="top-actions">
+        <div class="location">📍 أكتوبر الجديدة</div>
+        <button class="account-chip" id="sign-out">خروج</button>
+      </div>
+    </div>
+    <div class="hero">
+      <h1>صباحك يبدأ بعيش طازة ☀️</h1>
+      <p>اختار مخبوزاتك وإحنا نوصلها لحد باب البيت</p>
+    </div>
+    <div class="search"><input id="search" placeholder="بتدور على إيه؟" autocomplete="off"></div>
+  </div>
 </header>
 
 <main class="container" id="store-main" hidden>
-<div class="notice">
-🚚 خدمة لُقمة تستهدف أكتوبر الجديدة وغرب المطار. تفاصيل مواعيد التوصيل والرسوم سيتم تأكيدها قبل استقبال الطلبات.
-</div>
+  <div class="notice">🚚 خدمة لُقمة تستهدف أكتوبر الجديدة وغرب المطار. تفاصيل مواعيد التوصيل والرسوم سيتم تأكيدها قبل استقبال الطلبات.</div>
 
-<div class="notice install-box" id="install-help">
-📲 <b>ثبّت لُقمة على موبايلك</b><br>
-<span id="install-text">أضف التطبيق للشاشة الرئيسية لفتحه بسهولة.</span><br>
-<button class="primary" id="install-app" type="button" style="display:none">تثبيت لُقمة</button>
-</div>
+  <section class="countdown" aria-live="polite">
+    <div class="count-head">
+      <strong id="count-title">الحجز المسبق</strong>
+      <span class="live-dot">● مواعيد لُقمة</span>
+    </div>
+    <p class="count-message" id="count-message">بنجهز لك مواعيد الحجز والتوصيل…</p>
+    <div class="timer">
+      <div class="time-cell"><b id="cd-days">--</b><span>يوم</span></div>
+      <div class="time-cell"><b id="cd-hours">--</b><span>ساعة</span></div>
+      <div class="time-cell"><b id="cd-minutes">--</b><span>دقيقة</span></div>
+      <div class="time-cell"><b id="cd-seconds">--</b><span>ثانية</span></div>
+    </div>
+    <div class="delivery-line" id="delivery-line">موعد التوصيل: <b>سيتم تحديده</b></div>
+  </section>
 
-<div class="section">
-<h2>اختار من المخبوزات</h2>
-<span id="count">جاري تحميل الأصناف…</span>
-</div>
+  <div class="notice install-box" id="install-help">
+    📲 <b>ثبّت لُقمة على موبايلك</b><br>
+    <span id="install-text">أضف التطبيق للشاشة الرئيسية لفتحه بسهولة.</span><br>
+    <button class="primary" id="install-app" type="button" style="display:none">تثبيت لُقمة</button>
+  </div>
 
-<div class="categories" id="categories">
-<button class="category active" data-cat="all">الكل</button>
-<button class="category" data-cat="bread">عيش</button>
-<button class="category" data-cat="fino">فينو</button>
-<button class="category" data-cat="other">مخبوزات أخرى</button>
-</div>
+  <div class="section"><h2>اختار من المخبوزات</h2><span id="count">جاري تحميل الأصناف…</span></div>
 
-<div class="products" id="products">
-<div class="status">بنحمّل الأصناف والأسعار…</div>
-</div>
+  <div class="categories" id="categories">
+    <button class="category active" data-cat="all">الكل</button>
+    <button class="category" data-cat="bread">عيش</button>
+    <button class="category" data-cat="fino">فينو</button>
+    <button class="category" data-cat="other">مخبوزات أخرى</button>
+  </div>
 
-<div class="footer">
-لُقمة — عيشك ومخبوزاتك لحد باب بيتك ❤️<br>
-الأسعار المعروضة من قائمة الأصناف المسجلة.
-</div>
+  <div class="products" id="products"><div class="status">بنحمّل الأصناف والأسعار…</div></div>
+
+  <div class="footer">لُقمة — عيشك ومخبوزاتك لحد باب بيتك ❤️<br>الأسعار المعروضة من قائمة الأصناف المسجلة.</div>
 </main>
 
 <div class="cart-bar" id="cart-bar" hidden>
-<div class="cart-inner">
-<div>
-<b id="cart-count">السلة فاضية</b>
-<small id="cart-total">ابدأ بإضافة الأصناف</small>
-</div>
-<button class="primary" id="open-cart" disabled>عرض السلة</button>
-</div>
+  <div class="cart-inner">
+    <div><b id="cart-count">السلة فاضية</b><small id="cart-total">ابدأ بإضافة الأصناف</small></div>
+    <button class="primary" id="open-cart" disabled>عرض السلة</button>
+  </div>
 </div>
 
 <div class="modal" id="modal">
-<div class="sheet">
-<div class="sheet-header">
-<h3>🛒 سلة مشترياتك</h3>
-<button id="close-cart">إغلاق ×</button>
-</div>
-<div id="cart-items"></div>
-<div class="total">
-<span>إجمالي المنتجات</span>
-<span id="grand-total">0.00 ج</span>
-</div>
-<div class="warning">
-🚧 الطلبات والدفع والتوصيل غير مفعّلين حتى الآن. هذه نسخة تجريبية ولا يتم إرسال طلب أو خصم أي رصيد.
-</div>
-<button class="clear" id="clear-cart">إفراغ السلة</button>
-</div>
+  <div class="sheet">
+    <div class="sheet-header"><h3>🛒 سلة مشترياتك</h3><button id="close-cart">إغلاق ×</button></div>
+    <div id="cart-items"></div>
+    <div class="total"><span>إجمالي المنتجات</span><span id="grand-total">0.00 ج</span></div>
+    <div class="warning">🚧 الطلبات والدفع والتوصيل غير مفعّلين حتى الآن. هذه نسخة تجريبية ولا يتم إرسال طلب أو خصم أي رصيد.</div>
+    <button class="clear" id="clear-cart">إفراغ السلة</button>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script>
 "use strict";
 
+/* إعدادات مشروع Supabase العامة: المفتاح publishable فقط */
 const SUPABASE_URL="https://dvidxumpkgthubassfxm.supabase.co";
 const SUPABASE_KEY="sb_publishable_d5hFIwK_aLxzsF2WZt7uvg_iHZCESFs";
+const TIME_ZONE="Africa/Cairo";
 
-const supabaseClient=window.supabase.createClient(
-SUPABASE_URL,
-SUPABASE_KEY,
-{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}
-);
-
+const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{
+  auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
+});
 const $=id=>document.getElementById(id);
-const authGate=$("auth-gate");
-const authForm=$("auth-form");
-const authEmail=$("auth-email");
-const authMessage=$("auth-message");
-const authSubmit=$("auth-submit");
-const storeHeader=$("store-header");
-const storeMain=$("store-main");
-const cartBar=$("cart-bar");
+const authGate=$("auth-gate"),authForm=$("auth-form"),authEmail=$("auth-email");
+const authMessage=$("auth-message"),authSubmit=$("auth-submit");
+const storeHeader=$("store-header"),storeMain=$("store-main"),cartBar=$("cart-bar");
 
-let products=[];
-let currentCategory="all";
-let cooldownTimer=null;
+let products=[],currentCategory="all",cooldownTimer=null,initialSessionHandled=false;
+let appSettings=null,countdownInterval=null;
 const cart={};
-
 const money=n=>(Number(n)||0).toFixed(2)+" ج";
-
 const escapeHTML=value=>String(value??"").replace(/[&<>"']/g,char=>({
-"&":"&amp;",
-"<":"&lt;",
-">":"&gt;",
-'"':"&quot;",
-"'":"&#39;"
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
 }[char]));
 
 function setSignedIn(ok){
-authGate.style.display=ok?"none":"grid";
-document.body.classList.toggle("auth-locked",!ok);
-storeHeader.hidden=!ok;
-storeMain.hidden=!ok;
-cartBar.hidden=!ok;
-if(!ok)$("modal").classList.remove("show");
+  authGate.style.display=ok?"none":"grid";
+  document.body.classList.toggle("auth-locked",!ok);
+  storeHeader.hidden=!ok;storeMain.hidden=!ok;cartBar.hidden=!ok;
+  if(!ok){$("modal").classList.remove("show");stopCountdown();}
 }
-
 function startLoginCooldown(seconds=60){
-let remaining=seconds;
-authSubmit.disabled=true;
-const tick=()=>{
-authSubmit.textContent=`انتظر ${remaining} ثانية`;
-if(remaining<=0){
-clearInterval(cooldownTimer);
-cooldownTimer=null;
-authSubmit.disabled=false;
-authSubmit.textContent="إرسال رابط الدخول";
-return;
+  let remaining=seconds;authSubmit.disabled=true;
+  const tick=()=>{
+    authSubmit.textContent=`انتظر ${remaining} ثانية`;
+    if(remaining<=0){clearInterval(cooldownTimer);cooldownTimer=null;authSubmit.disabled=false;authSubmit.textContent="إرسال رابط الدخول";return;}
+    remaining--;
+  };
+  if(cooldownTimer)clearInterval(cooldownTimer);
+  tick();cooldownTimer=setInterval(tick,1000);
 }
-remaining--;
-};
-tick();
-cooldownTimer=setInterval(tick,1000);
-}
-
 authForm.addEventListener("submit",async event=>{
-event.preventDefault();
-const email=authEmail.value.trim();
-if(!email)return;
-
-if(!navigator.onLine){
-authMessage.textContent="لازم تتصل بالإنترنت لإرسال رابط الدخول.";
-return;
-}
-if(authSubmit.disabled)return;
-
-authSubmit.disabled=true;
-authSubmit.textContent="جاري إرسال الرابط…";
-authMessage.textContent="";
-
-try{
-const {error}=await supabaseClient.auth.signInWithOtp({
-email,
-options:{
-emailRedirectTo:window.location.origin+window.location.pathname
-}
+  event.preventDefault();
+  const email=authEmail.value.trim();
+  if(!email)return;
+  if(!navigator.onLine){authMessage.textContent="لازم تتصل بالإنترنت لإرسال رابط الدخول.";return;}
+  if(authSubmit.disabled)return;
+  authSubmit.disabled=true;authSubmit.textContent="جاري إرسال الرابط…";authMessage.textContent="";
+  try{
+    const {error}=await supabaseClient.auth.signInWithOtp({
+      email,options:{emailRedirectTo:window.location.origin+window.location.pathname}
+    });
+    if(error)throw error;
+    authMessage.textContent="تم طلب إرسال رابط الدخول. راجع بريدك الإلكتروني واضغط الرابط للعودة إلى لُقمة.";
+    startLoginCooldown(60);
+  }catch(error){
+    console.error("Login error:",error);
+    const msg=error.message||"حاول مرة أخرى.";
+    authMessage.textContent=msg.includes("after")||msg.includes("seconds")
+      ?"لسه بدري على طلب رابط جديد. انتظر دقيقة ثم حاول مرة واحدة."
+      :"تعذر إرسال رابط الدخول: "+msg;
+    startLoginCooldown(60);
+  }
 });
-if(error)throw error;
-
-authMessage.textContent="تم طلب إرسال رابط الدخول. راجع بريدك الإلكتروني، وافتح الرسالة واضغط الرابط للعودة إلى لُقمة.";
-startLoginCooldown(60);
-}catch(error){
-console.error("Login error:",error);
-const msg=error.message||"حاول مرة أخرى.";
-authMessage.textContent=
-msg.includes("after")||msg.includes("seconds")
-?"لسه بدري على طلب رابط جديد. انتظر دقيقة ثم حاول مرة واحدة."
-:"تعذر إرسال رابط الدخول: "+msg;
-startLoginCooldown(60);
-}
-});
-
 $("sign-out").addEventListener("click",async()=>{
-const {error}=await supabaseClient.auth.signOut();
-if(error){
-alert("تعذر تسجيل الخروج. حاول مرة أخرى.");
-return;
-}
-Object.keys(cart).forEach(k=>delete cart[k]);
-setSignedIn(false);
-authMessage.textContent="";
+  const {error}=await supabaseClient.auth.signOut();
+  if(error){alert("تعذر تسجيل الخروج. حاول مرة أخرى.");return;}
+  Object.keys(cart).forEach(k=>delete cart[k]);setSignedIn(false);authMessage.textContent="";
 });
 
 function categoryFor(name){
-const n=String(name||"");
-if(n.includes("فينو"))return"fino";
-if(n.includes("عيش"))return"bread";
-return"other";
+  const n=String(name||"");
+  if(n.includes("فينو"))return "fino";
+  if(n.includes("عيش"))return "bread";
+  return "other";
 }
-
 function iconFor(name){
-const n=String(name||"");
-if(n.includes("توست"))return"🍞";
-if(n.includes("فطيرة"))return"🥧";
-if(n.includes("كيزر"))return"🍔";
-if(n.includes("باني"))return"🥯";
-if(n.includes("شامي")||n.includes("بلدي")||n.includes("حبة كاملة")||n.includes("عيش"))return"🫓";
-return"🥖";
+  const n=String(name||"");
+  if(n.includes("توست"))return "🍞";
+  if(n.includes("فطيرة"))return "🥧";
+  if(n.includes("كيزر"))return "🍔";
+  if(n.includes("باني"))return "🥯";
+  if(n.includes("شامي")||n.includes("بلدي")||n.includes("حبة كاملة")||n.includes("عيش"))return "🫓";
+  return "🥖";
 }
 
-/* ربط صور المنتجات */
+/* أسماء الصور مطابقة لأسماء الملفات الموجودة بالمستودع */
 function imageFor(name){
-const n=String(name||"");
-
-if(n.includes("شامي"))return "./shami.jpg";
-if(n.includes("بلدي"))return "./baladi.jpg";
-if(n.includes("سياحي"))return "./seyahi.jpg";
-
-if(n.includes("شوفان")&&n.includes("فينو"))
-return "./whole-wheat-oats.jpg";
-
-if(n.includes("فينو")&&n.includes("حبة كاملة")&&n.includes("ميني"))
-return "./fino-whole-mini.jpg.PNG";
-
-if(n==="فينو حبة كاملة كبير")
-return "./fino-whole-large.jpg";
-
-if(n.includes("حبة كاملة طري"))
-return "./whole-wheat-soft.jpg";
-
-if(n==="فينو كبير سمسم")
-return "./fino-sesame.jpg";
-
-if(n.includes("بيتي باني سمسم"))
-return "./baiti-bani-sesame.jpg";
-
-if(n.includes("توست قالب"))
-return "./toast-loaf.jpg";
-
-if(n==="فينو ميني")
-return "./fino-mini.jpg";
-
-if(n.includes("كيزر"))
-return "./kaiser.jpg";
-
-if(n.includes("فطيرة"))
-return "./small-pie.jpg";
-
-return "";
+  const n=String(name||"");
+  if(n.includes("شامي"))return "./shami.jpg";
+  if(n.includes("بلدي"))return "./baladi.jpg";
+  if(n.includes("سياحي"))return "./seyahi.jpg";
+  if(n.includes("شوفان")&&n.includes("فينو"))return "./whole-wheat-oats.jpg";
+  if(n.includes("فينو")&&n.includes("حبة كاملة")&&n.includes("ميني"))return "./fino-whole-mini.jpg.PNG";
+  if(n==="فينو حبة كاملة كبير")return "./fino-whole-large.jpg";
+  if(n.includes("حبة كاملة طري"))return "./whole-wheat-soft.jpg";
+  if(n==="فينو كبير سمسم")return "./fino-sesame.jpg";
+  if(n.includes("بيتي باني سمسم"))return "./baiti-bani-sesame.jpg";
+  if(n.includes("توست قالب"))return "./toast-loaf.jpg";
+  if(n==="فينو ميني")return "./fino-mini.jpg";
+  if(n.includes("كيزر"))return "./kaiser.jpg";
+  if(n.includes("فطيرة"))return "./small-pie.jpg";
+  return "";
 }
-
 function unitFor(unit){
-if(unit==="loaf")return"للقالب كامل";
-if(unit==="pack")return"للباكت";
-return"للقطعة";
+  if(unit==="loaf")return "للقالب كامل";
+  if(unit==="pack")return "للباكت";
+  return "للقطعة";
 }
 
 async function loadProducts(){
-const box=$("products");
-const cacheKey="loqma_products_cache_v1";
-let hasCache=false;
-
-try{
-const saved=localStorage.getItem(cacheKey);
-if(saved){
-const cached=JSON.parse(saved);
-if(Array.isArray(cached)&&cached.length){
-products=cached;
-hasCache=true;
-render();
-$("count").textContent=products.length+" صنف • نسخة محفوظة";
-}
-}
-}catch(e){
-console.warn("Loqma cache:",e);
-}
-
-if(!hasCache){
-box.innerHTML='<div class="status">بنحمّل الأصناف والأسعار…</div>';
-}
-
-try{
-if(!navigator.onLine){
-if(hasCache)return;
-throw new Error("لا يوجد اتصال بالإنترنت ولا توجد نسخة محفوظة.");
-}
-
-const url=
-SUPABASE_URL+
-"/rest/v1/product_catalog?select=id,product_name,weight_grams,sale_unit,price_piasters,is_active,display_order&is_active=eq.true&order=display_order.asc";
-
-const response=await fetch(url,{
-headers:{
-apikey:SUPABASE_KEY,
-Accept:"application/json"
-}
-});
-
-if(!response.ok){
-throw new Error("تعذر تحميل الأصناف ("+response.status+")");
-}
-
-const rows=await response.json();
-if(!Array.isArray(rows)){
-throw new Error("استجابة غير متوقعة من قاعدة البيانات.");
-}
-
-const fresh=rows.map(row=>({
-id:String(row.id),
-name:String(row.product_name||""),
-price:Number(row.price_piasters)/100,
-category:categoryFor(row.product_name),
-icon:iconFor(row.product_name),
-unit:unitFor(row.sale_unit)
-})).filter(p=>p.name&&Number.isFinite(p.price)&&p.price>=0);
-
-if(!fresh.length){
-throw new Error("لا توجد أصناف مفعّلة حاليًا.");
-}
-
-products=fresh;
-localStorage.setItem(cacheKey,JSON.stringify(products));
-render();
-
-}catch(error){
-console.error("Loqma catalog:",error);
-if(hasCache){
-render();
-$("count").textContent=products.length+" صنف • نسخة محفوظة";
-}else{
-$("count").textContent="تعذر التحميل";
-box.innerHTML=
-'<div class="status">مش قادرين نحمّل الأصناف دلوقتي.<br>'+
-escapeHTML(error.message)+
-'<br><button class="primary" id="retry-products" style="margin-top:12px">إعادة المحاولة</button></div>';
-}
-}
+  const box=$("products"),cacheKey="loqma_products_cache_v1";
+  let hasCache=false;
+  try{
+    const saved=localStorage.getItem(cacheKey);
+    if(saved){
+      const cached=JSON.parse(saved);
+      if(Array.isArray(cached)&&cached.length){
+        products=cached;hasCache=true;render();
+        $("count").textContent=products.length+" صنف • نسخة محفوظة";
+      }
+    }
+  }catch(e){console.warn("Loqma cache:",e);}
+  if(!hasCache)box.innerHTML='<div class="status">بنحمّل الأصناف والأسعار…</div>';
+  try{
+    if(!navigator.onLine){if(hasCache)return;throw new Error("لا يوجد اتصال بالإنترنت ولا توجد نسخة محفوظة.");}
+    const url=SUPABASE_URL+"/rest/v1/product_catalog?select=id,product_name,weight_grams,sale_unit,price_piasters,is_active,display_order&is_active=eq.true&order=display_order.asc";
+    const response=await fetch(url,{headers:{apikey:SUPABASE_KEY,Accept:"application/json"}});
+    if(!response.ok)throw new Error("تعذر تحميل الأصناف ("+response.status+")");
+    const rows=await response.json();
+    if(!Array.isArray(rows))throw new Error("استجابة غير متوقعة من قاعدة البيانات.");
+    const fresh=rows.map(row=>({
+      id:String(row.id),name:String(row.product_name||""),price:Number(row.price_piasters)/100,
+      category:categoryFor(row.product_name),icon:iconFor(row.product_name),unit:unitFor(row.sale_unit)
+    })).filter(p=>p.name&&Number.isFinite(p.price)&&p.price>=0);
+    if(!fresh.length)throw new Error("لا توجد أصناف مفعّلة حاليًا.");
+    products=fresh;localStorage.setItem(cacheKey,JSON.stringify(products));render();
+  }catch(error){
+    console.error("Loqma catalog:",error);
+    if(hasCache){render();$("count").textContent=products.length+" صنف • نسخة محفوظة";}
+    else{
+      $("count").textContent="تعذر التحميل";
+      box.innerHTML='<div class="status">مش قادرين نحمّل الأصناف دلوقتي.<br>'+escapeHTML(error.message)+'<br><button class="primary" id="retry-products" style="margin-top:12px">إعادة المحاولة</button></div>';
+    }
+  }
 }
 
 function render(){
-const search=$("search").value.trim();
-const filtered=products.filter(p=>
-(currentCategory==="all"||p.category===currentCategory)&&
-p.name.includes(search)
-);
-
-$("count").textContent=filtered.length+" صنف";
-
-$("products").innerHTML=filtered.length
-?filtered.map(p=>{
-const image=imageFor(p.name);
-return `
-<article class="product">
-<div class="product-image">
-${
-image
-?`<img src="${image}" alt="${escapeHTML(p.name)}" loading="lazy" decoding="async" onerror="this.style.display='none';this.parentElement.textContent='${p.icon}'">`
-:p.icon
+  const search=$("search").value.trim();
+  const filtered=products.filter(p=>(currentCategory==="all"||p.category===currentCategory)&&p.name.includes(search));
+  $("count").textContent=filtered.length+" صنف";
+  $("products").innerHTML=filtered.length?filtered.map(p=>{
+    const image=imageFor(p.name);
+    return `<article class="product">
+      <div class="product-image">${image
+        ?`<img src="${image}" alt="${escapeHTML(p.name)}" loading="lazy" decoding="async" onerror="this.style.display='none';this.parentElement.textContent='${p.icon}'">`
+        :p.icon}</div>
+      <h3>${escapeHTML(p.name)}</h3><div class="unit">${escapeHTML(p.unit)}</div>
+      <div class="product-bottom"><div class="price">${money(p.price)}</div>
+      ${cart[p.id]?`<div class="qty"><button data-action="minus" data-id="${escapeHTML(p.id)}">−</button>${cart[p.id]}<button data-action="plus" data-id="${escapeHTML(p.id)}">+</button></div>`
+      :`<button class="add" data-action="plus" data-id="${escapeHTML(p.id)}">+</button>`}</div>
+    </article>`;
+  }).join(""):'<div class="empty">مفيش أصناف مطابقة للبحث</div>';
+  updateCart();
 }
-</div>
-<h3>${escapeHTML(p.name)}</h3>
-<div class="unit">${escapeHTML(p.unit)}</div>
-<div class="product-bottom">
-<div class="price">${money(p.price)}</div>
-${
-cart[p.id]
-?`
-<div class="qty">
-<button data-action="minus" data-id="${escapeHTML(p.id)}">−</button>
-${cart[p.id]}
-<button data-action="plus" data-id="${escapeHTML(p.id)}">+</button>
-</div>
-`
-:`
-<button class="add" data-action="plus" data-id="${escapeHTML(p.id)}">+</button>
-`
-}
-</div>
-</article>
-`;
-}).join("")
-:'<div class="empty">مفيش أصناف مطابقة للبحث</div>';
-
-updateCart();
-}
-
 function updateCart(){
-let count=0;
-let total=0;
-
-products.forEach(p=>{
-count+=cart[p.id]||0;
-total+=p.price*(cart[p.id]||0);
-});
-
-$("cart-count").textContent=count?count+" قطعة في السلة":"السلة فاضية";
-$("cart-total").textContent=count?"الإجمالي "+money(total):"ابدأ بإضافة الأصناف";
-$("open-cart").disabled=!count;
-$("grand-total").textContent=money(total);
+  let count=0,total=0;
+  products.forEach(p=>{count+=cart[p.id]||0;total+=p.price*(cart[p.id]||0);});
+  $("cart-count").textContent=count?count+" قطعة في السلة":"السلة فاضية";
+  $("cart-total").textContent=count?"الإجمالي "+money(total):"ابدأ بإضافة الأصناف";
+  $("open-cart").disabled=!count;$("grand-total").textContent=money(total);
 }
-
 $("products").addEventListener("click",event=>{
-if(event.target.closest("#retry-products")){
-loadProducts();
-return;
-}
-const button=event.target.closest("[data-action]");
-if(!button)return;
-
-const id=button.dataset.id;
-cart[id]=Math.max(0,(cart[id]||0)+(button.dataset.action==="plus"?1:-1));
-if(!cart[id])delete cart[id];
-render();
+  if(event.target.closest("#retry-products")){loadProducts();return;}
+  const button=event.target.closest("[data-action]");if(!button)return;
+  const id=button.dataset.id;
+  cart[id]=Math.max(0,(cart[id]||0)+(button.dataset.action==="plus"?1:-1));
+  if(!cart[id])delete cart[id];render();
 });
-
 $("categories").addEventListener("click",event=>{
-const button=event.target.closest("[data-cat]");
-if(!button)return;
-
-currentCategory=button.dataset.cat;
-document.querySelectorAll(".category").forEach(b=>
-b.classList.toggle("active",b===button)
-);
-render();
+  const button=event.target.closest("[data-cat]");if(!button)return;
+  currentCategory=button.dataset.cat;
+  document.querySelectorAll(".category").forEach(b=>b.classList.toggle("active",b===button));
+  render();
 });
-
 $("search").addEventListener("input",render);
-
 const modal=$("modal");
-
 $("open-cart").onclick=()=>{
-$("cart-items").innerHTML=products
-.filter(p=>cart[p.id])
-.map(p=>`
-<div class="cart-row">
-<span>
-${escapeHTML(p.name)}<br>
-${cart[p.id]} × ${money(p.price)}
-</span>
-<b>${money(p.price*cart[p.id])}</b>
-</div>
-`)
-.join("");
-modal.classList.add("show");
+  $("cart-items").innerHTML=products.filter(p=>cart[p.id]).map(p=>
+    `<div class="cart-row"><span>${escapeHTML(p.name)}<br>${cart[p.id]} × ${money(p.price)}</span><b>${money(p.price*cart[p.id])}</b></div>`
+  ).join("");
+  modal.classList.add("show");
 };
-
 $("close-cart").onclick=()=>modal.classList.remove("show");
+modal.addEventListener("click",event=>{if(event.target===modal)modal.classList.remove("show");});
+$("clear-cart").onclick=()=>{Object.keys(cart).forEach(k=>delete cart[k]);modal.classList.remove("show");render();};
+window.addEventListener("online",()=>{if(!storeMain.hidden)loadProducts();});
 
-modal.addEventListener("click",event=>{
-if(event.target===modal)modal.classList.remove("show");
-});
-
-$("clear-cart").onclick=()=>{
-Object.keys(cart).forEach(k=>delete cart[k]);
-modal.classList.remove("show");
-render();
-};
-
-window.addEventListener("online",()=>{
-if(!storeMain.hidden)loadProducts();
-});
-
-let initialSessionHandled=false;
-
+/* حساب المواعيد حسب توقيت القاهرة حتى لو ساعة الهاتف مختلفة */
+function zonedParts(date){
+  const parts=new Intl.DateTimeFormat("en-CA",{
+    timeZone:TIME_ZONE,year:"numeric",month:"2-digit",day:"2-digit",
+    hour:"2-digit",minute:"2-digit",second:"2-digit",hourCycle:"h23"
+  }).formatToParts(date);
+  const o={};parts.forEach(p=>{if(p.type!=="literal")o[p.type]=Number(p.value);});
+  return {year:o.year,month:o.month,day:o.day,hour:o.hour,minute:o.minute,second:o.second};
+}
+function localDateString(p){
+  return `${p.year}-${String(p.month).padStart(2,"0")}-${String(p.day).padStart(2,"0")}`;
+}
+function addDays(dateString,days){
+  const [y,m,d]=dateString.split("-").map(Number);
+  const x=new Date(Date.UTC(y,m-1,d+days));
+  return `${x.getUTCFullYear()}-${String(x.getUTCMonth()+1).padStart(2,"0")}-${String(x.getUTCDate()).padStart(2,"0")}`;
+}
+function localToUtc(dateString,timeString){
+  const [y,m,d]=dateString.split("-").map(Number);
+  const [hh,mm,ss=0]=String(timeString).split(":").map(Number);
+  const target=Date.UTC(y,m-1,d,hh,mm,ss);
+  let guess=target;
+  for(let i=0;i<3;i++){
+    const p=zonedParts(new Date(guess));
+    const represented=Date.UTC(p.year,p.month-1,p.day,p.hour,p.minute,p.second);
+    guess+=target-represented;
+  }
+  return new Date(guess);
+}
+function formatLocalDate(dateString){
+  const [y,m,d]=dateString.split("-").map(Number);
+  return new Intl.DateTimeFormat("ar-EG",{timeZone:TIME_ZONE,weekday:"long",day:"numeric",month:"long"})
+    .format(new Date(Date.UTC(y,m-1,d,12)));
+}
+function stopCountdown(){if(countdownInterval){clearInterval(countdownInterval);countdownInterval=null;}}
+function countdownTick(){
+  if(!appSettings)return;
+  const now=new Date(),p=zonedParts(now),today=localDateString(p);
+  const cutoff=appSettings.order_cutoff_time||"22:00:00";
+  const start=appSettings.delivery_start_time||"06:00:00";
+  const end=appSettings.delivery_end_time||"08:00:00";
+  const todayCutoff=localToUtc(today,cutoff);
+  const isBefore=now<todayCutoff;
+  const closeDate=isBefore?today:addDays(today,1);
+  const deliveryDate=isBefore?addDays(today,1):addDays(today,2);
+  const closeAt=localToUtc(closeDate,cutoff);
+  const deliveryStart=localToUtc(deliveryDate,start);
+  const deliveryEnd=localToUtc(deliveryDate,end);
+  let remaining=Math.max(0,closeAt-now);
+  const days=Math.floor(remaining/86400000);remaining%=86400000;
+  const hours=Math.floor(remaining/3600000);remaining%=3600000;
+  const minutes=Math.floor(remaining/60000);remaining%=60000;
+  const seconds=Math.floor(remaining/1000);
+  $("cd-days").textContent=String(days).padStart(2,"0");
+  $("cd-hours").textContent=String(hours).padStart(2,"0");
+  $("cd-minutes").textContent=String(minutes).padStart(2,"0");
+  $("cd-seconds").textContent=String(seconds).padStart(2,"0");
+  $("count-title").textContent=isBefore?"الحجز المسبق لبكرة":"الحجز المسبق لليوم التالي";
+  $("count-message").textContent=isBefore
+    ?"لسه عندك وقت تحجز عيشك الطازة قبل إغلاق الحجز الساعة "+cutoff.slice(0,5)+"."
+    :"طلبات اليوم اتقفلت. احجز دلوقتي للتوصيل في اليوم اللي بعده.";
+  const dateLabel=formatLocalDate(deliveryDate);
+  $("delivery-line").innerHTML=`موعد التوصيل المتوقع: <b>${dateLabel} من ${start.slice(0,5)} إلى ${end.slice(0,5)}</b>`;
+}
+async function loadAppSettings(){
+  try{
+    const {data,error}=await supabaseClient.from("app_settings")
+      .select("order_cutoff_time,delivery_start_time,delivery_end_time,timezone")
+      .limit(1).maybeSingle();
+    if(error)throw error;
+    if(!data)throw new Error("لا توجد إعدادات مواعيد مسجلة.");
+    appSettings=data;
+    stopCountdown();countdownTick();countdownInterval=setInterval(countdownTick,1000);
+  }catch(error){
+    console.warn("Loqma app settings:",error);
+    $("count-message").textContent="مواعيد الحجز والتوصيل غير متاحة حاليًا. حاول مرة أخرى لاحقًا.";
+    $("delivery-line").textContent="موعد التوصيل: سيتم تأكيده قبل تشغيل الطلبات.";
+    ["cd-days","cd-hours","cd-minutes","cd-seconds"].forEach(id=>$(id).textContent="--");
+  }
+}
 async function initializeAuth(){
-try{
-const {data,error}=await supabaseClient.auth.getSession();
-if(error)throw error;
-
-initialSessionHandled=true;
-setSignedIn(!!data.session);
-if(data.session)loadProducts();
-
-}catch(error){
-console.error("Session error:",error);
-authMessage.textContent="تعذر التحقق من تسجيل الدخول. تأكد من الإنترنت وحاول تحديث الصفحة.";
+  try{
+    const {data,error}=await supabaseClient.auth.getSession();
+    if(error)throw error;
+    initialSessionHandled=true;setSignedIn(!!data.session);
+    if(data.session){loadProducts();loadAppSettings();}
+  }catch(error){
+    console.error("Session error:",error);
+    authMessage.textContent="تعذر التحقق من تسجيل الدخول. تأكد من الإنترنت وحاول تحديث الصفحة.";
+  }
 }
-}
-
 supabaseClient.auth.onAuthStateChange((event,session)=>{
-if(!initialSessionHandled)return;
-setSignedIn(!!session);
-if(session)loadProducts();
+  if(!initialSessionHandled)return;
+  setSignedIn(!!session);
+  if(session){loadProducts();loadAppSettings();}
 });
 
-/* تثبيت لُقمة على أندرويد والأجهزة المدعومة */
+/* تثبيت لُقمة على الأجهزة المدعومة */
 let installPromptEvent=null;
-const installHelp=$("install-help");
-const installButton=$("install-app");
-const installText=$("install-text");
-
+const installHelp=$("install-help"),installButton=$("install-app"),installText=$("install-text");
 window.addEventListener("beforeinstallprompt",event=>{
-event.preventDefault();
-installPromptEvent=event;
-installHelp.style.display="block";
-installButton.style.display="inline-block";
-installText.textContent="اضغط تثبيت لإضافة لُقمة للشاشة الرئيسية.";
+  event.preventDefault();installPromptEvent=event;
+  installHelp.style.display="block";installButton.style.display="inline-block";
+  installText.textContent="اضغط تثبيت لإضافة لُقمة للشاشة الرئيسية.";
 });
-
 installButton.addEventListener("click",async()=>{
-if(!installPromptEvent)return;
-installPromptEvent.prompt();
-await installPromptEvent.userChoice;
-installPromptEvent=null;
-installButton.style.display="none";
+  if(!installPromptEvent)return;
+  installPromptEvent.prompt();await installPromptEvent.userChoice;
+  installPromptEvent=null;installButton.style.display="none";
 });
-
 window.addEventListener("appinstalled",()=>{
-installHelp.style.display="block";
-installText.textContent="تم تثبيت لُقمة على جهازك بنجاح ❤️";
-installButton.style.display="none";
+  installHelp.style.display="block";installText.textContent="تم تثبيت لُقمة على جهازك بنجاح ❤️";
+  installButton.style.display="none";
 });
-
 function showManualInstallHelp(){
-if(window.matchMedia("(display-mode: standalone)").matches)return;
-installHelp.style.display="block";
-installText.textContent=/Android/i.test(navigator.userAgent)
-?"من Chrome اضغط ⋮ ثم (تثبيت التطبيق) أو (إضافة إلى الشاشة الرئيسية). لو ظهر أن تخطيط الشاشة الرئيسية مقفول، افتح إعدادات الشاشة الرئيسية في هاتفك وأوقف قفل التخطيط."
-:"افتح خيارات المتصفح واختر إضافة إلى الشاشة الرئيسية.";
+  if(window.matchMedia("(display-mode: standalone)").matches)return;
+  installHelp.style.display="block";
+  installText.textContent=/Android/i.test(navigator.userAgent)
+    ?"من Chrome اضغط ⋮ ثم (تثبيت التطبيق) أو (إضافة إلى الشاشة الرئيسية)."
+    :"من Safari اضغط زر المشاركة ثم (إضافة إلى الشاشة الرئيسية).";
 }
-
 window.addEventListener("load",showManualInstallHelp);
 initializeAuth();
 
-if("serviceWorker"in navigator){
-window.addEventListener("load",()=>{
-navigator.serviceWorker
-.register("./sw.js")
-.catch(error=>console.warn("Service Worker:",error));
-});
+if("serviceWorker" in navigator){
+  window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js")
+    .catch(error=>console.warn("Service Worker:",error)));
 }
 </script>
-
 </body>
 </html>
