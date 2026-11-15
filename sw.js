@@ -1,4 +1,5 @@
-const CACHE_NAME = "loqma-v7";
+
+const CACHE_NAME = "loqma-v8";
 
 const APP_SHELL = [
   "./",
@@ -28,11 +29,9 @@ self.addEventListener("activate", event => {
 
 self.addEventListener("fetch", event => {
   const request = event.request;
-
   if (request.method !== "GET") return;
 
   const url = new URL(request.url);
-
   if (url.origin !== self.location.origin) return;
 
   event.respondWith(
@@ -42,12 +41,8 @@ self.addEventListener("fetch", event => {
       return fetch(request).then(response => {
         if (response && response.ok) {
           const copy = response.clone();
-
-          caches.open(CACHE_NAME).then(cache => {
-            cache.put(request, copy);
-          });
+          caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
         }
-
         return response;
       }).catch(() => caches.match("./index.html"));
     })
