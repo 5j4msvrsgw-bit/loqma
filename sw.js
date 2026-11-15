@@ -1,5 +1,5 @@
 
-const CACHE_NAME = "loqma-v8";
+const CACHE_NAME = "loqma-v9";
 
 const APP_SHELL = [
   "./",
@@ -29,11 +29,39 @@ self.addEventListener("activate", event => {
 
 self.addEventListener("fetch", event => {
   const request = event.request;
+
   if (request.method !== "GET") return;
 
   const url = new URL(request.url);
+
   if (url.origin !== self.location.origin) return;
 
+  // تحديث صفحات التطبيق من الإنترنت أولاً
+  if (
+    request.mode === "navigate" ||
+    url.pathname.endsWith("/index.html")
+  ) {
+    event.respondWith((async () => {
+      try {
+        const response = await fetch(request);
+
+        if (response && response.ok) {
+          const cache = await caches.open(CACHE_NAME);
+          await cache.put(request, response.clone());
+        }
+
+        return response;
+      } catch {
+        return (await caches.match(request))
+          || (await caches.match("./index.html"))
+          || Response.error();
+      }
+    })());
+
+    return;
+  }
+
+  // الملفات الأخرى: استخدم النسخة المحفوظة أولاً
   event.respondWith(
     caches.match(request).then(cached => {
       if (cached) return cached;
@@ -41,10 +69,17 @@ self.addEventListener("fetch", event => {
       return fetch(request).then(response => {
         if (response && response.ok) {
           const copy = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
+
+          caches.open(CACHE_NAME)
+            .then(cache => cache.put(request, copy));
         }
+
         return response;
-      }).catch(() => caches.match("./index.html"));
+      }).catch(() =>
+        caches.match(request).then(
+          cached => cached || Response.error()
+        )
+      );
     })
   );
 });
