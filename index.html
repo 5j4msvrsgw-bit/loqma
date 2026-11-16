@@ -58,7 +58,7 @@ header{color:white;background:radial-gradient(circle at 90% 5%,#c6a66b30,transpa
 <main class="container" id="store-main" hidden>
 <div class="notice" id="store-notice">🚚 التوصيل متاح حاليًا في أكتوبر الجديدة – غرب المطار. اطلب قبل موعد الإغلاق اليومي.</div>
 <div class="quick-actions"><button type="button" id="open-wallet-card">💳 المحفظة</button><button type="button" id="open-account-card">👤 بيانات حسابك</button><button type="button" id="open-my-orders">📦 متابعة طلباتي</button></div>
-<section class="panel" id="account-panel" hidden><div class="section" style="margin:0 0 10px"><h2>بيانات حسابك</h2><button class="small-btn" data-close-panel="account-panel">إغلاق</button></div><div class="fields"><div class="two"><div><label for="profile-name">الاسم</label><input id="profile-name" maxlength="100" placeholder="اسم العميل"></div><div><label for="profile-phone">رقم الموبايل</label><input id="profile-phone" type="tel" inputmode="tel" maxlength="20" placeholder="01xxxxxxxxx"></div></div><button class="primary" id="save-profile" type="button">حفظ البيانات</button><div class="result" id="profile-result"></div></div></section>
+<section class="panel" id="account-panel" hidden><div class="section" style="margin:0 0 10px"><h2>بيانات حسابك</h2><button class="small-btn" data-close-panel="account-panel">إغلاق</button></div><div class="fields"><div class="two"><div><label for="profile-name">الاسم</label><input id="profile-name" maxlength="100" placeholder="اسم العميل"></div><div><label for="profile-phone">رقم الموبايل</label><input id="profile-phone" type="tel" inputmode="tel" maxlength="20" placeholder="01xxxxxxxxx"></div></div><button class="primary" id="save-profile" type="button">حفظ البيانات</button><div class="result" id="profile-result"></div><div style="margin-top:16px"><h3 style="font-size:14px">عناوين التوصيل المحفوظة</h3><div id="profile-addresses" class="result">جاري تحميل العناوين…</div></div></div></section>
 <section class="panel" id="wallet-panel" hidden><div class="section" style="margin:0 0 8px"><h2>محفظة لُقمة</h2><div><button class="small-btn" data-close-panel="wallet-panel">إغلاق</button> <button class="primary" id="wallet-refresh">تحديث الرصيد</button></div></div><div class="wallet-number" id="wallet-balance">جاري تحميل الرصيد…</div><div class="notice">الرصيد مخصص للطلبات داخل لُقمة ولا يمكن سحبه نقدًا.</div><h4>شحن المحفظة</h4><div class="fields"><div><label for="topup-amount">المبلغ بالجنيه</label><input id="topup-amount" type="number" min="1" max="10000000" step="0.01" placeholder="مثال: 100"></div><div><label for="topup-method">طريقة التحويل</label><select id="topup-method"><option value="vodafone_cash">فودافون كاش</option><option value="instapay">إنستاباي</option></select></div><div class="wallet-grid"><div><label>رقم فودافون كاش</label><div class="wallet-number" id="voda-number">—</div><button class="small-btn" data-copy="voda-number">نسخ الرقم</button></div><div><label>معرّف إنستاباي</label><div class="wallet-number" id="insta-number">—</div><button class="small-btn" data-copy="insta-number">نسخ المعرّف</button></div></div><div><label for="transfer-reference">رقم العملية / مرجع التحويل *</label><input id="transfer-reference" maxlength="120" placeholder="اكتب رقم العملية بعد التحويل"></div><div><label for="topup-proof">صورة إثبات التحويل (اختياري)</label><input id="topup-proof" type="file" accept="image/jpeg,image/png,image/webp"></div><button class="primary" id="submit-topup">إرسال طلب الشحن للمراجعة</button><div class="result" id="topup-result"></div></div><h4>آخر حركات المحفظة</h4><div id="wallet-history" class="result">لا توجد حركات بعد.</div><h4>طلبات الشحن السابقة</h4><div id="my-topups" class="result">لا توجد طلبات شحن.</div></section>
 <section class="panel" id="my-orders-panel" hidden><div class="section" style="margin:0 0 10px"><h2>طلباتي واشتراكاتي</h2><button class="small-btn" data-close-panel="my-orders-panel">إغلاق</button></div><div id="my-orders-list">جاري تحميل الطلبات…</div></section>
 <div class="section"><h2>اختار من المخبوزات</h2><span id="count">جاري تحميل الأصناف…</span></div>
@@ -79,11 +79,16 @@ header{color:white;background:radial-gradient(circle at 90% 5%,#c6a66b30,transpa
 <div><label for="subscription-type">نوع الطلب</label><select id="subscription-type"><option value="daily">يومي — 5 جنيه توصيل + 1 جنيه خدمة</option><option value="weekly">أسبوعي — 20 جنيه توصيل + 1 جنيه خدمة للأسبوع كله</option></select></div>
 <div id="weekly-mode-wrap" hidden><label for="weekly-mode">طريقة الاشتراك الأسبوعي</label><select id="weekly-mode"><option value="fixed">ثابت: نفس الأصناف والكميات كل يوم</option><option value="flexible">متغير: أختار الأصناف والكميات لكل يوم</option></select></div>
 <div><label for="delivery-date">تاريخ أول توصيل</label><input id="delivery-date" type="date"></div></div><div id="flexible-days" hidden></div></div>
-<div class="panel"><h4>2) عنوان التوصيل — غرب المطار</h4><div class="fields">
+<div class="panel"><h4>2) عنوان التوصيل</h4><div class="fields">
+<div><label for="saved-address-select">اختار عنوان التوصيل</label><select id="saved-address-select" class="filter-input"><option value="new">＋ إضافة عنوان جديد</option></select></div>
+<div class="notice" id="saved-address-note">جاري تحميل عناوينك المحفوظة…</div>
+<div id="new-address-fields">
 <div><label for="addr-street">الشارع *</label><input id="addr-street" maxlength="200" placeholder="اسم الشارع"></div>
 <div class="two"><div><label for="addr-building">رقم العمارة</label><input id="addr-building" maxlength="80"></div><div><label for="addr-floor">الدور</label><input id="addr-floor" maxlength="40"></div></div>
 <div class="two"><div><label for="addr-apartment">الشقة</label><input id="addr-apartment" maxlength="40"></div><div><label for="addr-landmark">علامة مميزة</label><input id="addr-landmark" maxlength="150"></div></div>
-<div><label for="addr-notes">ملاحظات للمندوب</label><textarea id="addr-notes" rows="2" maxlength="300"></textarea></div><div><label for="customer-notes">ملاحظات الطلب (اختياري)</label><textarea id="customer-notes" rows="2" maxlength="300"></textarea></div>
+<div><label for="addr-notes">ملاحظات للمندوب</label><textarea id="addr-notes" rows="2" maxlength="300"></textarea></div>
+</div>
+<div><label for="customer-notes">ملاحظات الطلب (اختياري)</label><textarea id="customer-notes" rows="2" maxlength="300"></textarea></div>
 </div></div>
 <div class="panel"><h4>3) طريقة الدفع ومراجعة الرسوم</h4><div class="fields"><label for="order-payment">طريقة الدفع</label><select id="order-payment"><option value="cash_on_delivery">نقدًا عند الاستلام</option><option value="wallet" disabled>المحفظة — غير مفعلة حاليًا</option></select></div><div class="notice" id="checkout-summary">الحد الأدنى 30 جنيهًا من المنتجات لكل يوم توصيل.</div><div class="warning" style="margin-top:9px">الدفع النقدي عند الاستلام هو المتاح حاليًا. شحن المحفظة وتسجيل الرصيد متاحان.</div><button class="primary" id="place-order" style="width:100%;margin-top:11px">تأكيد الطلب</button><div class="result" id="order-result"></div></div>
 <button id="clear-cart" class="danger" style="margin-top:10px">إفراغ السلة</button>
@@ -92,12 +97,12 @@ header{color:white;background:radial-gradient(circle at 90% 5%,#c6a66b30,transpa
 <script>
 "use strict";
 const SUPABASE_URL="https://dvidxumpkgthubassfxm.supabase.co";
-const SUPABASE_KEY="sb_publishable_d5hFIwK_aLxzsF2WZt7uvg_iHZCESFs";
+const SUPABASE_KEY="sb_publishable_d5hFIWk_aLxzsF2WZt7uvg_iHZCESFs";
 const MIN_DAILY=30, DAILY_DELIVERY=5, DAILY_SERVICE=1, WEEKLY_DELIVERY=20, WEEKLY_SERVICE=1;
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 const $=id=>document.getElementById(id), money=n=>(Number(n)||0).toFixed(2)+" ج";
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-let user=null,staff=null,products=[],category="all",authReady=false,ordersCache=[],jobsCache=[],bakeriesCache=[],staffCache=[],adminTab="orders";
+let user=null,staff=null,products=[],category="all",authReady=false,ordersCache=[],jobsCache=[],bakeriesCache=[],staffCache=[],adminTab="orders",savedAddresses=[];
 const cart={};
 function cartKey(){return "loqma_cart_"+(user?.id||"guest")}
 function saveCart(){try{localStorage.setItem(cartKey(),JSON.stringify(cart))}catch{}}
@@ -126,7 +131,7 @@ $("products").addEventListener("click",e=>{const b=e.target.closest("[data-actio
 $("categories").addEventListener("click",e=>{const b=e.target.closest("[data-cat]");if(!b)return;category=b.dataset.cat;document.querySelectorAll(".category").forEach(x=>x.classList.toggle("active",x===b));render()});
 $("search").addEventListener("input",render);
 const modal=$("modal");
-$("open-cart").onclick=()=>{renderCartRows();$("order-result").innerHTML="";$("place-order").disabled=false;$("place-order").textContent="تأكيد الطلب";refreshSummary();modal.classList.add("show")};
+$("open-cart").onclick=async()=>{try{await loadCheckoutAddresses()}catch(e){console.warn("addresses",e)}renderCartRows();$("order-result").innerHTML="";$("place-order").disabled=false;$("place-order").textContent="تأكيد الطلب";refreshSummary();modal.classList.add("show")};
 function renderCartRows(){$("cart-items").innerHTML=products.filter(p=>cart[p.id]).map(p=>`<div class="cart-row"><span>${esc(p.name)}<br>${cart[p.id]} × ${money(p.price)}</span><b>${money(p.price*cart[p.id])}</b></div>`).join("")}
 $("close-cart").onclick=()=>modal.classList.remove("show");modal.addEventListener("click",e=>{if(e.target===modal)modal.classList.remove("show")});
 $("clear-cart").onclick=()=>{clearCart();modal.classList.remove("show")};
@@ -142,24 +147,58 @@ function getDays(){const type=$("subscription-type").value,mode=$("weekly-mode")
 function refreshSummary(){try{const type=$("subscription-type").value,mode=$("weekly-mode").value,days=getDays(),subtotal=days.reduce((s,d)=>s+valueOf(d.items),0);$("checkout-summary").textContent=type==="daily"?"منتجات "+money(subtotal)+" + توصيل 5.00 ج + خدمة 1.00 ج = "+money(subtotal+6)+". الحد الأدنى 30 جنيهًا.":(mode==="fixed"?"اشتراك أسبوعي ثابت":"اشتراك أسبوعي متغير")+" • مجموع المنتجات "+money(subtotal)+" • رسوم الأسبوع 21.00 ج. الحد الأدنى 30 جنيهًا لكل يوم."}catch(e){$("checkout-summary").textContent=e.message}}
 $("subscription-type").onchange=()=>{$("weekly-mode-wrap").hidden=$("subscription-type").value!=="weekly";drawFlexible();refreshSummary()};
 $("weekly-mode").onchange=()=>{drawFlexible();refreshSummary()};$("delivery-date").min=todayLocal();$("delivery-date").value=todayLocal();$("delivery-date").onchange=()=>{drawFlexible();refreshSummary()};$("flexible-days").addEventListener("input",refreshSummary);
+
+function addressLabel(a){return [a.label||"المنزل",a.area,a.street,a.building&&"عمارة "+a.building,a.floor&&"دور "+a.floor,a.apartment&&"شقة "+a.apartment,a.landmark&&"علامة مميزة: "+a.landmark].filter(Boolean).join(" — ")}
+function renderProfileAddresses(){
+ const host=$("profile-addresses");if(!host)return;
+ host.innerHTML=savedAddresses.length?savedAddresses.map(a=>'<div class="admin-item"><b>'+esc(a.label||"عنوان التوصيل")+'</b> '+(a.is_default?'<span class="badge">العنوان الافتراضي</span>':'')+'<br>'+esc(addressLabel(a))+'</div>').join(""):"لم تحفظ عنوان توصيل بعد. أول عنوان تضيفه سيُحفظ تلقائيًا لاستخدامه في طلباتك القادمة.";
+}
+function updateAddressSelection(){
+ const select=$("saved-address-select");if(!select)return;
+ const id=select.value,chosen=savedAddresses.find(a=>a.id===id),fields=$("new-address-fields");
+ if(fields)fields.hidden=id!=="new";
+ $("saved-address-note").textContent=chosen?"العنوان المختار: "+addressLabel(chosen):"أدخل عنوانك مرة واحدة، وسيُحفظ لاستخدامه في طلباتك القادمة.";
+}
+async function loadCheckoutAddresses(){
+ if(!user)return;
+ const {data,error}=await sb.from("addresses").select("id,label,governorate,city,area,street,building,floor,apartment,landmark,delivery_notes,is_default,created_at").eq("user_id",user.id).eq("is_active",true).order("is_default",{ascending:false}).order("created_at",{ascending:false});
+ if(error){$("saved-address-note").textContent="تعذر تحميل العناوين: "+error.message;throw error}
+ savedAddresses=data||[];
+ const select=$("saved-address-select"),previous=select.value;
+ select.innerHTML='<option value="new">＋ إضافة عنوان جديد</option>'+savedAddresses.map(a=>'<option value="'+esc(a.id)+'">'+esc(addressLabel(a))+(a.is_default?" — افتراضي":"")+'</option>').join("");
+ const preferred=savedAddresses.find(a=>a.id===previous)||savedAddresses.find(a=>a.is_default)||savedAddresses[0];
+ select.value=preferred?preferred.id:"new";updateAddressSelection();renderProfileAddresses();
+}
+$("saved-address-select").addEventListener("change",updateAddressSelection);
+
 async function submitOrder(){
  const btn=$("place-order"),out=$("order-result");
  try{
   if(!user)throw Error("سجل الدخول أولًا.");if($("order-payment").value!=="cash_on_delivery")throw Error("طريقة الدفع المختارة غير متاحة حاليًا.");
-  const street=$("addr-street").value.trim(),customerName=$("profile-name").value.trim(),customerPhone=$("profile-phone").value.trim();
-  if(!street)throw Error("اكتب اسم الشارع.");if(!customerName||!customerPhone)throw Error("احفظ الاسم ورقم الموبايل أولًا من بيانات حسابك.");
+  const customerName=$("profile-name").value.trim(),customerPhone=$("profile-phone").value.trim();
+  if(!customerName||!customerPhone)throw Error("احفظ الاسم ورقم الموبايل أولًا من بيانات حسابك.");
   const days=getDays();days.forEach((d,i)=>{if(!d.items.length)throw Error("اختار أصنافًا ليوم "+(i+1)+".");if(valueOf(d.items)<MIN_DAILY)throw Error("الحد الأدنى للمنتجات 30 جنيهًا في كل يوم توصيل.")});
   btn.disabled=true;btn.textContent="جاري تسجيل الطلب…";out.textContent="";
-  const address={user_id:user.id,label:"المنزل",governorate:"الجيزة",city:"أكتوبر الجديدة",area:"غرب المطار",street,building:$("addr-building").value.trim()||null,floor:$("addr-floor").value.trim()||null,apartment:$("addr-apartment").value.trim()||null,landmark:$("addr-landmark").value.trim()||null,delivery_notes:$("addr-notes").value.trim()||null,is_default:false,is_active:true};
-  const {data:addr,error:addrErr}=await sb.from("addresses").insert(address).select("id").single();if(addrErr)throw addrErr;
-  const type=$("subscription-type").value,{data,error}=await sb.rpc("loqma_place_subscription",{p_address_id:addr.id,p_subscription_type:type,p_weekly_mode:type==="weekly"?$("weekly-mode").value:null,p_days:days,p_idempotency_key:crypto.randomUUID(),p_customer_notes:$("customer-notes").value.trim()||null});
+  let addressId=$("saved-address-select").value;
+  if(addressId==="new"){
+   const street=$("addr-street").value.trim();if(!street)throw Error("اكتب اسم الشارع.");
+   const address={user_id:user.id,label:"المنزل",governorate:"الجيزة",city:"أكتوبر الجديدة",area:"غرب المطار",street,building:$("addr-building").value.trim()||null,floor:$("addr-floor").value.trim()||null,apartment:$("addr-apartment").value.trim()||null,landmark:$("addr-landmark").value.trim()||null,delivery_notes:$("addr-notes").value.trim()||null,is_default:savedAddresses.length===0,is_active:true};
+   const {data:addr,error:addrErr}=await sb.from("addresses").insert(address).select("id").single();if(addrErr)throw addrErr;addressId=addr.id;
+  }else if(!savedAddresses.some(a=>a.id===addressId)){throw Error("عنوان التوصيل المختار غير موجود. حدّث العناوين وحاول مرة أخرى.")}
+  const type=$("subscription-type").value,{data,error}=await sb.rpc("loqma_place_subscription",{p_address_id:addressId,p_subscription_type:type,p_weekly_mode:type==="weekly"?$("weekly-mode").value:null,p_days:days,p_idempotency_key:crypto.randomUUID(),p_customer_notes:$("customer-notes").value.trim()||null});
   if(error)throw error;const total=Number(data.total_amount_piasters)/100;
   out.innerHTML=`<div class="notice">✅ تم تسجيل طلبك بنجاح وهو قيد مراجعة الإدارة.<br>رقم الاشتراك: <b>${esc(data.subscription_number??data.subscription_id)}</b><br>الإجمالي: ${money(total)}<br>عدد أيام التوصيل: ${days.length}</div>`;
-  btn.textContent="تم تسجيل الطلب";clearCart();await loadMyOrders();
+  btn.textContent="تم تسجيل الطلب";clearCart();await loadMyOrders();await loadCheckoutAddresses();
  }catch(e){console.error(e);out.innerHTML='<div class="warning">تعذر تسجيل الطلب: '+esc(e.message||"حاول مرة أخرى.")+'</div>';btn.disabled=false;btn.textContent="تأكيد الطلب"}
 }
 $("place-order").onclick=submitOrder;
-async function loadProfile(){if(!user)return;const {data,error}=await sb.from("profiles").select("full_name,phone").eq("user_id",user.id).maybeSingle();if(!error&&data){$("profile-name").value=data.full_name||"";$("profile-phone").value=data.phone||""}}
+async function loadProfile(){
+ if(!user)return;
+ const {data,error}=await sb.from("profiles").select("full_name,phone").eq("user_id",user.id).maybeSingle();
+ if(error){$("profile-result").textContent="تعذر تحميل بيانات الحساب: "+error.message;return}
+ if(data){$("profile-name").value=data.full_name||"";$("profile-phone").value=data.phone||""}
+ await loadCheckoutAddresses();
+}
 $("save-profile").onclick=async()=>{if(!user)return;const full_name=$("profile-name").value.trim(),phone=$("profile-phone").value.trim();if(!full_name||!phone){$("profile-result").textContent="اكتب الاسم ورقم الموبايل.";return}const {error}=await sb.from("profiles").upsert({user_id:user.id,full_name,phone,updated_at:new Date().toISOString()},{onConflict:"user_id"});$("profile-result").textContent=error?"تعذر الحفظ: "+error.message:"تم حفظ بياناتك."};
 async function loadMyOrders(){if(!user)return;$("my-orders-list").textContent="جاري تحميل الطلبات…";const {data,error}=await sb.from("orders").select("*").eq("customer_id",user.id).order("created_at",{ascending:false}).limit(50);if(error){$("my-orders-list").textContent="تعذر تحميل الطلبات: "+error.message;return}if(!data?.length){$("my-orders-list").textContent="لسه مفيش طلبات مسجلة.";return}const states={pending:"قيد المراجعة",confirmed:"تم التأكيد",preparing:"قيد التجهيز",ready_for_pickup:"جاهز للاستلام من المخبز",out_for_delivery:"خرج للتوصيل",delivered:"تم التسليم",cancelled:"ملغي"};$("my-orders-list").innerHTML=data.map(o=>`<div class="order-card"><div class="order-head"><strong>طلب رقم ${esc(o.order_number||o.id)}</strong><span class="badge">${esc(states[o.status]||o.status)}</span></div><div class="muted">موعد التوصيل: ${esc(o.delivery_date||"—")} • الإجمالي: ${money(Number(o.total_amount_piasters)/100)}</div><div class="muted">تاريخ الطلب: ${new Date(o.created_at).toLocaleString("ar-EG")}</div></div>`).join("")}
 function openPanel(id){const p=$(id);p.hidden=false;p.scrollIntoView({behavior:"smooth",block:"start"});if(id==="wallet-panel")loadWallet();if(id==="my-orders-panel")loadMyOrders()};
