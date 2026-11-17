@@ -89,7 +89,7 @@ header:after{content:"";position:absolute;width:240px;height:240px;border:1px so
 .product-admin-item .small-btn{padding:9px 15px}
 @media(max-width:390px){.product-create-grid{grid-template-columns:1fr}.hero{padding:14px}.hero:after{font-size:60px}}
 
-</style>
+.product-edit-image{height:94px;display:flex;align-items:center;justify-content:center;background:#f1f5ef;border-radius:10px;margin:8px 0;overflow:hidden;color:var(--muted);font-size:11px}.product-edit-image img{height:100%;max-width:100%;object-fit:contain}.image-preview-wrap{height:130px;background:#eef3ec;border-radius:12px;display:grid;place-items:center;margin:8px 0;overflow:hidden}.image-preview-wrap img{max-height:125px;max-width:100%;object-fit:contain}.category-create-row{margin:12px 0 8px}.category-admin-list{display:grid;gap:8px;margin-top:12px}.category-admin-item{display:grid;grid-template-columns:1.5fr .6fr 1fr auto;gap:6px;align-items:center}.category-admin-item .filter-input{min-width:0;font-size:10px;padding:8px 5px}@media(max-width:430px){.category-admin-item{grid-template-columns:1fr 70px}.category-admin-item select{grid-column:1}.category-admin-item button{grid-column:2;grid-row:2}}</style>
 </head>
 <body class="locked">
 <div class="auth-gate" id="auth-gate"><div class="auth-card">
@@ -381,72 +381,44 @@ async function loadDrivers(){
   await loadDrivers();
  });
 }
-async function loadProductAdmin(){
- const host=$("staff-content");
- const {data,error}=await sb.from("product_catalog").select("*").order("display_order");
- if(error){host.innerHTML='<div class="warning">'+esc(error.message)+'</div>';return}
- const rows=data||[];
- const nextOrder=rows.reduce((m,p)=>Math.max(m,Number(p.display_order)||0),0)+1;
- host.innerHTML=`
- <div class="product-admin-intro"><div><b>إدارة كتالوج لُقمة</b><p>أضف صنفًا جديدًا أو عدّل الاسم والسعر والوحدة والتوفر والترتيب. التغييرات تظهر للعميل بعد الحفظ.</p></div><span>🥖</span></div>
- <details class="product-create" open>
-  <summary>＋ إضافة منتج جديد</summary>
-  <div class="fields product-create-grid">
-   <label>اسم المنتج<input class="filter-input" id="new-product-name" maxlength="120" placeholder="مثال: عيش بلدي"></label>
-   <label>اسم المخبز / المصدر<input class="filter-input" id="new-product-source" maxlength="100" value="لُقمة" placeholder="اسم المخبز"></label>
-   <label>السعر بالجنيه<input class="filter-input" id="new-product-price" type="number" min="0.01" step=".01" placeholder="مثال: 2.50"></label>
-   <label>وحدة البيع<select class="filter-input" id="new-product-unit"><option value="piece">للقطعة</option><option value="loaf">للقالب كامل</option><option value="pack">للباكت</option></select></label>
-   <label>الوزن بالجرام (اختياري)<input class="filter-input" id="new-product-weight" type="number" min="1" step="1" placeholder="مثال: 80"></label>
-   <label>ترتيب العرض<input class="filter-input" id="new-product-order" type="number" step="1" value="${nextOrder}"></label>
-  </div>
-  <button class="primary" id="create-product" type="button">إضافة المنتج للكتالوج</button>
-  <div class="result" id="create-product-result" aria-live="polite"></div>
- </details>
- <div class="product-admin-heading"><b>المنتجات الحالية</b><span>${rows.length} صنف</span></div>
- <div class="product-admin-list">${rows.map(p=>`
-  <article class="admin-item product-admin-item">
-   <div class="product-admin-name"><b>${esc(p.product_name)}</b><span class="badge">${p.is_active?"متاح":"متوقف"}</span></div>
-   <div class="two">
-    <label>اسم المنتج<input class="filter-input" id="name-${esc(p.id)}" maxlength="120" value="${esc(p.product_name)}"></label>
-    <label>السعر بالجنيه<input class="filter-input" type="number" min=".01" step=".01" id="price-${esc(p.id)}" value="${(Number(p.price_piasters)/100).toFixed(2)}"></label>
-    <label>المصدر / المخبز<input class="filter-input" id="source-${esc(p.id)}" maxlength="100" value="${esc(p.source_name)}"></label>
-    <label>وحدة البيع<select class="filter-input" id="unit-${esc(p.id)}"><option value="piece" ${p.sale_unit==="piece"?"selected":""}>للقطعة</option><option value="loaf" ${p.sale_unit==="loaf"?"selected":""}>للقالب كامل</option><option value="pack" ${p.sale_unit==="pack"?"selected":""}>للباكت</option></select></label>
-    <label>الوزن بالجرام<input class="filter-input" type="number" min="1" step="1" id="weight-${esc(p.id)}" value="${p.weight_grams??""}" placeholder="اختياري"></label>
-    <label>ترتيب العرض<input class="filter-input" type="number" step="1" id="order-${esc(p.id)}" value="${Number(p.display_order)||0}"></label>
-    <label>حالة المنتج<select class="filter-input" id="active-${esc(p.id)}"><option value="true" ${p.is_active?"selected":""}>متاح للشراء</option><option value="false" ${!p.is_active?"selected":""}>إيقاف مؤقت</option></select></label>
-   </div>
-   <button class="small-btn" data-save-product="${esc(p.id)}">حفظ التعديلات</button>
-  </article>`).join("")||'<div class="empty">لا توجد منتجات حتى الآن.</div>'}</div>`;
- const result=$("create-product-result");
- $("create-product").onclick=async()=>{
-  const button=$("create-product"),name=$("new-product-name").value.trim(),source=$("new-product-source").value.trim(),price=Number($("new-product-price").value),unit=$("new-product-unit").value,weightRaw=$("new-product-weight").value,order=Number($("new-product-order").value);
-  try{
-   if(!name||!source)throw Error("اكتب اسم المنتج واسم المخبز أو المصدر.");
-   if(!Number.isFinite(price)||price<=0)throw Error("اكتب سعرًا صحيحًا أكبر من صفر.");
-   if(weightRaw!==""&&(!Number.isInteger(Number(weightRaw))||Number(weightRaw)<=0))throw Error("الوزن يجب أن يكون رقمًا صحيحًا أكبر من صفر.");
-   if(!Number.isInteger(order)||order<0)throw Error("ترتيب العرض غير صحيح.");
-   button.disabled=true;result.textContent="جاري إضافة المنتج…";
-   const {error:insertError}=await sb.from("product_catalog").insert({product_name:name,source_name:source,price_piasters:Math.round(price*100),sale_unit:unit,weight_grams:weightRaw===""?null:Number(weightRaw),display_order:order,is_active:true});
-   if(insertError)throw insertError;
-   result.textContent="تمت إضافة المنتج بنجاح.";
-   await loadProducts();await loadProductAdmin();
-  }catch(e){result.textContent="تعذر إضافة المنتج: "+(e.message||"خطأ غير معروف");}
-  finally{button.disabled=false;}
- };
- host.querySelectorAll("[data-save-product]").forEach(b=>b.onclick=async()=>{
-  const id=b.dataset.saveProduct,name=$("name-"+id).value.trim(),source_name=$("source-"+id).value.trim(),price=Number($("price-"+id).value),sale_unit=$("unit-"+id).value,weightRaw=$("weight-"+id).value,display_order=Number($("order-"+id).value),is_active=$("active-"+id).value==="true";
-  try{
-   if(!name||!source_name)throw Error("اسم المنتج والمصدر مطلوبان.");
-   if(!Number.isFinite(price)||price<=0)throw Error("السعر يجب أن يكون أكبر من صفر.");
-   if(weightRaw!==""&&(!Number.isInteger(Number(weightRaw))||Number(weightRaw)<=0))throw Error("الوزن غير صحيح.");
-   if(!Number.isInteger(display_order)||display_order<0)throw Error("ترتيب العرض غير صحيح.");
-   b.disabled=true;
-   const {error:updateError}=await sb.from("product_catalog").update({product_name:name,source_name,price_piasters:Math.round(price*100),sale_unit,weight_grams:weightRaw===""?null:Number(weightRaw),display_order,is_active,updated_at:new Date().toISOString()}).eq("id",id);
-   if(updateError)throw updateError;
-   await loadProducts();await loadProductAdmin();
-  }catch(e){alert("تعذر حفظ التعديل: "+(e.message||"خطأ غير معروف"));b.disabled=false;}
- });
+async function uploadProductImage(file){
+ if(!file)return null;
+ if(!["image/jpeg","image/png","image/webp"].includes(file.type))throw Error("اختر صورة JPG أو PNG أو WEBP.");
+ if(file.size>5*1024*1024)throw Error("حجم الصورة يجب ألا يتجاوز 5 ميجابايت.");
+ const ext=file.type==="image/png"?"png":file.type==="image/webp"?"webp":"jpg",path="products/"+crypto.randomUUID()+"."+ext;
+ const up=await sb.storage.from("product-images").upload(path,file,{cacheControl:"31536000",contentType:file.type,upsert:false});if(up.error)throw up.error;
+ return sb.storage.from("product-images").getPublicUrl(path).data.publicUrl;
 }
+async function loadProductAdmin(){
+ const host=$("staff-content"),res=await Promise.all([sb.from("product_catalog").select("*").order("display_order"),sb.from("product_categories").select("*").order("display_order")]),rows=res[0].data||[],cats=res[1].data||[];
+ if(res[0].error||res[1].error){host.innerHTML='<div class="warning">'+esc(res[0].error?.message||res[1].error?.message)+'</div>';return}
+ productCategories=cats.filter(c=>c.is_active);const next=rows.reduce((m,p)=>Math.max(m,Number(p.display_order)||0),0)+1;
+ const catOptions=selected=>'<option value="">بدون قسم</option>'+cats.filter(c=>c.is_active).map(c=>'<option value="'+esc(c.id)+'" '+(selected===c.id?'selected':'')+'>'+esc(c.name)+'</option>').join("");
+ host.innerHTML='<div class="product-admin-intro"><div><b>إدارة كتالوج لُقمة</b><p>أضف المنتجات وصورها، وأنشئ الأقسام، وتحكم في الأسعار والتوفر.</p></div><span>🥖</span></div>'+
+ '<details class="product-create" open><summary>＋ إضافة منتج جديد</summary><div class="fields product-create-grid">'+
+ '<label>اسم المنتج<input class="filter-input" id="new-product-name" maxlength="120"></label><label>المصدر / المخبز<input class="filter-input" id="new-product-source" maxlength="100" value="لُقمة"></label>'+
+ '<label>السعر بالجنيه<input class="filter-input" id="new-product-price" type="number" min=".01" step=".01"></label><label>القسم<select class="filter-input" id="new-product-category">'+catOptions("")+'</select></label>'+
+ '<label>وحدة البيع<select class="filter-input" id="new-product-unit"><option value="piece">للقطعة</option><option value="loaf">للقالب كامل</option><option value="pack">للباكت</option></select></label>'+
+ '<label>الوزن بالجرام<input class="filter-input" id="new-product-weight" type="number" min="1" step="1"></label><label>ترتيب العرض<input class="filter-input" id="new-product-order" type="number" min="0" value="'+next+'"></label>'+
+ '<label>صورة المنتج<input class="filter-input" id="new-product-image" type="file" accept="image/jpeg,image/png,image/webp"></label></div>'+
+ '<div class="image-preview-wrap" id="new-image-preview-wrap" hidden><img id="new-image-preview" alt="معاينة صورة المنتج"></div><button class="primary" id="create-product" type="button">إضافة المنتج</button><div class="result" id="create-product-result"></div></details>'+
+ '<details class="product-create"><summary>＋ إدارة الأقسام ('+cats.length+')</summary><div class="two category-create-row"><input class="filter-input" id="new-category-name" maxlength="60" placeholder="اسم القسم الجديد"><input class="filter-input" id="new-category-order" type="number" min="0" value="'+(cats.length+1)+'"></div>'+
+ '<button class="primary" id="create-category" type="button">إضافة قسم</button><div class="result" id="category-result"></div><div class="category-admin-list">'+cats.map(c=>'<div class="category-admin-item"><input class="filter-input" id="cat-name-'+esc(c.id)+'" value="'+esc(c.name)+'" maxlength="60"><input class="filter-input" id="cat-order-'+esc(c.id)+'" type="number" min="0" value="'+c.display_order+'"><select class="filter-input" id="cat-active-'+esc(c.id)+'"><option value="true" '+(c.is_active?'selected':'')+'>ظاهر</option><option value="false" '+(!c.is_active?'selected':'')+'>مخفي</option></select><button class="small-btn" data-save-category="'+esc(c.id)+'">حفظ</button></div>').join("")+'</div></details>'+
+ '<div class="product-admin-heading"><b>المنتجات الحالية</b><span>'+rows.length+' صنف</span></div><div class="product-admin-list">'+rows.map(p=>'<article class="admin-item product-admin-item"><div class="product-admin-name"><b>'+esc(p.product_name)+'</b><span class="badge">'+(p.is_active?'متاح':'متوقف')+'</span></div>'+
+ '<div class="product-edit-image">'+(p.image_url?'<img src="'+esc(p.image_url)+'" alt="'+esc(p.product_name)+'">':'<span>🥖 لا توجد صورة</span>')+'</div><div class="two">'+
+ '<label>اسم المنتج<input class="filter-input" id="name-'+esc(p.id)+'" value="'+esc(p.product_name)+'" maxlength="120"></label><label>السعر بالجنيه<input class="filter-input" id="price-'+esc(p.id)+'" type="number" min=".01" step=".01" value="'+(Number(p.price_piasters)/100).toFixed(2)+'"></label>'+
+ '<label>المصدر / المخبز<input class="filter-input" id="source-'+esc(p.id)+'" value="'+esc(p.source_name)+'" maxlength="100"></label><label>القسم<select class="filter-input" id="category-'+esc(p.id)+'">'+catOptions(p.category_id||"")+'</select></label>'+
+ '<label>وحدة البيع<select class="filter-input" id="unit-'+esc(p.id)+'"><option value="piece" '+(p.sale_unit==="piece"?'selected':'')+'>للقطعة</option><option value="loaf" '+(p.sale_unit==="loaf"?'selected':'')+'>للقالب كامل</option><option value="pack" '+(p.sale_unit==="pack"?'selected':'')+'>للباكت</option></select></label>'+
+ '<label>الوزن بالجرام<input class="filter-input" id="weight-'+esc(p.id)+'" type="number" min="1" value="'+(p.weight_grams??"")+'"></label><label>ترتيب العرض<input class="filter-input" id="order-'+esc(p.id)+'" type="number" min="0" value="'+(Number(p.display_order)||0)+'"></label>'+
+ '<label>الحالة<select class="filter-input" id="active-'+esc(p.id)+'"><option value="true" '+(p.is_active?'selected':'')+'>متاح</option><option value="false" '+(!p.is_active?'selected':'')+'>متوقف</option></select></label>'+
+ '<label>تغيير الصورة<input class="filter-input" id="image-'+esc(p.id)+'" type="file" accept="image/jpeg,image/png,image/webp"></label></div><button class="small-btn" data-save-product="'+esc(p.id)+'">حفظ التعديلات</button></article>').join("")+'</div>';
+ const fileInput=$("new-product-image");fileInput.onchange=()=>{const file=fileInput.files?.[0],wrap=$("new-image-preview-wrap");if(!file){wrap.hidden=true;return}if(!["image/jpeg","image/png","image/webp"].includes(file.type)||file.size>5*1024*1024){alert("اختر صورة JPG أو PNG أو WEBP حتى 5 ميجابايت.");fileInput.value="";wrap.hidden=true;return}$("new-image-preview").src=URL.createObjectURL(file);wrap.hidden=false};
+ $("create-product").onclick=async()=>{const btn=$("create-product"),out=$("create-product-result"),name=$("new-product-name").value.trim(),source_name=$("new-product-source").value.trim(),price=Number($("new-product-price").value),category_id=$("new-product-category").value||null,weight=$("new-product-weight").value,display_order=Number($("new-product-order").value),file=fileInput.files?.[0];try{if(!name||!source_name)throw Error("اسم المنتج والمصدر مطلوبان.");if(!Number.isFinite(price)||price<=0)throw Error("السعر غير صحيح.");if(weight!==""&&(!Number.isInteger(Number(weight))||Number(weight)<=0))throw Error("الوزن غير صحيح.");if(!Number.isInteger(display_order)||display_order<0)throw Error("الترتيب غير صحيح.");btn.disabled=true;out.textContent="جاري إضافة المنتج ورفع الصورة…";const image_url=await uploadProductImage(file),ins=await sb.from("product_catalog").insert({product_name:name,source_name,price_piasters:Math.round(price*100),sale_unit:$("new-product-unit").value,weight_grams:weight===""?null:Number(weight),display_order,is_active:true,category_id,image_url});if(ins.error)throw ins.error;await loadProducts();await loadProductAdmin()}catch(e){out.textContent="تعذر الإضافة: "+(e.message||"خطأ غير معروف");btn.disabled=false}};
+ $("create-category").onclick=async()=>{const name=$("new-category-name").value.trim(),display_order=Number($("new-category-order").value),out=$("category-result");try{if(!name)throw Error("اكتب اسم القسم.");if(!Number.isInteger(display_order)||display_order<0)throw Error("الترتيب غير صحيح.");const ins=await sb.from("product_categories").insert({name,slug:"cat-"+crypto.randomUUID(),display_order,is_active:true});if(ins.error)throw ins.error;await loadProducts();await loadProductAdmin()}catch(e){out.textContent="تعذر إضافة القسم: "+e.message}};
+ host.querySelectorAll("[data-save-category]").forEach(btn=>btn.onclick=async()=>{const id=btn.dataset.saveCategory,name=$("cat-name-"+id).value.trim(),display_order=Number($("cat-order-"+id).value),is_active=$("cat-active-"+id).value==="true";try{if(!name)throw Error("اسم القسم مطلوب.");if(!Number.isInteger(display_order)||display_order<0)throw Error("الترتيب غير صحيح.");btn.disabled=true;const u=await sb.from("product_categories").update({name,display_order,is_active,updated_at:new Date().toISOString()}).eq("id",id);if(u.error)throw u.error;await loadProducts();await loadProductAdmin()}catch(e){alert("تعذر حفظ القسم: "+e.message);btn.disabled=false}});
+ host.querySelectorAll("[data-save-product]").forEach(btn=>btn.onclick=async()=>{const id=btn.dataset.saveProduct,name=$("name-"+id).value.trim(),source_name=$("source-"+id).value.trim(),price=Number($("price-"+id).value),weight=$("weight-"+id).value,display_order=Number($("order-"+id).value),is_active=$("active-"+id).value==="true",category_id=$("category-"+id).value||null,file=$("image-"+id).files?.[0];try{if(!name||!source_name)throw Error("اسم المنتج والمصدر مطلوبان.");if(!Number.isFinite(price)||price<=0)throw Error("السعر غير صحيح.");if(weight!==""&&(!Number.isInteger(Number(weight))||Number(weight)<=0))throw Error("الوزن غير صحيح.");if(!Number.isInteger(display_order)||display_order<0)throw Error("الترتيب غير صحيح.");btn.disabled=true;const old=rows.find(p=>p.id===id),image_url=file?await uploadProductImage(file):(old?.image_url||null),u=await sb.from("product_catalog").update({product_name:name,source_name,price_piasters:Math.round(price*100),sale_unit:$("unit-"+id).value,weight_grams:weight===""?null:Number(weight),display_order,is_active,category_id,image_url,updated_at:new Date().toISOString()}).eq("id",id);if(u.error)throw u.error;await loadProducts();await loadProductAdmin()}catch(e){alert("تعذر حفظ المنتج: "+(e.message||"خطأ غير معروف"));btn.disabled=false}});
+}
+
 async function loadAdminSettings(){const host=$("staff-content"),{data,error}=await sb.from("app_settings").select("*").limit(1).maybeSingle();if(error){host.innerHTML='<div class="warning">تعذر تحميل الإعدادات: '+esc(error.message)+'</div>';return}if(!data){host.innerHTML='<div class="warning">لم يتم العثور على سجل إعدادات التطبيق.</div>';return}host.innerHTML=`<div class="panel"><h4>حالة استقبال الطلبات</h4><p>${data.allow_orders?"استقبال الطلبات مفتوح":"استقبال الطلبات مغلق"}</p><button class="${data.allow_orders?"danger":"primary"}" id="toggle-orders">${data.allow_orders?"إغلاق استقبال الطلبات":"فتح استقبال الطلبات"}</button></div><div class="panel"><h4>مواعيد التشغيل</h4><div class="two"><label>بداية التوصيل<input class="filter-input" id="delivery-start" type="time" value="${esc(data.delivery_start_time||"06:00")}"></label><label>نهاية التوصيل<input class="filter-input" id="delivery-end" type="time" value="${esc(data.delivery_end_time||"08:00")}"></label><label>آخر موعد للطلب<input class="filter-input" id="cutoff-time" type="time" value="${esc(data.order_cutoff_time||"22:00")}"></label><label>رسوم التوصيل بالجنيه<input class="filter-input" id="delivery-fee" type="number" min="0" step=".01" value="${data.delivery_fee_piasters==null?"":Number(data.delivery_fee_piasters)/100}"></label></div><button class="primary" id="save-settings" style="margin-top:10px">حفظ المواعيد والرسوم</button><div class="result" id="settings-result"></div></div>`;
  $("toggle-orders").onclick=async()=>{const {error}=await sb.rpc("loqma_admin_set_ordering",{p_allow:!data.allow_orders});if(error)alert("تعذر تغيير الحالة: "+error.message);else loadAdminSettings()};
  $("save-settings").onclick=async()=>{const patch={delivery_start_time:$("delivery-start").value,delivery_end_time:$("delivery-end").value,order_cutoff_time:$("cutoff-time").value};const fee=$("delivery-fee").value;if(fee!=="")patch.delivery_fee_piasters=Math.round(Number(fee)*100);const key=data.id;let q=sb.from("app_settings").update(patch);q=key!==undefined?q.eq("id",key):q;const {error}=await q;if(error)$("settings-result").textContent="تعذر الحفظ: "+error.message;else $("settings-result").textContent="تم حفظ الإعدادات."}
