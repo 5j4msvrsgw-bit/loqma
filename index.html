@@ -314,7 +314,67 @@ function printHtml(title,body,thermal=false){const w=window.open("","_blank");if
 .delivery-art{width:29%;min-width:95px;max-width:190px;position:relative;display:flex;align-items:center}.delivery-art svg{width:100%;height:auto;filter:drop-shadow(0 5px 3px #183e2520)}
 .delivery-copy{flex:1;display:grid;gap:9px;text-align:right;font-size:clamp(11px,2.8vw,15px);line-height:1.8}.delivery-copy b{font-weight:900}.delivery-copy span{font-size:.92em}
 .delivery-pin{font-size:27px;color:#6d9b3c;display:grid;text-align:center}.delivery-pin small{font-size:15px;color:#b89b42}
-@media(max-width:520px){#store-header{padding-top:18px}#store-header .logo{font-size:36px}#store-header .top-actions{overflow-x:auto;flex-wrap:nowrap;padding-bottom:5px;scrollbar-width:none}#store-header .top-actions::-webkit-scrollbar{display:none}#store-header .chip{padding:10px 11px;font-size:11px}#store-header .hero{min-height:160px;padding:13px 10px;gap:8px;margin-top:18px}#store-header .hero-art{width:43%;min-height:140px;aspect-ratio:.95/1;border-radius:14px 45px 14px 14px}#store-header .hero h1{font-size:18px;line-height:1.8}#store-header .hero p{font-size:11px;line-height:1.9}#store-header .hero-kicker{font-size:10px}#store-header .search{border-radius:18px;margin-top:14px}#store-header .search input{padding:15px 0;font-size:14px}#store-main .delivery-banner{min-height:104px;padding:9px 10px;gap:5px;border-radius:19px}.delivery-art{width:29%;min-width:82px}.delivery-copy{font-size:11px;gap:5px}.delivery-pin{font-size:21px}}.cutoff-countdown{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:2px}.cutoff-label{font-size:.88em;color:#42664d}.cutoff-time{direction:ltr;unicode-bidi:isolate;display:inline-flex;align-items:center;background:#174a35;color:#fff8df;border-radius:10px;padding:5px 10px;font-size:clamp(15px,3.4vw,20px);font-weight:900;letter-spacing:1px;font-variant-numeric:tabular-nums;box-shadow:inset 0 1px #ffffff30}.next-day-note{display:block;color:#9a6b24;font-weight:800;font-size:.9em}.cutoff-caption{font-size:.9em;color:#315d49}@media(max-width:520px){.cutoff-countdown{gap:6px}.cutoff-time{padding:4px 8px;font-size:15px}}</style></head><body><h2>${esc(title)}</h2>${body}<div class="noprint"><button onclick="window.print()">طباعة</button></div><script>window.onload=()=>setTimeout(()=>window.print(),350)<\/script></body></html>`);w.document.close()}
+@media(max-width:520px){#store-header{padding-top:18px}#store-header .logo{font-size:36px}#store-header .top-actions{overflow-x:auto;flex-wrap:nowrap;padding-bottom:5px;scrollbar-width:none}#store-header .top-actions::-webkit-scrollbar{display:none}#store-header .chip{padding:10px 11px;font-size:11px}#store-header .hero{min-height:160px;padding:13px 10px;gap:8px;margin-top:18px}#store-header .hero-art{width:43%;min-height:140px;aspect-ratio:.95/1;border-radius:14px 45px 14px 14px}#store-header .hero h1{font-size:18px;line-height:1.8}#store-header .hero p{font-size:11px;line-height:1.9}#store-header .hero-kicker{font-size:10px}#store-header .search{border-radius:18px;margin-top:14px}#store-header .search input{padding:15px 0;font-size:14px}#store-main .delivery-banner{min-height:104px;padding:9px 10px;gap:5px;border-radius:19px}.delivery-art{width:29%;min-width:82px}.delivery-copy{font-size:11px;gap:5px}.delivery-pin{font-size:21px}}.cutoff-countdown{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:2px}.cutoff-label{font-size:.88em;color:#42664d}.cutoff-time{direction:ltr;unicode-bidi:isolate;display:inline-flex;align-items:center;background:#174a35;color:#fff8df;border-radius:10px;padding:5px 10px;font-size:clamp(15px,3.4vw,20px);font-weight:900;letter-spacing:1px;font-variant-numeric:tabular-nums;box-shadow:inset 0 1px #ffffff30}.next-day-note{display:block;color:#9a6b24;font-weight:800;font-size:.9em}.cutoff-caption{font-size:.9em;color:#315d49}@media(max-width:520px){.cutoff-countdown{gap:6px}.cutoff-time{padding:4px 8px;font-size:15px}}
+/* Final reference pass: compact mobile composition, real storefront stays interactive */
+#store-header{padding:18px 0 22px;background:radial-gradient(ellipse at 75% 0%,#397c4c 0%,transparent 38%),radial-gradient(ellipse at 8% 55%,#145c40 0%,transparent 42%),linear-gradient(145deg,#063b2b 0%,#0a4b35 58%,#07533b 100%);border-radius:0 0 34px 34px}
+#store-header .container{padding-left:18px;padding-right:18px}
+#store-header .top{display:flex;flex-direction:column;align-items:stretch;gap:18px}
+#store-header .logo{align-self:flex-end;font-size:48px;font-weight:900;line-height:1.05;margin:0 4px 2px 0}
+#store-header .logo small{display:block;text-align:right;font-size:15px;font-weight:800;letter-spacing:.5px;color:#f0d27c;margin-top:9px}
+#store-header .logo-wheat{font-size:25px;right:2px;top:-19px}
+#store-header .top-actions{display:flex;flex-flow:row wrap;align-items:center;justify-content:flex-start;gap:8px;width:100%;overflow:visible}
+#store-header .chip{min-height:42px;padding:10px 14px;border:1px solid #a9cbb05c;background:linear-gradient(145deg,#ffffff20,#ffffff0b);color:#fff;border-radius:28px;font-size:13px;font-weight:650;box-shadow:inset 0 1px #ffffff22,0 4px 12px #001b1020}
+#store-header .location-chip{background:#fff1bd;color:#174a35;border-color:#fff1bd;font-weight:850}
+#store-header .hero{display:flex;flex-direction:row-reverse;align-items:center;justify-content:space-between;min-height:220px;margin:24px 0 0;padding:16px 14px;border-radius:27px;border:1.5px solid #d8d39b99;background:linear-gradient(110deg,#123f2c70 0%,#0a4b35ed 54%,#0b4935 100%);box-shadow:0 14px 32px #001b122b;overflow:hidden}
+#store-header .hero-copy{flex:1 1 54%;min-width:0;text-align:right;z-index:2}
+#store-header .hero-kicker{display:block;color:#f2d78e;font-size:13px;font-weight:800;margin-bottom:5px}
+#store-header .hero h1{font-size:clamp(22px,5vw,36px);line-height:1.45;font-weight:900;margin:0 0 10px;color:#fff}
+#store-header .hero p{font-size:clamp(13px,3vw,17px);line-height:1.8;margin:0;color:#f4f3e9}
+#store-header .hero-art{flex:0 0 43%;width:43%;max-width:440px;min-height:0;height:180px;aspect-ratio:1/1;object-fit:cover;object-position:center;border-radius:20px 64px 20px 20px;box-shadow:0 10px 25px #00180f38;border:1px solid #f0d58a80}
+#store-header .search{margin:18px 0 0;height:66px;border:0;border-radius:23px;background:#fff;padding:0 22px;box-shadow:0 9px 25px #001c1428}
+#store-header .search input{height:100%;padding:0;font-size:17px;color:#183d2e}
+#store-main{padding-top:18px}
+#store-main .delivery-banner{display:grid;grid-template-columns:minmax(92px,31%) minmax(0,1fr) 25px;align-items:center;gap:10px;min-height:124px;height:auto;margin:18px 0 20px;padding:12px 13px;border:1.5px solid #d7e5cb;border-radius:25px;background:linear-gradient(110deg,#edf6df 0%,#f8f8e9 56%,#e6f0d9 100%);box-shadow:0 10px 24px #1c4a3014;color:#174a35;overflow:hidden}
+#store-main .delivery-art{width:100%;min-width:0;max-width:none;height:100px;max-height:100px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+#store-main .delivery-art svg{display:block;width:100%;height:100%;max-height:100px;object-fit:contain;filter:drop-shadow(0 5px 4px #183e2520)}
+#store-main .delivery-copy{min-width:0;display:flex;flex-direction:column;gap:5px;text-align:right;font-size:13px;line-height:1.65}
+#store-main .delivery-copy b{font-size:13px;font-weight:900}
+#store-main .delivery-copy .cutoff-caption{font-size:11px;color:#42634d}
+#store-main .cutoff-countdown{display:flex;align-items:center;justify-content:flex-start;gap:7px;flex-wrap:wrap;margin-top:1px}
+#store-main .cutoff-label{font-size:11px;color:#42664d}
+#store-main .cutoff-time{background:#164b36;color:#fff5d4;border:1px solid #d7bd73;border-radius:9px;padding:4px 9px;font-size:16px;letter-spacing:1px}
+#store-main .next-day-note{font-size:11px;color:#916a25;font-weight:850}
+#store-main .delivery-pin{font-size:22px;align-self:start}
+#store-main .delivery-pin small{font-size:12px}
+@media(max-width:520px){
+ #store-header{padding-top:18px}
+ #store-header .container{padding-left:14px;padding-right:14px}
+ #store-header .logo{font-size:42px}
+ #store-header .logo small{font-size:13px}
+ #store-header .top-actions{gap:7px}
+ #store-header .chip{min-height:39px;padding:8px 10px;font-size:11px}
+ #store-header .hero{min-height:164px;margin-top:18px;padding:11px 10px;gap:8px;border-radius:22px}
+ #store-header .hero-art{flex-basis:42%;width:42%;height:140px;min-height:0;border-radius:15px 42px 15px 15px}
+ #store-header .hero-copy{flex-basis:58%}
+ #store-header .hero-kicker{font-size:10px}
+ #store-header .hero h1{font-size:clamp(18px,5vw,23px);line-height:1.55;margin-bottom:6px}
+ #store-header .hero p{font-size:11px;line-height:1.8}
+ #store-header .search{height:58px;margin-top:14px;padding:0 16px;border-radius:19px}
+ #store-header .search input{font-size:14px}
+ #store-main{padding-top:12px}
+ #store-main .delivery-banner{grid-template-columns:29% minmax(0,1fr) 18px;gap:7px;min-height:108px;margin:13px 0 16px;padding:9px 9px;border-radius:20px}
+ #store-main .delivery-art{height:82px;max-height:82px}
+ #store-main .delivery-art svg{max-height:82px}
+ #store-main .delivery-copy{gap:4px;font-size:11px;line-height:1.55}
+ #store-main .delivery-copy b{font-size:11px;line-height:1.6}
+ #store-main .delivery-copy .cutoff-caption{font-size:9px}
+ #store-main .cutoff-countdown{gap:5px}
+ #store-main .cutoff-label{font-size:9px}
+ #store-main .cutoff-time{font-size:14px;padding:3px 7px}
+ #store-main .next-day-note{font-size:9px}
+ #store-main .delivery-pin{font-size:18px}
+}
+</style></head><body><h2>${esc(title)}</h2>${body}<div class="noprint"><button onclick="window.print()">طباعة</button></div><script>window.onload=()=>setTimeout(()=>window.print(),350)<\/script></body></html>`);w.document.close()}
 function orderPrintMarkup(o,profile,address,items){return `<div class="ticket"><b>طلب رقم: ${esc(o.order_number||o.id)}</b><br>العميل: ${esc(profile?.full_name||"—")}<br>الموبايل: ${esc(profile?.phone||"—")}<br>العنوان: ${esc([address?.area,address?.street,address?.building&&"عمارة "+address.building,address?.floor&&"دور "+address.floor,address?.apartment&&"شقة "+address.apartment,address?.landmark].filter(Boolean).join(" - "))}<br>موعد التوصيل: ${esc(o.delivery_date||"—")}<br><hr>${(items||[]).map(i=>`${esc(i.product_name)} × ${esc(i.quantity)} — ${moneyP(i.line_total_piasters)}`).join("<br>")}<hr><b>الإجمالي: ${moneyP(o.total_amount_piasters)}</b><br>الحالة: ${statusLabel(o.status)}<br>ملاحظات: ${esc(o.customer_notes||"—")}</div>`}
 async function fetchOrderDetails(rows){
  const ids=[...new Set(rows.map(o=>o.customer_id).filter(Boolean))],aids=[...new Set(rows.map(o=>o.address_id).filter(Boolean))],oids=rows.map(o=>o.id);
