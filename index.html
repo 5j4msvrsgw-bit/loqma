@@ -163,6 +163,7 @@ function categoryOf(n){return n.includes("فينو")?"fino":n.includes("عيش")
 function imageOf(n){const x=n.toLowerCase();if(x.includes("بلدي"))return"baladi.jpg";if(x.includes("شامي"))return"shami.jpg";if(x.includes("سياحي"))return"seyahi.jpg";if(x.includes("فينو")&&x.includes("سمسم"))return"fino-sesame.jpg";if(x.includes("شوفان"))return"whole-wheat-oats.jpg";if(x.includes("فينو")&&x.includes("كامل")&&x.includes("كبير"))return"fino-whole-large.jpg";if(x.includes("حبة كاملة"))return"whole-wheat-soft.jpg";if(x.includes("فينو")&&x.includes("ميني"))return"fino-mini.jpg";if(x.includes("فينو"))return"fino.jpg";if(x.includes("توست"))return"toast-loaf.jpg";if(x.includes("فطيرة"))return"small-pie.jpg";if(x.includes("كيزر"))return"kaiser.jpg";if(x.includes("باني"))return"baiti-bani-sesame.jpg";return""}
 function iconOf(n){if(n.includes("توست"))return"🍞";if(n.includes("فطيرة"))return"🥧";if(n.includes("كيزر"))return"🍔";if(n.includes("باني"))return"🥯";if(n.includes("عيش")||n.includes("شامي"))return"🫓";return"🥖"}
 function unitOf(u){return u==="loaf"?"للقالب كامل":u==="pack"?"للباكت":"للقطعة"}
+function renderCategories(){const host=$("categories");if(!host)return;const ids=new Set(productCategories.map(c=>c.id));if(category!=="all"&&!ids.has(category))category="all";host.innerHTML='<button class="category '+(category==="all"?"active":"")+'" data-cat="all">الكل</button>'+productCategories.map(c=>'<button class="category '+(category===c.id?"active":"")+'" data-cat="'+esc(c.id)+'">'+esc(c.name)+'</button>').join("")}
 function render(){
  const q=$("search").value.trim();
  const list=products.filter(p=>(category==="all"||p.categoryId===category)&&p.name.includes(q));
@@ -173,12 +174,15 @@ function render(){
 function updateCart(){let count=0,total=0;products.forEach(p=>{count+=cart[p.id]||0;total+=p.price*(cart[p.id]||0)});$("cart-count").textContent=count?count+" قطعة في السلة":"السلة فاضية";$("cart-total").textContent=!count?"ابدأ بإضافة الأصناف":total<MIN_DAILY?"باقي "+money(MIN_DAILY-total)+" للحد الأدنى":"وصلت للحد الأدنى";$("open-cart").disabled=!count;$("grand-total").textContent=money(total)}
 async function loadProducts(){
  $("products").innerHTML='<div class="status">بنحمّل الأصناف والأسعار…</div>';
- const {data,error}=await sb.from("product_catalog").select("id,product_name,sale_unit,price_piasters,is_active").eq("is_active",true).order("display_order");
- if(error){$("products").innerHTML='<div class="status">تعذر تحميل الأصناف. حدّث الصفحة وحاول تاني.</div>';console.error(error);return}
- products=(data||[]).map(r=>({id:r.id,name:r.product_name,price:Number(r.price_piasters)/100,pricePiasters:Number(r.price_piasters),unit:unitOf(r.sale_unit),category:categoryOf(r.product_name),icon:iconOf(r.product_name),image:imageOf(r.product_name)}));render()
+ const [catalog,cats]=await Promise.all([sb.from("product_catalog").select("id,product_name,sale_unit,price_piasters,is_active,category_id,image_url").eq("is_active",true).order("display_order"),sb.from("product_categories").select("id,name,slug,display_order,is_active").eq("is_active",true).order("display_order")]);
+ if(catalog.error){$("products").innerHTML='<div class="status">تعذر تحميل الأصناف. حدّث الصفحة وحاول تاني.</div>';console.error(catalog.error);return}
+ productCategories=cats.data||[];if(cats.error)console.warn("تعذر تحميل الأقسام",cats.error);
+ const cmap=new Map(productCategories.map(c=>[c.id,c.slug]));
+ products=(catalog.data||[]).map(r=>({id:r.id,name:r.product_name,price:Number(r.price_piasters)/100,pricePiasters:Number(r.price_piasters),unit:unitOf(r.sale_unit),categoryId:r.category_id||null,category:cmap.get(r.category_id)||categoryOf(r.product_name),icon:iconOf(r.product_name),imageUrl:r.image_url||(imageOf(r.product_name)?"./"+imageOf(r.product_name):"")}));
+ renderCategories();render()
 }
 $("products").addEventListener("click",e=>{const b=e.target.closest("[data-action]");if(!b)return;const id=b.dataset.id;cart[id]=Math.max(0,(cart[id]||0)+(b.dataset.action==="plus"?1:-1));if(!cart[id])delete cart[id];saveCart();render()});
-$("categories").addEventListener("click",e=>{const b=e.target.closest("[data-cat]");if(!b)return;category=b.dataset.cat;document.querySelectorAll(".category").forEach(x=>x.classList.toggle("active",x===b));render()});
+$("categories").addEventListener("click",e=>{const b=e.target.closest("[data-cat]");if(!b)return;category=b.dataset.cat;renderCategories();render()});
 $("search").addEventListener("input",render);
 const modal=$("modal");
 $("open-cart").onclick=async()=>{try{await loadCheckoutAddresses()}catch(e){console.warn("addresses",e)}renderCartRows();$("order-result").innerHTML="";$("place-order").disabled=false;$("place-order").textContent="تأكيد الطلب";refreshSummary();modal.classList.add("show")};
