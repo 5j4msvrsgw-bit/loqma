@@ -45,9 +45,8 @@ header{color:white;background:radial-gradient(circle at 90% 5%,#c6a66b30,transpa
 <body class="locked">
 <div class="auth-gate" id="auth-gate"><div class="auth-card">
 <div style="font-size:40px">🥖</div><h1>أهلاً بيك في لُقمة</h1>
-<p>عيشِك ومخبوزاتك الطازجة لحد باب بيتك. اكتب بريدك الإلكتروني وهنبعت لك رابط آمن لتسجيل الدخول.</p>
-<form id="auth-form"><input id="auth-email" type="email" autocomplete="email" placeholder="name@example.com" required><button class="primary" id="auth-submit">إرسال رابط الدخول</button></form>
-<div class="auth-msg" id="auth-message" aria-live="polite"></div><p style="font-size:10px">افتح رسالة البريد واضغط رابط الدخول للعودة إلى لُقمة.</p>
+<p>بنجهزلك حسابك تلقائيًا… لحظات وتقدر تختار مخبوزاتك.</p>
+<div class="auth-msg" id="auth-message" aria-live="polite">جاري فتح المتجر بأمان…</div>
 </div></div>
 <header id="store-header" hidden><div class="container">
 <div class="top"><div class="logo">لُقمة.<small>طازة لحد باب بيتك</small></div><div class="top-actions">
@@ -88,6 +87,7 @@ header{color:white;background:radial-gradient(circle at 90% 5%,#c6a66b30,transpa
 <div class="two"><div><label for="addr-apartment">الشقة</label><input id="addr-apartment" maxlength="40"></div><div><label for="addr-landmark">علامة مميزة</label><input id="addr-landmark" maxlength="150"></div></div>
 <div><label for="addr-notes">ملاحظات للمندوب</label><textarea id="addr-notes" rows="2" maxlength="300"></textarea></div>
 </div>
+<div class="panel"><h4>بيانات استلام الطلب</h4><div class="fields"><div><label for="checkout-name">الاسم *</label><input id="checkout-name" maxlength="100" autocomplete="name" placeholder="اسمك بالكامل" required></div><div><label for="checkout-phone">رقم الموبايل *</label><input id="checkout-phone" type="tel" inputmode="tel" maxlength="20" autocomplete="tel" placeholder="01xxxxxxxxx" required></div></div></div>
 <div><label for="customer-notes">ملاحظات الطلب (اختياري)</label><textarea id="customer-notes" rows="2" maxlength="300"></textarea></div>
 </div></div>
 <div class="panel"><h4>3) طريقة الدفع ومراجعة الرسوم</h4><div class="fields"><label for="order-payment">طريقة الدفع</label><select id="order-payment"><option value="cash_on_delivery">نقدًا عند الاستلام</option><option value="wallet" disabled>المحفظة — غير مفعلة حاليًا</option></select></div><div class="notice" id="checkout-summary">الحد الأدنى 30 جنيهًا من المنتجات لكل يوم توصيل.</div><div class="warning" style="margin-top:9px">الدفع النقدي عند الاستلام هو المتاح حاليًا. شحن المحفظة وتسجيل الرصيد متاحان.</div><button class="primary" id="place-order" style="width:100%;margin-top:11px">تأكيد الطلب</button><div class="result" id="order-result"></div></div>
@@ -135,8 +135,17 @@ $("open-cart").onclick=async()=>{try{await loadCheckoutAddresses()}catch(e){cons
 function renderCartRows(){$("cart-items").innerHTML=products.filter(p=>cart[p.id]).map(p=>`<div class="cart-row"><span>${esc(p.name)}<br>${cart[p.id]} × ${money(p.price)}</span><b>${money(p.price*cart[p.id])}</b></div>`).join("")}
 $("close-cart").onclick=()=>modal.classList.remove("show");modal.addEventListener("click",e=>{if(e.target===modal)modal.classList.remove("show")});
 $("clear-cart").onclick=()=>{clearCart();modal.classList.remove("show")};
-$("sign-out").onclick=async()=>{await sb.auth.signOut();clearCart();user=null;staff=null;showStore(false)};
-$("auth-form").addEventListener("submit",async e=>{e.preventDefault();const email=$("auth-email").value.trim();$("auth-submit").disabled=true;$("auth-message").textContent="جاري إرسال الرابط…";const {error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:location.origin+location.pathname}});$("auth-message").textContent=error?"تعذر إرسال الرابط: "+error.message:"تم إرسال رابط الدخول إلى بريدك. افتحه للعودة إلى لُقمة.";$("auth-submit").disabled=false});
+$("sign-out").onclick=()=>{alert("حسابك الحالي حساب ضيف مرتبط بطلباتك. لتجنب فقدان الوصول لطلباتك، تم إيقاف تسجيل الخروج من هذه النسخة.")};
+function syncCustomerFields(source){
+ const name=source==="profile"?$("profile-name").value:$("checkout-name").value;
+ const phone=source==="profile"?$("profile-phone").value:$("checkout-phone").value;
+ $("profile-name").value=name;$("checkout-name").value=name;
+ $("profile-phone").value=phone;$("checkout-phone").value=phone;
+}
+$("profile-name").addEventListener("input",()=>syncCustomerFields("profile"));
+$("profile-phone").addEventListener("input",()=>syncCustomerFields("profile"));
+$("checkout-name").addEventListener("input",()=>syncCustomerFields("checkout"));
+$("checkout-phone").addEventListener("input",()=>syncCustomerFields("checkout"));
 function todayLocal(){const p=new Intl.DateTimeFormat("en-CA",{timeZone:"Africa/Cairo",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date()),o={};p.forEach(x=>o[x.type]=x.value);return o.year+"-"+o.month+"-"+o.day}
 function addDays(date,n){const [y,m,d]=date.split("-").map(Number),x=new Date(Date.UTC(y,m-1,d+n));return x.getUTCFullYear()+"-"+String(x.getUTCMonth()+1).padStart(2,"0")+"-"+String(x.getUTCDate()).padStart(2,"0")}
 function dateLabel(date){const [y,m,d]=date.split("-").map(Number);return new Intl.DateTimeFormat("ar-EG",{weekday:"long",day:"numeric",month:"long"}).format(new Date(Date.UTC(y,m-1,d,12)))}
@@ -175,8 +184,13 @@ async function submitOrder(){
  const btn=$("place-order"),out=$("order-result");
  try{
   if(!user)throw Error("سجل الدخول أولًا.");if($("order-payment").value!=="cash_on_delivery")throw Error("طريقة الدفع المختارة غير متاحة حاليًا.");
-  const customerName=$("profile-name").value.trim(),customerPhone=$("profile-phone").value.trim();
-  if(!customerName||!customerPhone)throw Error("احفظ الاسم ورقم الموبايل أولًا من بيانات حسابك.");
+  const customerName=$("checkout-name").value.trim(),customerPhone=$("checkout-phone").value.trim();
+  if(!customerName||!customerPhone)throw Error("اكتب الاسم ورقم الموبايل لاستلام الطلب.");
+  const normalizedPhone=customerPhone.replace(/[\s-]/g,"");
+  if(!/^01[0-9]{9}$/.test(normalizedPhone))throw Error("رقم الموبايل يجب أن يكون 11 رقمًا ويبدأ بـ 01.");
+  const {error:profileError}=await sb.from("profiles").upsert({user_id:user.id,full_name:customerName,phone:normalizedPhone,updated_at:new Date().toISOString()},{onConflict:"user_id"});
+  if(profileError)throw Error("تعذر حفظ بياناتك: "+profileError.message);
+  $("profile-name").value=customerName;$("profile-phone").value=normalizedPhone;$("checkout-phone").value=normalizedPhone;
   const days=getDays();days.forEach((d,i)=>{if(!d.items.length)throw Error("اختار أصنافًا ليوم "+(i+1)+".");if(valueOf(d.items)<MIN_DAILY)throw Error("الحد الأدنى للمنتجات 30 جنيهًا في كل يوم توصيل.")});
   btn.disabled=true;btn.textContent="جاري تسجيل الطلب…";out.textContent="";
   let addressId=$("saved-address-select").value;
@@ -196,10 +210,10 @@ async function loadProfile(){
  if(!user)return;
  const {data,error}=await sb.from("profiles").select("full_name,phone").eq("user_id",user.id).maybeSingle();
  if(error){$("profile-result").textContent="تعذر تحميل بيانات الحساب: "+error.message;return}
- if(data){$("profile-name").value=data.full_name||"";$("profile-phone").value=data.phone||""}
+ if(data){$("profile-name").value=data.full_name||"";$("profile-phone").value=data.phone||"";$("checkout-name").value=data.full_name||"";$("checkout-phone").value=data.phone||""}
  await loadCheckoutAddresses();
 }
-$("save-profile").onclick=async()=>{if(!user)return;const full_name=$("profile-name").value.trim(),phone=$("profile-phone").value.trim();if(!full_name||!phone){$("profile-result").textContent="اكتب الاسم ورقم الموبايل.";return}const {error}=await sb.from("profiles").upsert({user_id:user.id,full_name,phone,updated_at:new Date().toISOString()},{onConflict:"user_id"});$("profile-result").textContent=error?"تعذر الحفظ: "+error.message:"تم حفظ بياناتك."};
+$("save-profile").onclick=async()=>{if(!user)return;const full_name=$("profile-name").value.trim(),phone=$("profile-phone").value.trim().replace(/[\s-]/g,"");if(!full_name||!phone){$("profile-result").textContent="اكتب الاسم ورقم الموبايل.";return}if(!/^01[0-9]{9}$/.test(phone)){$("profile-result").textContent="رقم الموبايل يجب أن يكون 11 رقمًا ويبدأ بـ 01.";return}const {error}=await sb.from("profiles").upsert({user_id:user.id,full_name,phone,updated_at:new Date().toISOString()},{onConflict:"user_id"});$("profile-result").textContent=error?"تعذر الحفظ: "+error.message:"تم حفظ بياناتك.";if(!error){$("checkout-name").value=full_name;$("checkout-phone").value=phone}};
 async function loadMyOrders(){if(!user)return;$("my-orders-list").textContent="جاري تحميل الطلبات…";const {data,error}=await sb.from("orders").select("*").eq("customer_id",user.id).order("created_at",{ascending:false}).limit(50);if(error){$("my-orders-list").textContent="تعذر تحميل الطلبات: "+error.message;return}if(!data?.length){$("my-orders-list").textContent="لسه مفيش طلبات مسجلة.";return}const states={pending:"قيد المراجعة",confirmed:"تم التأكيد",preparing:"قيد التجهيز",ready_for_pickup:"جاهز للاستلام من المخبز",out_for_delivery:"خرج للتوصيل",delivered:"تم التسليم",cancelled:"ملغي"};$("my-orders-list").innerHTML=data.map(o=>`<div class="order-card"><div class="order-head"><strong>طلب رقم ${esc(o.order_number||o.id)}</strong><span class="badge">${esc(states[o.status]||o.status)}</span></div><div class="muted">موعد التوصيل: ${esc(o.delivery_date||"—")} • الإجمالي: ${money(Number(o.total_amount_piasters)/100)}</div><div class="muted">تاريخ الطلب: ${new Date(o.created_at).toLocaleString("ar-EG")}</div></div>`).join("")}
 function openPanel(id){const p=$(id);p.hidden=false;p.scrollIntoView({behavior:"smooth",block:"start"});if(id==="wallet-panel")loadWallet();if(id==="my-orders-panel")loadMyOrders()};
 function togglePanel(id){const p=$(id);p.hidden=!p.hidden;if(!p.hidden){p.scrollIntoView({behavior:"smooth",block:"start"});if(id==="wallet-panel")loadWallet();if(id==="my-orders-panel")loadMyOrders()}}
@@ -308,9 +322,23 @@ async function loadDriverJobs(){
  host.querySelectorAll("[data-driver-status]").forEach(b=>b.onclick=async()=>{const note=b.dataset.status==="failed"?prompt("اكتب سبب تعذر التسليم:"):"";if(b.dataset.status==="failed"&&!note)return;const {error}=await sb.rpc("loqma_driver_update_delivery",{p_job_id:b.dataset.driverStatus,p_status:b.dataset.status,p_note:note||null});if(error)alert("تعذر تحديث المهمة: "+error.message);else loadDriverJobs()})
 }
 async function init(){
- const {data,error}=await sb.auth.getSession();if(error){$("auth-message").textContent=error.message;return}
- user=data.session?.user||null;authReady=true;showStore(!!user);
- if(user){restoreCart();await loadStaffIdentity();loadProducts();loadProfile();loadWallet();if(staff){$("staff-jump").hidden=false}}
+ try{
+  const {data,error}=await sb.auth.getSession();if(error)throw error;
+  let session=data.session;
+  if(!session){
+   $("auth-message").textContent="جاري إنشاء حساب ضيف…";
+   const {data:guest,error:guestError}=await sb.auth.signInAnonymously();
+   if(guestError)throw guestError;
+   session=guest.session;
+  }
+  user=session?.user||null;
+  if(!user)throw Error("لم نتمكن من إنشاء حسابك. حاول تحديث الصفحة.");
+  authReady=true;showStore(true);restoreCart();
+  await loadStaffIdentity();loadProducts();loadProfile();loadWallet();
+  if(staff)$("staff-jump").hidden=false;
+ }catch(e){
+  $("auth-message").textContent="تعذر فتح المتجر: "+(e.message||"حدث خطأ غير متوقع.")+" — تأكد من تفعيل Anonymous Sign-ins في Supabase.";
+ }
 }
 sb.auth.onAuthStateChange(async(event,session)=>{if(!authReady)return;const previous=user?.id;user=session?.user||null;showStore(!!user);if(user){if(previous!==user.id)restoreCart();await loadStaffIdentity();loadProducts();loadProfile();loadWallet()}else{staff=null;$("staff-jump").hidden=true;$("staff-panel").hidden=true;clearCart()}});
 init();
