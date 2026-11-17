@@ -29,7 +29,7 @@ header{color:white;background:radial-gradient(circle at 90% 5%,#c6a66b30,transpa
 .cart-bar{position:fixed;bottom:0;left:0;right:0;background:#fffefaf2;backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom));z-index:20;box-shadow:0 -7px 24px #10251b12}.cart-inner{max-width:1060px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:10px}.cart-inner b{font-size:12px}.cart-inner small{display:block;color:var(--muted);font-size:10px}
 .modal{display:none;position:fixed;inset:0;background:#10251b88;align-items:flex-end;z-index:30;backdrop-filter:blur(3px)}.modal.show{display:flex}.sheet{background:var(--paper);width:100%;max-width:850px;margin:auto auto 0;border-radius:22px 22px 0 0;padding:16px;max-height:92dvh;overflow:auto}.sheet-head{display:flex;justify-content:space-between;align-items:center}.sheet-head h3{font-size:15px}.sheet-head button{border:0;background:#f0f1eb;padding:7px 11px;border-radius:9px}
 .cart-row,.admin-item{border-bottom:1px solid var(--line);padding:10px 0;font-size:11px;line-height:1.9;overflow-wrap:anywhere}.cart-row{display:flex;justify-content:space-between;gap:10px}.total{display:flex;justify-content:space-between;margin:12px 0;font-weight:900;font-size:14px}
-.auth-gate{position:fixed;inset:0;z-index:50;background:var(--bg);display:grid;place-items:center;padding:18px}.auth-card{width:100%;max-width:420px;background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:var(--shadow)}.auth-card h1{font-size:22px;color:var(--g);margin:5px 0}.auth-card p{font-size:12px;color:var(--muted);line-height:2}.auth-card input{width:100%;direction:ltr;text-align:left;padding:12px;border:1px solid var(--line);border-radius:10px;margin:8px 0 12px}.auth-card button{width:100%}.auth-msg{font-size:11px;color:var(--g);margin-top:10px;overflow-wrap:anywhere}body.locked{overflow:hidden}
+.auth-gate{position:fixed;inset:0;z-index:50;background:var(--bg);display:grid;place-items:center;padding:18px}.auth-card{width:100%;max-width:420px;background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:var(--shadow)}.auth-card h1{font-size:22px;color:var(--g);margin:5px 0}.auth-card p{font-size:12px;color:var(--muted);line-height:2}.auth-card input{width:100%;direction:ltr;text-align:left;padding:12px;border:1px solid var(--line);border-radius:10px;margin:8px 0 12px}.auth-card button{width:100%}.auth-msg{font-size:11px;color:var(--g);margin-top:10px;overflow-wrap:anywhere}.staff-login-shade{position:fixed;inset:0;z-index:60;background:#10251b99;display:grid;place-items:center;padding:18px}.staff-login-card{width:100%;max-width:390px;background:var(--paper);border-radius:18px;padding:18px;box-shadow:var(--shadow)}.staff-login-card h3{margin:0 0 10px;color:var(--g)}.staff-login-card input{width:100%;border:1px solid var(--line);border-radius:9px;padding:11px;margin:6px 0 10px;direction:ltr;text-align:left}.staff-login-actions{display:flex;gap:8px}.staff-login-actions button{flex:1}body.locked{overflow:hidden}
 .admin-toolbar{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:10px 0}.stat{background:#f2f5ef;border:1px solid #e3eade;border-radius:11px;padding:9px;text-align:center}.stat b{display:block;font-size:19px;color:var(--g)}.stat span{font-size:9px;color:var(--muted)}
 .filters{display:grid;grid-template-columns:2fr 1fr 1fr;gap:7px;margin:10px 0}.order-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px;margin:9px 0}.order-head{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}.order-head strong{color:var(--g);font-size:12px}.muted{color:var(--muted);font-size:10px}.badge{display:inline-block;padding:4px 8px;border-radius:20px;background:#edf3ed;color:var(--g);font-size:9px;font-weight:800}.order-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}.order-actions select{max-width:180px;padding:6px;border:1px solid var(--line);border-radius:8px;font-size:10px}
 .admin-tabs{display:flex;gap:7px;overflow:auto;margin:10px 0}.admin-tab{border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 12px;white-space:nowrap;font-size:10px;font-weight:800;color:var(--g)}.admin-tab.active{background:var(--g);color:#fff}
@@ -48,9 +48,10 @@ header{color:white;background:radial-gradient(circle at 90% 5%,#c6a66b30,transpa
 <p>بنجهزلك حسابك تلقائيًا… لحظات وتقدر تختار مخبوزاتك.</p>
 <div class="auth-msg" id="auth-message" aria-live="polite">جاري فتح المتجر بأمان…</div>
 </div></div>
+<div class="staff-login-shade" id="staff-login-modal" hidden><div class="staff-login-card"><h3>دخول موظفي لُقمة</h3><p>الدخول مخصص لحسابات الإدارة والمندوبين المعتمدة فقط.</p><form id="staff-login-form"><label for="staff-login-email">البريد الإلكتروني</label><input id="staff-login-email" type="email" autocomplete="username" required placeholder="employee@example.com"><label for="staff-login-password">كلمة المرور</label><input id="staff-login-password" type="password" autocomplete="current-password" required minlength="8" placeholder="كلمة المرور"><div class="staff-login-actions"><button class="primary" type="submit" id="staff-login-submit">دخول الموظفين</button><button class="secondary" type="button" id="staff-login-cancel">إلغاء</button></div><div class="auth-msg" id="staff-login-message" aria-live="polite"></div></form></div></div>
 <header id="store-header" hidden><div class="container">
 <div class="top"><div class="logo">لُقمة.<small>طازة لحد باب بيتك</small></div><div class="top-actions">
-<span class="chip">📍 أكتوبر الجديدة – غرب المطار</span><button class="chip" id="wallet-jump">المحفظة</button><button class="chip" id="account-jump">حسابي</button><button class="chip" id="my-orders-jump">طلباتي</button><button class="chip" id="staff-jump" hidden>لوحة التشغيل</button><button class="chip" id="sign-out">خروج</button>
+<span class="chip">📍 أكتوبر الجديدة – غرب المطار</span><button class="chip" id="wallet-jump">المحفظة</button><button class="chip" id="account-jump">حسابي</button><button class="chip" id="my-orders-jump">طلباتي</button><button class="chip" id="staff-jump" hidden>لوحة التشغيل</button><button class="chip" id="staff-login-open">دخول الموظفين</button><button class="chip" id="sign-out">خروج</button>
 </div></div>
 <div class="hero"><h1>صباحك يبدأ بعيش طازة ☀️</h1><p>اختار مخبوزاتك وإحنا نوصلها لحد باب البيت</p></div><div class="search"><input id="search" placeholder="بتدور على إيه؟" autocomplete="off"></div>
 </div></header>
@@ -297,7 +298,34 @@ function printSelected(thermal){const ids=[...document.querySelectorAll(".order-
 async function loadBakeries(){const host=$("staff-content"),{data,error}=await sb.from("bakeries").select("*").order("created_at",{ascending:false});if(error){host.innerHTML='<div class="warning">'+esc(error.message)+'</div>';return}bakeriesCache=data||[];host.innerHTML=`<div class="panel"><h4>إضافة مخبز</h4><div class="two"><input id="new-bakery-name" class="filter-input" placeholder="اسم المخبز"><input id="new-bakery-phone" class="filter-input" placeholder="رقم التواصل"></div><button class="primary" id="add-bakery" style="margin-top:8px">إضافة المخبز</button></div>`+(data||[]).map(b=>`<div class="admin-item"><b>${esc(b.name||"مخبز")}</b> • ${esc(b.phone||"بدون هاتف")} • ${b.is_active?"نشط":"متوقف"}<br><span class="muted">معرّف: ${esc(b.id)}</span></div>`).join("")||'<div class="empty">لا توجد مخابز مضافة.</div>';
  $("add-bakery").onclick=async()=>{const name=$("new-bakery-name").value.trim(),phone=$("new-bakery-phone").value.trim();if(!name){alert("اكتب اسم المخبز.");return}const {error}=await sb.from("bakeries").insert({name,phone:phone||null,is_active:true});if(error)alert(error.message);else loadBakeries()}
 }
-async function loadDrivers(){const host=$("staff-content"),[jr,pr]=await Promise.all([sb.from("staff_members").select("user_id,role,is_active,bakery_id").eq("role","driver"),sb.from("profiles").select("user_id,full_name,phone")]);if(jr.error){host.innerHTML='<div class="warning">'+esc(jr.error.message)+'</div>';return}staffCache=jr.data||[];const profiles=Object.fromEntries((pr.data||[]).map(p=>[p.user_id,p]));host.innerHTML='<div class="notice">أضف حساب المندوب من تسجيل الدخول أولًا، ثم أضف رقمه كموظف driver من جدول staff_members في قاعدة البيانات. هذه الشاشة تعرض الحسابات المسجلة فقط.</div>'+staffCache.map(d=>{const p=profiles[d.user_id]||{};return `<div class="admin-item"><b>${esc(p.full_name||"مندوب بدون اسم")}</b> • ${esc(p.phone||"بدون رقم")}<br><small>${esc(d.user_id)}</small> • ${d.is_active?"نشط":"موقوف"}</div>`}).join("")}
+async function loadDrivers(){
+ const host=$("staff-content"),[jr,pr]=await Promise.all([sb.from("staff_members").select("user_id,role,is_active,bakery_id,created_at").eq("role","driver").order("created_at",{ascending:false}),sb.from("profiles").select("user_id,full_name,phone")]);
+ if(jr.error){host.innerHTML='<div class="warning">'+esc(jr.error.message)+'</div>';return}
+ staffCache=jr.data||[];const profiles=Object.fromEntries((pr.data||[]).map(p=>[p.user_id,p]));
+ host.innerHTML=`<div class="panel"><h4>إضافة مندوب جديد</h4><div class="fields">
+ <div><label for="new-driver-name">اسم المندوب</label><input class="filter-input" id="new-driver-name" maxlength="100" placeholder="الاسم بالكامل"></div>
+ <div><label for="new-driver-phone">رقم الموبايل</label><input class="filter-input" id="new-driver-phone" inputmode="numeric" maxlength="11" placeholder="01xxxxxxxxx"></div>
+ <div><label for="new-driver-email">البريد الإلكتروني للدخول</label><input class="filter-input" id="new-driver-email" type="email" placeholder="employee@example.com"></div>
+ <div><label for="new-driver-password">كلمة مرور مؤقتة (8 أحرف على الأقل)</label><input class="filter-input" id="new-driver-password" type="password" minlength="8" autocomplete="new-password"></div>
+ <button class="primary" id="create-driver">إنشاء حساب المندوب</button><div class="result" id="create-driver-result"></div></div></div>
+ <h4>حسابات المندوبين (${staffCache.length})</h4>`+staffCache.map(d=>{const p=profiles[d.user_id]||{};return `<div class="admin-item"><b>${esc(p.full_name||"مندوب بدون اسم")}</b> • ${esc(p.phone||"بدون رقم")}<br><small>${esc(d.user_id)}</small> • <b>${d.is_active?"نشط":"موقوف"}</b> <button class="${d.is_active?"danger":"small-btn"}" data-driver-toggle="${esc(d.user_id)}" data-active="${d.is_active?"true":"false"}">${d.is_active?"إيقاف الحساب":"تفعيل الحساب"}</button></div>`}).join("")||'<div class="empty">لا يوجد مندوبون مسجلون حتى الآن.</div>';
+ $("create-driver").onclick=async()=>{
+  const result=$("create-driver-result"),name=$("new-driver-name").value.trim(),phone=$("new-driver-phone").value.trim(),email=$("new-driver-email").value.trim(),password=$("new-driver-password").value;
+  if(!name||!email||!password){result.textContent="أكمل الاسم والبريد وكلمة المرور.";return}
+  const btn=$("create-driver");btn.disabled=true;result.textContent="جاري إنشاء حساب الموظف…";
+  const {data,error}=await sb.functions.invoke("loqma-staff-admin",{body:{action:"create_driver",full_name:name,phone,email,password}});
+  btn.disabled=false;
+  if(error||data?.error){result.textContent="تعذر إنشاء الحساب: "+(data?.error||error?.message||"خطأ غير معروف");return}
+  result.textContent="تم إنشاء حساب المندوب بنجاح. سلّمه البريد وكلمة المرور بطريقة آمنة.";
+  await loadDrivers();
+ };
+ host.querySelectorAll("[data-driver-toggle]").forEach(btn=>btn.onclick=async()=>{
+  const active=btn.dataset.active!=="true";if(!confirm(active?"تفعيل حساب هذا المندوب؟":"إيقاف حساب هذا المندوب؟"))return;
+  btn.disabled=true;const {data,error}=await sb.functions.invoke("loqma-staff-admin",{body:{action:"set_driver_active",user_id:btn.dataset.driverToggle,is_active:active}});
+  if(error||data?.error){alert("تعذر تعديل الحساب: "+(data?.error||error?.message||"خطأ غير معروف"));btn.disabled=false;return}
+  await loadDrivers();
+ });
+}
 async function loadProductAdmin(){const host=$("staff-content"),{data,error}=await sb.from("product_catalog").select("*").order("display_order");if(error){host.innerHTML='<div class="warning">'+esc(error.message)+'</div>';return}host.innerHTML='<div class="notice">تعديل السعر أو إيقاف الصنف يتم حفظه مباشرة في كتالوج المنتجات.</div>'+(data||[]).map(p=>`<div class="admin-item"><b>${esc(p.product_name)}</b><div class="two"><label>السعر بالجنيه<input class="filter-input" type="number" min="0" step=".01" id="price-${esc(p.id)}" value="${(Number(p.price_piasters)/100).toFixed(2)}"></label><label>التوفر<select class="filter-input" id="active-${esc(p.id)}"><option value="true" ${p.is_active?"selected":""}>متاح</option><option value="false" ${!p.is_active?"selected":""}>غير متاح</option></select></label></div><button class="small-btn" data-save-product="${esc(p.id)}">حفظ التعديل</button></div>`).join("");
  host.querySelectorAll("[data-save-product]").forEach(b=>b.onclick=async()=>{const id=b.dataset.saveProduct,price=Number($("price-"+id).value),is_active=$("active-"+id).value==="true";if(!Number.isFinite(price)||price<0){alert("السعر غير صحيح.");return}const {error}=await sb.from("product_catalog").update({price_piasters:Math.round(price*100),is_active}).eq("id",id);if(error)alert("تعذر الحفظ: "+error.message);else{alert("تم الحفظ.");await loadProducts()}})
 }
@@ -340,6 +368,20 @@ async function init(){
   $("auth-message").textContent="تعذر فتح المتجر: "+(e.message||"حدث خطأ غير متوقع.")+" — تأكد من تفعيل Anonymous Sign-ins في Supabase.";
  }
 }
+$("staff-login-open").onclick=()=>{$("staff-login-message").textContent="";$("staff-login-modal").hidden=false;$("staff-login-email").focus()};
+$("staff-login-cancel").onclick=()=>{$("staff-login-modal").hidden=true};
+$("staff-login-form").onsubmit=async e=>{
+ e.preventDefault();const btn=$("staff-login-submit"),msg=$("staff-login-message"),email=$("staff-login-email").value.trim(),password=$("staff-login-password").value;
+ btn.disabled=true;msg.textContent="جاري التحقق من حساب الموظف…";
+ try{
+  const {data,error}=await sb.auth.signInWithPassword({email,password});
+  if(error)throw error;
+  user=data.user;await loadStaffIdentity();
+  if(!staff){await sb.auth.signOut({scope:"local"});throw Error("هذا الحساب غير مسجل كموظف نشط في لُقمة.");}
+  $("staff-login-modal").hidden=true;$("staff-login-form").reset();showStore(true);await loadStaff();$("staff-panel").hidden=false;
+ }catch(error){msg.textContent="تعذر الدخول: "+(error.message||"راجع البريد وكلمة المرور.");}
+ finally{btn.disabled=false;}
+};
 sb.auth.onAuthStateChange(async(event,session)=>{if(!authReady)return;const previous=user?.id;user=session?.user||null;showStore(!!user);if(user){if(previous!==user.id)restoreCart();await loadStaffIdentity();loadProducts();loadProfile();loadWallet()}else{staff=null;$("staff-jump").hidden=true;$("staff-panel").hidden=true;clearCart()}});
 init();
 if("serviceWorker" in navigator){
