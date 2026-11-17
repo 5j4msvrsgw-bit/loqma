@@ -97,7 +97,7 @@ header{color:white;background:radial-gradient(circle at 90% 5%,#c6a66b30,transpa
 <script>
 "use strict";
 const SUPABASE_URL="https://dvidxumpkgthubassfxm.supabase.co";
-const SUPABASE_KEY="sb_publishable_d5hFIWk_aLxzsF2WZt7uvg_iHZCESFs";
+const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2aWR4dW1wa2d0aHViYXNzZnhtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwNjQ5MzAsImV4cCI6MjEwOTY0MDkzMH0.KHjbQHiRHxQ499r-Z_j93CirfO-ElLPeE6btSUFzumU";
 const MIN_DAILY=30, DAILY_DELIVERY=5, DAILY_SERVICE=1, WEEKLY_DELIVERY=20, WEEKLY_SERVICE=1;
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 const $=id=>document.getElementById(id), money=n=>(Number(n)||0).toFixed(2)+" ج";
