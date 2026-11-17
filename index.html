@@ -379,7 +379,7 @@ $("staff-login-form").onsubmit=async e=>{
   const {data,error}=await sb.auth.signInWithPassword({email,password});
   if(error)throw error;
   user=data.user;await loadStaffIdentity();
-  if(!staff){await sb.auth.signOut({scope:"local"});throw Error("هذا الحساب غير مسجل كموظف نشط في لُقمة.");}
+  if(!staff){$("staff-login-modal").hidden=true;showStore(true);throw Error("هذا الحساب لا يملك صلاحية موظف نشط. يمكنك استخدامه كحساب عميل عادي.");}
   $("staff-login-modal").hidden=true;$("staff-login-form").reset();showStore(true);await loadStaff();$("staff-panel").hidden=false;
  }catch(error){msg.textContent="تعذر الدخول: "+(error.message||"راجع البريد وكلمة المرور.");}
  finally{btn.disabled=false;}
