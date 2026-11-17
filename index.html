@@ -342,6 +342,22 @@ async function init(){
 }
 sb.auth.onAuthStateChange(async(event,session)=>{if(!authReady)return;const previous=user?.id;user=session?.user||null;showStore(!!user);if(user){if(previous!==user.id)restoreCart();await loadStaffIdentity();loadProducts();loadProfile();loadWallet()}else{staff=null;$("staff-jump").hidden=true;$("staff-panel").hidden=true;clearCart()}});
 init();
-if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(console.warn));
+if("serviceWorker" in navigator){
+ const nativeApp=!!(window.Capacitor&&typeof window.Capacitor.isNativePlatform==="function"&&window.Capacitor.isNativePlatform());
+ window.addEventListener("load",async()=>{
+  if(nativeApp){
+   try{
+    const registrations=await navigator.serviceWorker.getRegistrations();
+    await Promise.all(registrations.map(registration=>registration.unregister()));
+    if("caches" in window){const keys=await caches.keys();await Promise.all(keys.map(key=>caches.delete(key)))}
+    if(navigator.serviceWorker.controller&&!sessionStorage.getItem("loqma-native-cache-cleared")){
+     sessionStorage.setItem("loqma-native-cache-cleared","1");location.reload();
+    }
+   }catch(error){console.warn("Native cache cleanup:",error)}
+  }else{
+   navigator.serviceWorker.register("./sw.js").catch(console.warn);
+  }
+ });
+}
 </script>
 </body></html>
