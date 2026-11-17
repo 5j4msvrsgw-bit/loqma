@@ -40,6 +40,55 @@ header{color:white;background:radial-gradient(circle at 90% 5%,#c6a66b30,transpa
 @media(min-width:900px){.products{grid-template-columns:repeat(4,1fr)}}
 @media(max-width:520px){.filters{grid-template-columns:1fr 1fr}.filters input{grid-column:1/-1}.stats{grid-template-columns:repeat(2,1fr)}.top-actions .chip{padding:7px 8px;font-size:10px}.hero h1{font-size:20px}}
 @media print{body{background:#fff;padding:0}.no-print,header,.cart-bar,.auth-gate{display:none!important}.container{max-width:none;padding:0}.print-area{display:block!important}.order-card{break-inside:avoid;border:1px solid #bbb}.admin{border:0;padding:0}.simple-table{min-width:0}.print-title{text-align:center;margin:0 0 15px}}
+
+/* تحسينات الواجهة والحركة */
+body{background:radial-gradient(ellipse at 5% 22%,#e4eee5 0,transparent 38%),var(--bg)}
+header{position:relative;overflow:hidden;box-shadow:0 12px 32px #0d281f20}
+header:after{content:"";position:absolute;width:240px;height:240px;border:1px solid #ffffff18;border-radius:50%;left:-85px;bottom:-160px;box-shadow:0 0 0 22px #ffffff08,0 0 0 48px #ffffff05;pointer-events:none}
+.hero{position:relative;padding:17px 16px 18px;border:1px solid #ffffff20;border-radius:19px;background:linear-gradient(115deg,#ffffff12,#ffffff05);overflow:hidden}
+.hero:after{content:"🥖";position:absolute;left:14px;bottom:-15px;font-size:76px;opacity:.13;transform:rotate(-18deg);pointer-events:none}
+.hero h1{font-size:clamp(21px,5vw,29px);letter-spacing:-.4px}
+.hero p{font-size:13px}
+.search{box-shadow:0 8px 22px #081f171c;transition:box-shadow .2s,transform .2s}
+.search:focus-within{box-shadow:0 0 0 3px #c6a66b55,0 8px 22px #081f171c;transform:translateY(-1px)}
+.section h2{font-size:17px}
+.category{transition:background .2s,border-color .2s,color .2s,transform .2s}
+.category:active,.quick-actions button:active,.primary:active,.add:active{transform:scale(.96)}
+.product{position:relative;overflow:hidden;animation:loqmaRise .42s both;transition:transform .22s,box-shadow .22s,border-color .22s}
+.product:nth-child(2n){animation-delay:.045s}.product:nth-child(3n){animation-delay:.09s}
+.product:active{transform:scale(.985)}
+.product-image{position:relative;background:linear-gradient(145deg,#f5f5eb,#e7efe6);transition:background .25s}
+.product-image img{transition:transform .45s cubic-bezier(.2,.7,.2,1)}
+.product:hover .product-image img{transform:scale(1.055)}
+.product h3{font-size:13px}
+.price{font-size:15px}
+.add{box-shadow:0 3px 8px #123b2d18;transition:transform .18s,background .18s}
+.add:hover{background:var(--g);color:white;transform:rotate(90deg)}
+.qty button{transition:transform .16s}
+.qty button:active{transform:scale(.88)}
+.cart-bar{border-radius:18px 18px 0 0}
+.cart-inner .primary{min-width:120px;box-shadow:0 5px 14px #123b2d26}
+.panel,.admin{box-shadow:0 7px 22px #15291d08}
+.modal.show .sheet{animation:loqmaSheet .28s cubic-bezier(.2,.8,.2,1)}
+@keyframes loqmaRise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes loqmaSheet{from{opacity:.7;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+.product-admin-intro{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border-radius:15px;background:linear-gradient(120deg,#123b2d,#1d6048);color:white;margin:8px 0 13px}
+.product-admin-intro b{font-size:14px}.product-admin-intro p{font-size:10px;line-height:1.9;color:#e1ece4;margin:5px 0 0}.product-admin-intro>span{font-size:34px}
+.product-create{border:1px solid #dce8dc;background:#f8fbf6;border-radius:14px;padding:13px;margin-bottom:16px}
+.product-create summary{font-weight:900;color:var(--g);font-size:13px;cursor:pointer;padding:3px}
+.product-create-grid{grid-template-columns:repeat(2,minmax(0,1fr));margin:12px 0}
+.product-create-grid label,.product-admin-item label{font-size:10px;color:var(--g);font-weight:800}
+.product-create .primary{width:100%}
+.product-admin-heading{display:flex;justify-content:space-between;align-items:center;color:var(--g);font-size:13px;margin:12px 0}
+.product-admin-heading span{font-size:10px;color:var(--muted)}
+.product-admin-item{background:white;border:1px solid var(--line);border-radius:13px;padding:12px;margin:9px 0}
+.product-admin-name{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:9px}
+.product-admin-name b{font-size:12px}
+.product-admin-item .two{margin-bottom:9px}
+.product-admin-item .small-btn{padding:9px 15px}
+@media(max-width:390px){.product-create-grid{grid-template-columns:1fr}.hero{padding:14px}.hero:after{font-size:60px}}
+
 </style>
 </head>
 <body class="locked">
@@ -328,8 +377,71 @@ async function loadDrivers(){
   await loadDrivers();
  });
 }
-async function loadProductAdmin(){const host=$("staff-content"),{data,error}=await sb.from("product_catalog").select("*").order("display_order");if(error){host.innerHTML='<div class="warning">'+esc(error.message)+'</div>';return}host.innerHTML='<div class="notice">تعديل السعر أو إيقاف الصنف يتم حفظه مباشرة في كتالوج المنتجات.</div>'+(data||[]).map(p=>`<div class="admin-item"><b>${esc(p.product_name)}</b><div class="two"><label>السعر بالجنيه<input class="filter-input" type="number" min="0" step=".01" id="price-${esc(p.id)}" value="${(Number(p.price_piasters)/100).toFixed(2)}"></label><label>التوفر<select class="filter-input" id="active-${esc(p.id)}"><option value="true" ${p.is_active?"selected":""}>متاح</option><option value="false" ${!p.is_active?"selected":""}>غير متاح</option></select></label></div><button class="small-btn" data-save-product="${esc(p.id)}">حفظ التعديل</button></div>`).join("");
- host.querySelectorAll("[data-save-product]").forEach(b=>b.onclick=async()=>{const id=b.dataset.saveProduct,price=Number($("price-"+id).value),is_active=$("active-"+id).value==="true";if(!Number.isFinite(price)||price<0){alert("السعر غير صحيح.");return}const {error}=await sb.from("product_catalog").update({price_piasters:Math.round(price*100),is_active}).eq("id",id);if(error)alert("تعذر الحفظ: "+error.message);else{alert("تم الحفظ.");await loadProducts()}})
+async function loadProductAdmin(){
+ const host=$("staff-content");
+ const {data,error}=await sb.from("product_catalog").select("*").order("display_order");
+ if(error){host.innerHTML='<div class="warning">'+esc(error.message)+'</div>';return}
+ const rows=data||[];
+ const nextOrder=rows.reduce((m,p)=>Math.max(m,Number(p.display_order)||0),0)+1;
+ host.innerHTML=`
+ <div class="product-admin-intro"><div><b>إدارة كتالوج لُقمة</b><p>أضف صنفًا جديدًا أو عدّل الاسم والسعر والوحدة والتوفر والترتيب. التغييرات تظهر للعميل بعد الحفظ.</p></div><span>🥖</span></div>
+ <details class="product-create" open>
+  <summary>＋ إضافة منتج جديد</summary>
+  <div class="fields product-create-grid">
+   <label>اسم المنتج<input class="filter-input" id="new-product-name" maxlength="120" placeholder="مثال: عيش بلدي"></label>
+   <label>اسم المخبز / المصدر<input class="filter-input" id="new-product-source" maxlength="100" value="لُقمة" placeholder="اسم المخبز"></label>
+   <label>السعر بالجنيه<input class="filter-input" id="new-product-price" type="number" min="0.01" step=".01" placeholder="مثال: 2.50"></label>
+   <label>وحدة البيع<select class="filter-input" id="new-product-unit"><option value="piece">للقطعة</option><option value="loaf">للقالب كامل</option><option value="pack">للباكت</option></select></label>
+   <label>الوزن بالجرام (اختياري)<input class="filter-input" id="new-product-weight" type="number" min="1" step="1" placeholder="مثال: 80"></label>
+   <label>ترتيب العرض<input class="filter-input" id="new-product-order" type="number" step="1" value="${nextOrder}"></label>
+  </div>
+  <button class="primary" id="create-product" type="button">إضافة المنتج للكتالوج</button>
+  <div class="result" id="create-product-result" aria-live="polite"></div>
+ </details>
+ <div class="product-admin-heading"><b>المنتجات الحالية</b><span>${rows.length} صنف</span></div>
+ <div class="product-admin-list">${rows.map(p=>`
+  <article class="admin-item product-admin-item">
+   <div class="product-admin-name"><b>${esc(p.product_name)}</b><span class="badge">${p.is_active?"متاح":"متوقف"}</span></div>
+   <div class="two">
+    <label>اسم المنتج<input class="filter-input" id="name-${esc(p.id)}" maxlength="120" value="${esc(p.product_name)}"></label>
+    <label>السعر بالجنيه<input class="filter-input" type="number" min=".01" step=".01" id="price-${esc(p.id)}" value="${(Number(p.price_piasters)/100).toFixed(2)}"></label>
+    <label>المصدر / المخبز<input class="filter-input" id="source-${esc(p.id)}" maxlength="100" value="${esc(p.source_name)}"></label>
+    <label>وحدة البيع<select class="filter-input" id="unit-${esc(p.id)}"><option value="piece" ${p.sale_unit==="piece"?"selected":""}>للقطعة</option><option value="loaf" ${p.sale_unit==="loaf"?"selected":""}>للقالب كامل</option><option value="pack" ${p.sale_unit==="pack"?"selected":""}>للباكت</option></select></label>
+    <label>الوزن بالجرام<input class="filter-input" type="number" min="1" step="1" id="weight-${esc(p.id)}" value="${p.weight_grams??""}" placeholder="اختياري"></label>
+    <label>ترتيب العرض<input class="filter-input" type="number" step="1" id="order-${esc(p.id)}" value="${Number(p.display_order)||0}"></label>
+    <label>حالة المنتج<select class="filter-input" id="active-${esc(p.id)}"><option value="true" ${p.is_active?"selected":""}>متاح للشراء</option><option value="false" ${!p.is_active?"selected":""}>إيقاف مؤقت</option></select></label>
+   </div>
+   <button class="small-btn" data-save-product="${esc(p.id)}">حفظ التعديلات</button>
+  </article>`).join("")||'<div class="empty">لا توجد منتجات حتى الآن.</div>'}</div>`;
+ const result=$("create-product-result");
+ $("create-product").onclick=async()=>{
+  const button=$("create-product"),name=$("new-product-name").value.trim(),source=$("new-product-source").value.trim(),price=Number($("new-product-price").value),unit=$("new-product-unit").value,weightRaw=$("new-product-weight").value,order=Number($("new-product-order").value);
+  try{
+   if(!name||!source)throw Error("اكتب اسم المنتج واسم المخبز أو المصدر.");
+   if(!Number.isFinite(price)||price<=0)throw Error("اكتب سعرًا صحيحًا أكبر من صفر.");
+   if(weightRaw!==""&&(!Number.isInteger(Number(weightRaw))||Number(weightRaw)<=0))throw Error("الوزن يجب أن يكون رقمًا صحيحًا أكبر من صفر.");
+   if(!Number.isInteger(order)||order<0)throw Error("ترتيب العرض غير صحيح.");
+   button.disabled=true;result.textContent="جاري إضافة المنتج…";
+   const {error:insertError}=await sb.from("product_catalog").insert({product_name:name,source_name:source,price_piasters:Math.round(price*100),sale_unit:unit,weight_grams:weightRaw===""?null:Number(weightRaw),display_order:order,is_active:true});
+   if(insertError)throw insertError;
+   result.textContent="تمت إضافة المنتج بنجاح.";
+   await loadProducts();await loadProductAdmin();
+  }catch(e){result.textContent="تعذر إضافة المنتج: "+(e.message||"خطأ غير معروف");}
+  finally{button.disabled=false;}
+ };
+ host.querySelectorAll("[data-save-product]").forEach(b=>b.onclick=async()=>{
+  const id=b.dataset.saveProduct,name=$("name-"+id).value.trim(),source_name=$("source-"+id).value.trim(),price=Number($("price-"+id).value),sale_unit=$("unit-"+id).value,weightRaw=$("weight-"+id).value,display_order=Number($("order-"+id).value),is_active=$("active-"+id).value==="true";
+  try{
+   if(!name||!source_name)throw Error("اسم المنتج والمصدر مطلوبان.");
+   if(!Number.isFinite(price)||price<=0)throw Error("السعر يجب أن يكون أكبر من صفر.");
+   if(weightRaw!==""&&(!Number.isInteger(Number(weightRaw))||Number(weightRaw)<=0))throw Error("الوزن غير صحيح.");
+   if(!Number.isInteger(display_order)||display_order<0)throw Error("ترتيب العرض غير صحيح.");
+   b.disabled=true;
+   const {error:updateError}=await sb.from("product_catalog").update({product_name:name,source_name,price_piasters:Math.round(price*100),sale_unit,weight_grams:weightRaw===""?null:Number(weightRaw),display_order,is_active,updated_at:new Date().toISOString()}).eq("id",id);
+   if(updateError)throw updateError;
+   await loadProducts();await loadProductAdmin();
+  }catch(e){alert("تعذر حفظ التعديل: "+(e.message||"خطأ غير معروف"));b.disabled=false;}
+ });
 }
 async function loadAdminSettings(){const host=$("staff-content"),{data,error}=await sb.from("app_settings").select("*").limit(1).maybeSingle();if(error){host.innerHTML='<div class="warning">تعذر تحميل الإعدادات: '+esc(error.message)+'</div>';return}if(!data){host.innerHTML='<div class="warning">لم يتم العثور على سجل إعدادات التطبيق.</div>';return}host.innerHTML=`<div class="panel"><h4>حالة استقبال الطلبات</h4><p>${data.allow_orders?"استقبال الطلبات مفتوح":"استقبال الطلبات مغلق"}</p><button class="${data.allow_orders?"danger":"primary"}" id="toggle-orders">${data.allow_orders?"إغلاق استقبال الطلبات":"فتح استقبال الطلبات"}</button></div><div class="panel"><h4>مواعيد التشغيل</h4><div class="two"><label>بداية التوصيل<input class="filter-input" id="delivery-start" type="time" value="${esc(data.delivery_start_time||"06:00")}"></label><label>نهاية التوصيل<input class="filter-input" id="delivery-end" type="time" value="${esc(data.delivery_end_time||"08:00")}"></label><label>آخر موعد للطلب<input class="filter-input" id="cutoff-time" type="time" value="${esc(data.order_cutoff_time||"22:00")}"></label><label>رسوم التوصيل بالجنيه<input class="filter-input" id="delivery-fee" type="number" min="0" step=".01" value="${data.delivery_fee_piasters==null?"":Number(data.delivery_fee_piasters)/100}"></label></div><button class="primary" id="save-settings" style="margin-top:10px">حفظ المواعيد والرسوم</button><div class="result" id="settings-result"></div></div>`;
  $("toggle-orders").onclick=async()=>{const {error}=await sb.rpc("loqma_admin_set_ordering",{p_allow:!data.allow_orders});if(error)alert("تعذر تغيير الحالة: "+error.message);else loadAdminSettings()};
