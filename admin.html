@@ -33,12 +33,12 @@ h1,h2,h3,p{margin-top:0}.heading{display:flex;justify-content:space-between;alig
  <div class="login-card">
   <div style="font-size:40px">🥖</div><h1>لوحة إدارة لُقمة</h1>
   <p>سجّل الدخول بالبريد الإلكتروني المصرّح له كمدير. لن يتم عرض بيانات الإدارة إلا للحساب المسجل في صلاحيات المدير.</p>
-  <form id="login-form"><input id="email" type="email" placeholder="name@example.com" autocomplete="email" required><button class="btn" id="login-btn">إرسال رابط الدخول</button></form>
+  <form id="login-form"><input id="email" type="email" placeholder="البريد الإلكتروني" autocomplete="username" required><input id="password" type="password" placeholder="كلمة المرور" autocomplete="current-password" required><button class="btn" id="login-btn">دخول</button></form><button class="btn secondary" id="magic-link-btn" type="button" style="margin-top:8px;width:100%">الدخول بالرابط مؤقتًا</button>
   <div class="msg" id="login-msg" aria-live="polite"></div>
  </div>
 </section>
 <div id="admin-app" hidden>
-<header><div class="wrap top"><div class="brand">لُقمة.<small>لوحة الإدارة والتشغيل</small></div><div class="header-actions"><button id="refresh">تحديث</button><button id="logout">تسجيل الخروج</button></div></div></header>
+<header><div class="wrap top"><div class="brand">لُقمة.<small>لوحة الإدارة والتشغيل</small></div><div class="header-actions"><button id="refresh">تحديث</button><button id="set-password">تعيين كلمة المرور</button><button id="logout">تسجيل الخروج</button></div></div></header>
 <main class="wrap">
  <section class="panel">
   <div class="heading"><h2 id="page-title">إدارة الطلبات</h2><span class="muted" id="admin-email"></span></div>
@@ -70,12 +70,23 @@ async function checkAdmin(){
  staff=data;
 }
 async function signIn(){
- const email=$("email").value.trim();$("login-btn").disabled=true;setMessage("login-msg","جاري إرسال رابط الدخول…");
- const {error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:location.href.split("#")[0]}});
- setMessage("login-msg",error?"تعذر إرسال الرابط: "+error.message:"تم إرسال رابط الدخول إلى بريدك. افتحه من نفس الجهاز للعودة إلى لوحة الإدارة.");
+ const email=$("email").value.trim(),password=$("password").value;
+ $("login-btn").disabled=true;setMessage("login-msg","جاري تسجيل الدخول…");
+ const {error}=await sb.auth.signInWithPassword({email,password});
+ setMessage("login-msg",error?"تعذر تسجيل الدخول: "+error.message:"تم تسجيل الدخول بنجاح.");
  $("login-btn").disabled=false;
 }
+async function sendMagicLink(){
+ const email=$("email").value.trim();
+ if(!email){setMessage("login-msg","اكتب البريد الإلكتروني أولًا.");return}
+ $("magic-link-btn").disabled=true;setMessage("login-msg","جاري إرسال رابط الدخول المؤقت…");
+ const {error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:location.href.split("#")[0]}});
+ setMessage("login-msg",error?"تعذر إرسال الرابط: "+error.message:"تم إرسال رابط الدخول إلى بريدك.");
+ $("magic-link-btn").disabled=false;
+}
 $("login-form").addEventListener("submit",e=>{e.preventDefault();signIn()});
+$("magic-link-btn").addEventListener("click",sendMagicLink);
+$("set-password").addEventListener("click",async()=>{const password=prompt("اكتب كلمة مرور جديدة (8 أحرف على الأقل):");if(password===null)return;if(password.length<8){alert("كلمة المرور يجب ألا تقل عن 8 أحرف.");return}const {error}=await sb.auth.updateUser({password});if(error)alert("تعذر حفظ كلمة المرور: "+error.message);else alert("تم تعيين كلمة المرور. استخدمها في المرات القادمة.");});
 async function startSession(session){
  user=session?.user||null;
  if(!user){showApp(false);return}
