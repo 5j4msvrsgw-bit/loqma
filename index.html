@@ -460,6 +460,34 @@ function printHtml(title,body,thermal=false){const w=window.open("","_blank");if
  .cutoff-countdown{gap:5px}
  .cutoff-time{font-size:16px;min-width:105px;padding:5px 7px}
 }
+
+/* Responsive asset sizing: preserve each uploaded image's own proportions */
+#store-header{background-size:cover;background-position:center top}
+#store-header .logo{width:100%;align-items:flex-end}
+#store-header .loqma-logo-img{width:clamp(150px,42vw,220px);height:auto;max-height:none;object-fit:contain;object-position:right center}
+#store-header .hero{display:flex;align-items:center;gap:clamp(12px,3vw,24px);min-height:0}
+#store-header .hero-copy{flex:1;min-width:0}
+#store-header .hero-art{display:block;flex:0 0 42%;width:42%;max-width:360px;height:auto;min-height:0;aspect-ratio:auto;object-fit:contain;object-position:center;border-radius:18px;border:1px solid #e8d28b99}
+#store-main .delivery-banner{display:flex;flex-direction:column;align-items:stretch;gap:10px;padding:12px;border-radius:22px}
+#store-main .delivery-art{display:block;flex:none;width:100%;min-width:0;max-width:none;height:auto;min-height:0;overflow:visible;border-radius:14px}
+#store-main .delivery-art img{display:block;width:100%;height:auto;max-width:none;max-height:none;object-fit:contain;object-position:center;filter:none;border-radius:14px}
+#store-main .delivery-copy{width:100%;flex:none;gap:7px;font-size:clamp(13px,3.2vw,16px)}
+#store-main .delivery-pin{display:none}
+#store-main .cutoff-countdown{justify-content:flex-start;gap:8px}
+#store-main .cutoff-time{min-width:125px;font-size:clamp(17px,4.4vw,23px);padding:7px 12px}
+@media(max-width:520px){
+ #store-header .logo{align-items:flex-end}
+ #store-header .loqma-logo-img{width:clamp(145px,44vw,185px);max-height:none}
+ #store-header .hero{min-height:0;padding:12px 10px;gap:10px}
+ #store-header .hero-art{flex-basis:42%;width:42%;height:auto;min-height:0;aspect-ratio:auto;object-fit:contain;border-radius:14px}
+ #store-header .hero h1{font-size:clamp(17px,4.8vw,22px);line-height:1.5}
+ #store-header .hero p{font-size:clamp(11px,3vw,14px);line-height:1.8}
+ #store-main .delivery-banner{gap:9px;padding:10px}
+ #store-main .delivery-art{width:100%;height:auto;min-height:0}
+ #store-main .delivery-art img{width:100%;height:auto;object-fit:contain}
+ #store-main .delivery-copy{font-size:13px}
+ #store-main .cutoff-time{font-size:17px;min-width:112px;padding:6px 9px}
+}
 </style></head><body><h2>${esc(title)}</h2>${body}<div class="noprint"><button onclick="window.print()">طباعة</button></div><script>window.onload=()=>setTimeout(()=>window.print(),350)<\/script></body></html>`);w.document.close()}
 function orderPrintMarkup(o,profile,address,items){return `<div class="ticket"><b>طلب رقم: ${esc(o.order_number||o.id)}</b><br>العميل: ${esc(profile?.full_name||"—")}<br>الموبايل: ${esc(profile?.phone||"—")}<br>العنوان: ${esc([address?.area,address?.street,address?.building&&"عمارة "+address.building,address?.floor&&"دور "+address.floor,address?.apartment&&"شقة "+address.apartment,address?.landmark].filter(Boolean).join(" - "))}<br>موعد التوصيل: ${esc(o.delivery_date||"—")}<br><hr>${(items||[]).map(i=>`${esc(i.product_name)} × ${esc(i.quantity)} — ${moneyP(i.line_total_piasters)}`).join("<br>")}<hr><b>الإجمالي: ${moneyP(o.total_amount_piasters)}</b><br>الحالة: ${statusLabel(o.status)}<br>ملاحظات: ${esc(o.customer_notes||"—")}</div>`}
 async function fetchOrderDetails(rows){
