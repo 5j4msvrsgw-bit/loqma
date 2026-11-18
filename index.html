@@ -445,6 +445,21 @@ function printHtml(title,body,thermal=false){const w=window.open("","_blank");if
  #store-main .delivery-art{width:29%;height:76px}
  #store-main .delivery-art img{height:76px}
 }
+
+/* Live countdown over the uploaded delivery artwork */
+.delivery-banner{align-items:center}
+.delivery-art{height:92px;min-height:92px;overflow:hidden;border-radius:14px;flex:0 0 29%}
+.delivery-art img{display:block;width:100%;height:100%;max-width:none;object-fit:cover;object-position:left center}
+.cutoff-countdown{display:flex!important;align-items:center;gap:7px;flex-wrap:wrap}
+.cutoff-time{min-width:112px;justify-content:center;font-size:clamp(17px,4vw,22px);letter-spacing:1px}
+.next-day-note[hidden],.cutoff-countdown[hidden]{display:none!important}
+@media(max-width:520px){
+ .delivery-banner{gap:8px;padding:10px}
+ .delivery-art{height:82px;min-height:82px;flex-basis:27%}
+ .delivery-copy{gap:5px;font-size:12px}
+ .cutoff-countdown{gap:5px}
+ .cutoff-time{font-size:16px;min-width:105px;padding:5px 7px}
+}
 </style></head><body><h2>${esc(title)}</h2>${body}<div class="noprint"><button onclick="window.print()">طباعة</button></div><script>window.onload=()=>setTimeout(()=>window.print(),350)<\/script></body></html>`);w.document.close()}
 function orderPrintMarkup(o,profile,address,items){return `<div class="ticket"><b>طلب رقم: ${esc(o.order_number||o.id)}</b><br>العميل: ${esc(profile?.full_name||"—")}<br>الموبايل: ${esc(profile?.phone||"—")}<br>العنوان: ${esc([address?.area,address?.street,address?.building&&"عمارة "+address.building,address?.floor&&"دور "+address.floor,address?.apartment&&"شقة "+address.apartment,address?.landmark].filter(Boolean).join(" - "))}<br>موعد التوصيل: ${esc(o.delivery_date||"—")}<br><hr>${(items||[]).map(i=>`${esc(i.product_name)} × ${esc(i.quantity)} — ${moneyP(i.line_total_piasters)}`).join("<br>")}<hr><b>الإجمالي: ${moneyP(o.total_amount_piasters)}</b><br>الحالة: ${statusLabel(o.status)}<br>ملاحظات: ${esc(o.customer_notes||"—")}</div>`}
 async function fetchOrderDetails(rows){
@@ -628,28 +643,37 @@ $("staff-login-form").onsubmit=async e=>{
 };
 sb.auth.onAuthStateChange(async(event,session)=>{if(!authReady)return;const previous=user?.id;user=session?.user||null;showStore(!!user);if(user){if(previous!==user.id)restoreCart();await loadStaffIdentity();loadProducts();loadProfile();loadWallet()}else{staff=null;$("staff-jump").hidden=true;$("staff-panel").hidden=true;clearCart()}});
 
-// Daily order cutoff: 10:00 PM device-local time (Egypt storefront).
+// Live daily order cutoff: 10:00 PM Cairo time.
 (function(){
- const timeNode=document.getElementById("cutoff-time");
- const countdown=document.getElementById("cutoff-countdown");
- const nextDay=document.getElementById("next-day-note");
- if(!timeNode||!countdown||!nextDay)return;
- const updateCutoff=()=>{
-  const now=new Date();
-  const cutoff=new Date(now);
-  cutoff.setHours(22,0,0,0);
-  const closed=now.getTime()>=cutoff.getTime();
-  if(closed)cutoff.setDate(cutoff.getDate()+1);
-  const remaining=Math.max(0,cutoff.getTime()-now.getTime());
-  const hours=Math.floor(remaining/3600000);
-  const minutes=Math.floor((remaining%3600000)/60000);
-  const seconds=Math.floor((remaining%60000)/1000);
-  timeNode.textContent=[hours,minutes,seconds].map(v=>String(v).padStart(2,"0")).join(":");
-  countdown.querySelector(".cutoff-label").textContent=closed?"متبقي على استقبال طلبات اليوم التالي":"متبقي على إغلاق طلبات اليوم";
-  nextDay.hidden=!closed;
+ const start=()=>{
+  const timeNode=document.getElementById("cutoff-time");
+  const countdown=document.getElementById("cutoff-countdown");
+  const nextDay=document.getElementById("next-day-note");
+  if(!timeNode||!countdown||!nextDay)return;
+  const cairoParts=()=>{
+   const parts=new Intl.DateTimeFormat("en-GB",{timeZone:"Africa/Cairo",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hourCycle:"h23"}).formatToParts(new Date());
+   const out={};for(const p of parts)if(p.type!=="literal")out[p.type]=Number(p.value);
+   return out;
+  };
+  const update=()=>{
+   try{
+    const p=cairoParts();
+    const now=Date.UTC(p.year,p.month-1,p.day,p.hour,p.minute,p.second);
+    const closed=p.hour>=22;
+    const targetDay=new Date(Date.UTC(p.year,p.month-1,p.day+(closed?1:0),22,0,0));
+    const remaining=Math.max(0,targetDay.getTime()-now);
+    const h=Math.floor(remaining/3600000),m=Math.floor((remaining%3600000)/60000),sec=Math.floor((remaining%60000)/1000);
+    timeNode.textContent=[h,m,sec].map(v=>String(v).padStart(2,"0")).join(":");
+    const label=countdown.querySelector(".cutoff-label");
+    if(label)label.textContent=closed?"متبقي على استقبال طلبات اليوم التالي":"متبقي على إغلاق طلبات اليوم";
+    nextDay.hidden=!closed;
+    countdown.hidden=false;
+   }catch(error){timeNode.textContent="تعذر تحديث العداد";console.error("Loqma cutoff timer:",error)}
+  };
+  update();if(window.loqmaCutoffTimer)clearInterval(window.loqmaCutoffTimer);
+  window.loqmaCutoffTimer=setInterval(update,1000);
  };
- updateCutoff();
- window.setInterval(updateCutoff,1000);
+ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start,{once:true});else start();
 })();
 
 init();
