@@ -131,6 +131,43 @@ header:after{content:"";position:absolute;width:240px;height:240px;border:1px so
 #store-header .logo small{display:block;margin:0;color:#f1d58b;font-size:clamp(11px,3vw,14px);font-weight:800;letter-spacing:.5px}
 #store-header .loqma-logo-img{display:none!important}
 
+
+/* LOQMA reference redesign v2 — real existing brand assets */
+:root{--loqma-deep:#06472f;--loqma-leaf:#0b6a3d;--loqma-gold:#f1cf49}
+html,body{background:#e9f2df!important}
+body{background-image:linear-gradient(180deg,rgba(3,55,34,.06),rgba(238,247,225,.35)),url("./assets/loqma-bg.webp.PNG")!important;background-size:cover!important;background-position:center top!important;background-attachment:fixed!important;background-repeat:no-repeat!important}
+#store-header{background-image:linear-gradient(100deg,rgba(3,58,34,.36),rgba(3,69,39,.48)),url("./assets/loqma-bg.webp.PNG")!important;background-size:cover!important;background-position:center!important;border-radius:0 0 30px 30px!important;padding:20px 0 25px!important;box-shadow:0 12px 30px #063c2b38!important}
+#store-header .logo-word{font-size:clamp(42px,11vw,58px)!important;text-shadow:0 3px 14px #002b1b88!important}
+#store-header .logo small{color:#ffdf62!important;font-size:clamp(13px,3.5vw,16px)!important}
+#store-header .top-actions .chip,#store-header .chip{background:rgba(229,255,235,.17)!important;border:1px solid rgba(226,255,231,.36)!important;box-shadow:inset 0 1px 0 #ffffff35,0 4px 14px #002d1d28!important;backdrop-filter:blur(9px)!important;border-radius:22px!important}
+#store-header .hero{min-height:205px!important;margin-top:24px!important;padding:16px 18px!important;border:2px solid rgba(238,255,220,.65)!important;border-radius:30px!important;background:linear-gradient(100deg,rgba(4,74,40,.08),rgba(2,62,35,.24))!important;box-shadow:0 10px 25px #002d1d26!important}
+#store-header .hero-art{width:48%!important;max-width:360px!important;max-height:220px!important;object-fit:contain!important;filter:drop-shadow(0 8px 12px #001f1260)!important}
+#store-header .hero-copy h1{font-size:clamp(23px,6vw,36px)!important;line-height:1.35!important;text-shadow:0 2px 8px #002d1d65!important}
+#store-header .search{border-radius:24px!important;box-shadow:0 8px 22px #002d1d25!important}
+#store-header .search input{border-radius:24px!important;min-height:62px!important}
+#store-main{padding-top:20px!important}
+#store-main .delivery-banner{display:grid!important;grid-template-columns:minmax(118px,36%) minmax(0,1fr)!important;align-items:center!important;gap:10px!important;min-height:174px!important;padding:12px 14px!important;border:1px solid #fff!important;border-radius:30px!important;background:linear-gradient(110deg,#f4ffd9 0%,#e4f4c7 55%,#f8f8df 100%)!important;box-shadow:0 12px 28px #23552b22,inset 0 1px 0 #fff!important}
+#store-main .delivery-art{display:block!important;grid-column:1!important;grid-row:1!important;width:100%!important;height:auto!important;max-height:145px!important;object-fit:contain!important;object-position:center!important;filter:drop-shadow(0 7px 8px #234c2635)!important}
+#store-main .delivery-copy{grid-column:2!important;grid-row:1!important;text-align:right!important;min-width:0!important}
+#store-main .delivery-copy b{font-size:clamp(13px,3.5vw,18px)!important;line-height:1.55!important;color:#06472f!important}
+#store-main .cutoff-label{font-size:clamp(11px,2.8vw,14px)!important;color:#174d32!important}
+#store-main .cutoff-time .count-unit{background:#075b38!important;border:2px solid #e6c64b!important;border-radius:17px!important;box-shadow:0 5px 12px #12472c25!important;min-width:55px!important}
+#store-main .cutoff-time .count-unit b{color:#fff!important}
+#store-main .cutoff-time .count-unit small{color:#ffe16a!important}
+#store-main .quick-actions button{border:1px solid #e5eadc!important;border-radius:20px!important;box-shadow:0 6px 18px #244b2b12!important}
+#store-main .panel{border:1px solid #e5eadc!important;border-radius:25px!important;box-shadow:0 10px 28px #244b2b12!important}
+#store-main .cart-bar{box-shadow:0 -8px 28px #183d2720!important;border-radius:28px 28px 0 0!important}
+@media(max-width:520px){
+ #store-header{padding-top:14px!important}
+ #store-header .hero{grid-template-columns:1fr 1fr!important;gap:8px!important;min-height:170px!important;padding:12px!important}
+ #store-header .hero-art{width:100%!important;max-height:160px!important}
+ #store-header .hero-copy h1{font-size:clamp(20px,5.5vw,27px)!important}
+ #store-main .delivery-banner{grid-template-columns:36% minmax(0,1fr)!important;min-height:158px!important;padding:10px!important;gap:8px!important}
+ #store-main .delivery-art{max-height:125px!important}
+ #store-main .cutoff-time{gap:4px!important}
+ #store-main .cutoff-time .count-unit{min-width:43px!important;padding:5px 4px!important}
+}
+
 </style>
 </head>
 <body class="locked">
@@ -147,7 +184,7 @@ header:after{content:"";position:absolute;width:240px;height:240px;border:1px so
 <div class="hero"><div class="hero-copy"><span class="hero-kicker">طازة كل صباح</span><h1>صباحك يبدأ بعيش طازة ☀️</h1><p>اختار مخبوزاتك وإحنا نوصلها لحد باب البيت</p></div><img class="hero-art" src="./assets/hero-bread.webp.PNG" alt="سلة عيش ومخبوزات لُقمة الطازة" loading="eager"></div><div class="search"><input id="search" placeholder="بتدور على إيه؟" autocomplete="off"></div>
 </div></header>
 <main class="container" id="store-main" hidden>
-<div class="notice delivery-banner" id="store-notice"><div class="delivery-copy"><b>التوصيل متاح حاليًا في أكتوبر الجديدة – غرب المطار</b><span class="cutoff-caption">◷ آخر موعد لاستقبال الطلبات اليوم الساعة 10:00 مساءً</span><div class="cutoff-countdown" id="cutoff-countdown" role="status" aria-live="off"><span class="cutoff-label">متبقي على إغلاق الطلبات</span><span class="cutoff-time" id="cutoff-time">--:--:--</span></div><span class="next-day-note" id="next-day-note" hidden>انتهى استقبال طلبات اليوم — طلبك الآن لليوم التالي 🌅</span></div><div class="delivery-pin">📍<small>⌁</small></div></div>
+<div class="notice delivery-banner" id="store-notice"><img class="delivery-art" src="./assets/loqma-delivery.webp.PNG" alt="عربية توصيل لُقمة"><div class="delivery-copy"><b>التوصيل متاح حاليًا في أكتوبر الجديدة – غرب المطار</b><span class="cutoff-caption">◷ آخر موعد لاستقبال الطلبات اليوم الساعة 10:00 مساءً</span><div class="cutoff-countdown" id="cutoff-countdown" role="status" aria-live="off"><span class="cutoff-label">متبقي على إغلاق الطلبات</span><span class="cutoff-time" id="cutoff-time">--:--:--</span></div><span class="next-day-note" id="next-day-note" hidden>انتهى استقبال طلبات اليوم — طلبك الآن لليوم التالي 🌅</span></div></div>
 <div class="quick-actions"><button type="button" id="open-wallet-card">💳 المحفظة</button><button type="button" id="open-account-card">👤 بيانات حسابك</button><button type="button" id="open-my-orders">📦 متابعة طلباتي</button></div>
 <section class="panel" id="account-panel" hidden><div class="section" style="margin:0 0 10px"><h2>بيانات حسابك</h2><button class="small-btn" data-close-panel="account-panel">إغلاق</button></div><div class="fields"><div class="two"><div><label for="profile-name">الاسم</label><input id="profile-name" maxlength="100" placeholder="اسم العميل"></div><div><label for="profile-phone">رقم الموبايل</label><input id="profile-phone" type="tel" inputmode="tel" maxlength="20" placeholder="01xxxxxxxxx"></div></div><button class="primary" id="save-profile" type="button">حفظ البيانات</button><div class="result" id="profile-result"></div><div style="margin-top:16px"><h3 style="font-size:14px">عناوين التوصيل المحفوظة</h3><div id="profile-addresses" class="result">جاري تحميل العناوين…</div></div></div></section>
 <section class="panel" id="wallet-panel" hidden><div class="section" style="margin:0 0 8px"><h2>محفظة لُقمة</h2><div><button class="small-btn" data-close-panel="wallet-panel">إغلاق</button> <button class="primary" id="wallet-refresh">تحديث الرصيد</button></div></div><div class="wallet-number" id="wallet-balance">جاري تحميل الرصيد…</div><div class="notice">الرصيد مخصص للطلبات داخل لُقمة ولا يمكن سحبه نقدًا.</div><h4>شحن المحفظة</h4><div class="fields"><div><label for="topup-amount">المبلغ بالجنيه</label><input id="topup-amount" type="number" min="1" max="10000000" step="0.01" placeholder="مثال: 100"></div><div><label for="topup-method">طريقة التحويل</label><select id="topup-method"><option value="vodafone_cash">فودافون كاش</option><option value="instapay">إنستاباي</option></select></div><div class="wallet-grid"><div><label>رقم فودافون كاش</label><div class="wallet-number" id="voda-number">—</div><button class="small-btn" data-copy="voda-number">نسخ الرقم</button></div><div><label>معرّف إنستاباي</label><div class="wallet-number" id="insta-number">—</div><button class="small-btn" data-copy="insta-number">نسخ المعرّف</button></div></div><div><label for="transfer-reference">رقم العملية / مرجع التحويل *</label><input id="transfer-reference" maxlength="120" placeholder="اكتب رقم العملية بعد التحويل"></div><div><label for="topup-proof">صورة إثبات التحويل (اختياري)</label><input id="topup-proof" type="file" accept="image/jpeg,image/png,image/webp"></div><button class="primary" id="submit-topup">إرسال طلب الشحن للمراجعة</button><div class="result" id="topup-result"></div></div><h4>آخر حركات المحفظة</h4><div id="wallet-history" class="result">لا توجد حركات بعد.</div><h4>طلبات الشحن السابقة</h4><div id="my-topups" class="result">لا توجد طلبات شحن.</div></section>
