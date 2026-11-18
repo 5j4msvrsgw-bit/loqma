@@ -124,6 +124,13 @@ header:after{content:"";position:absolute;width:240px;height:240px;border:1px so
  #store-main .next-day-note{font-size:9px}
 }
 
+
+/* Use a clean text wordmark instead of the oversized logo image */
+#store-header .logo{display:flex;flex-direction:column;align-items:flex-end;gap:7px}
+#store-header .logo-word{display:block;color:#fff;font-size:clamp(38px,10vw,54px);font-weight:950;line-height:1.05;letter-spacing:-1.5px;text-shadow:0 3px 12px #001b1260}
+#store-header .logo small{display:block;margin:0;color:#f1d58b;font-size:clamp(11px,3vw,14px);font-weight:800;letter-spacing:.5px}
+#store-header .loqma-logo-img{display:none!important}
+
 </style>
 </head>
 <body class="locked">
@@ -134,7 +141,7 @@ header:after{content:"";position:absolute;width:240px;height:240px;border:1px so
 </div></div>
 <div class="staff-login-shade" id="staff-login-modal" hidden><div class="staff-login-card"><h3>دخول موظفي لُقمة</h3><p>الدخول مخصص لحسابات الإدارة والمندوبين المعتمدة فقط.</p><form id="staff-login-form"><label for="staff-login-email">البريد الإلكتروني</label><input id="staff-login-email" type="email" autocomplete="username" required placeholder="employee@example.com"><label for="staff-login-password">كلمة المرور</label><input id="staff-login-password" type="password" autocomplete="current-password" required minlength="8" placeholder="كلمة المرور"><div class="staff-login-actions"><button class="primary" type="submit" id="staff-login-submit">دخول الموظفين</button><button class="secondary" type="button" id="staff-login-cancel">إلغاء</button></div><div class="auth-msg" id="staff-login-message" aria-live="polite"></div></form></div></div>
 <header id="store-header" hidden><div class="container">
-<div class="top"><div class="logo"><img class="loqma-logo-img" src="./assets/loqma-logo.webp.PNG" alt="لُقمة"><small>طازة لحد باب بيتك</small></div><div class="top-actions">
+<div class="top"><div class="logo"><span class="logo-word">لُقمة.</span><small>طازة لحد باب بيتك</small></div><div class="top-actions">
 <span class="chip location-chip">📍 أكتوبر الجديدة – غرب المطار</span><button class="chip" id="wallet-jump">▣ المحفظة</button><button class="chip" id="account-jump">♟ حسابي</button><button class="chip" id="my-orders-jump">▤ طلباتي</button><button class="chip" id="staff-jump" hidden>لوحة التشغيل</button><button class="chip" id="staff-login-open">♟ دخول الموظفين</button><button class="chip" id="sign-out">⇥ خروج</button>
 </div></div>
 <div class="hero"><div class="hero-copy"><span class="hero-kicker">طازة كل صباح</span><h1>صباحك يبدأ بعيش طازة ☀️</h1><p>اختار مخبوزاتك وإحنا نوصلها لحد باب البيت</p></div><img class="hero-art" src="./assets/hero-bread.webp.PNG" alt="سلة عيش ومخبوزات لُقمة الطازة" loading="eager"></div><div class="search"><input id="search" placeholder="بتدور على إيه؟" autocomplete="off"></div>
