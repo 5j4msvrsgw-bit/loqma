@@ -488,6 +488,39 @@ function printHtml(title,body,thermal=false){const w=window.open("","_blank");if
  #store-main .delivery-copy{font-size:13px}
  #store-main .cutoff-time{font-size:17px;min-width:112px;padding:6px 9px}
 }
+
+/* Correct mobile storefront canvas and reference composition */
+html,body{width:100%;min-width:0;max-width:100%;overflow-x:hidden}
+#store-header,header#store-header{display:block;width:100%;max-width:none;min-width:0;margin:0;box-sizing:border-box}
+#store-header>.container,#store-main.container{display:block;width:100%;max-width:1100px;min-width:0;margin-left:auto;margin-right:auto;box-sizing:border-box}
+#store-header>.container{padding-left:16px;padding-right:16px}
+#store-main.container{padding-left:16px;padding-right:16px}
+#store-header .top,#store-header .hero,#store-header .search,#store-main .delivery-banner{width:100%;min-width:0;box-sizing:border-box}
+#store-header .logo{width:auto;max-width:100%;align-self:flex-end}
+#store-header .loqma-logo-img{display:block;width:clamp(132px,38vw,190px);height:auto;max-height:none;object-fit:contain}
+#store-header .top-actions{width:100%;max-width:100%;display:flex;flex-wrap:wrap;overflow:visible}
+#store-header .hero{display:flex;flex-direction:row-reverse;align-items:center;justify-content:space-between;min-height:0;padding:12px;gap:12px}
+#store-header .hero-copy{flex:1 1 56%;min-width:0}
+#store-header .hero-art{display:block;flex:0 1 42%;width:42%;max-width:320px;height:auto;min-height:0;aspect-ratio:1.15/1;object-fit:cover;object-position:center;border-radius:16px}
+#store-header .search{display:block}
+#store-main .delivery-banner{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;min-height:0;padding:10px;margin:16px 0;border-radius:20px}
+#store-main .delivery-art{display:block;width:100%;max-width:none;min-width:0;height:auto;min-height:0;flex:none;overflow:hidden;border-radius:14px}
+#store-main .delivery-art img{display:block;width:100%;height:auto;max-width:100%;max-height:none;object-fit:contain;object-position:center;filter:none}
+#store-main .delivery-copy{display:grid;width:100%;min-width:0;gap:5px;font-size:13px;line-height:1.8}
+#store-main .delivery-pin{display:none}
+#store-main .cutoff-countdown{display:flex!important;flex-wrap:wrap;align-items:center;gap:7px}
+#store-main .cutoff-time{min-width:112px;justify-content:center}
+@media(max-width:520px){
+ #store-header>.container,#store-main.container{padding-left:14px;padding-right:14px}
+ #store-header .top{gap:12px}
+ #store-header .chip{font-size:11px;padding:9px 10px;min-height:38px}
+ #store-header .hero{margin-top:16px;padding:10px;gap:9px}
+ #store-header .hero-art{flex-basis:41%;width:41%;aspect-ratio:1/1;height:auto}
+ #store-header .hero h1{font-size:clamp(17px,4.7vw,22px);line-height:1.55}
+ #store-header .hero p{font-size:clamp(11px,3vw,14px);line-height:1.7}
+ #store-main .delivery-banner{padding:8px;gap:7px}
+ #store-main .delivery-copy{font-size:12px}
+}
 </style></head><body><h2>${esc(title)}</h2>${body}<div class="noprint"><button onclick="window.print()">طباعة</button></div><script>window.onload=()=>setTimeout(()=>window.print(),350)<\/script></body></html>`);w.document.close()}
 function orderPrintMarkup(o,profile,address,items){return `<div class="ticket"><b>طلب رقم: ${esc(o.order_number||o.id)}</b><br>العميل: ${esc(profile?.full_name||"—")}<br>الموبايل: ${esc(profile?.phone||"—")}<br>العنوان: ${esc([address?.area,address?.street,address?.building&&"عمارة "+address.building,address?.floor&&"دور "+address.floor,address?.apartment&&"شقة "+address.apartment,address?.landmark].filter(Boolean).join(" - "))}<br>موعد التوصيل: ${esc(o.delivery_date||"—")}<br><hr>${(items||[]).map(i=>`${esc(i.product_name)} × ${esc(i.quantity)} — ${moneyP(i.line_total_piasters)}`).join("<br>")}<hr><b>الإجمالي: ${moneyP(o.total_amount_piasters)}</b><br>الحالة: ${statusLabel(o.status)}<br>ملاحظات: ${esc(o.customer_notes||"—")}</div>`}
 async function fetchOrderDetails(rows){
