@@ -132,6 +132,17 @@ header:after{content:"";position:absolute;width:240px;height:240px;border:1px so
 #store-header .loqma-logo-img{display:none!important}
 
 
+
+/* LOQMA hero typography refinement — remove pasted basket artwork */
+#store-header .hero{display:flex!important;align-items:center!important;justify-content:center!important;min-height:205px!important;padding:30px 22px!important;text-align:center!important;background:radial-gradient(ellipse at 50% 18%,rgba(177,218,116,.18),transparent 58%),linear-gradient(125deg,rgba(3,54,34,.34),rgba(3,74,43,.52))!important}
+#store-header .hero-art{display:none!important}
+#store-header .hero-copy{width:100%!important;max-width:620px!important;margin:0 auto!important;display:flex!important;flex-direction:column!important;align-items:center!important;gap:10px!important;text-align:center!important}
+#store-header .hero-kicker{display:inline-flex!important;align-items:center!important;justify-content:center!important;padding:7px 16px!important;border:1px solid rgba(255,225,116,.52)!important;border-radius:30px!important;background:rgba(255,225,116,.10)!important;color:#ffe27a!important;font-size:clamp(13px,3.5vw,16px)!important;font-weight:850!important;letter-spacing:.2px!important}
+#store-header .hero-copy h1{margin:2px 0!important;color:#fff!important;font-size:clamp(27px,7.2vw,42px)!important;font-weight:950!important;line-height:1.45!important;text-shadow:0 3px 15px rgba(0,28,16,.45)!important}
+#store-header .hero-copy h1:after{content:"";display:block;width:82px;height:4px;margin:10px auto 0;border-radius:8px;background:linear-gradient(90deg,#d9b83c,#fff0a3,#d9b83c)}
+#store-header .hero-copy p{max-width:440px!important;margin:0!important;color:#f4f8e9!important;font-size:clamp(14px,3.8vw,18px)!important;font-weight:650!important;line-height:1.9!important;text-shadow:0 2px 8px rgba(0,25,14,.4)!important}
+@media(max-width:520px){#store-header .hero{min-height:190px!important;padding:25px 16px!important}#store-header .hero-copy{gap:9px!important}#store-header .hero-copy h1{font-size:clamp(26px,7.4vw,34px)!important}#store-header .hero-copy p{font-size:14px!important}}
+
 /* LOQMA reference redesign v2 — real existing brand assets */
 :root{--loqma-deep:#06472f;--loqma-leaf:#0b6a3d;--loqma-gold:#f1cf49}
 html,body{background:#e9f2df!important}
@@ -181,7 +192,7 @@ body{background-image:linear-gradient(180deg,rgba(3,55,34,.06),rgba(238,247,225,
 <div class="top"><div class="logo"><span class="logo-word">لُقمة.</span><small>طازة لحد باب بيتك</small></div><div class="top-actions">
 <span class="chip location-chip">📍 أكتوبر الجديدة – غرب المطار</span><button class="chip" id="wallet-jump">▣ المحفظة</button><button class="chip" id="account-jump">♟ حسابي</button><button class="chip" id="my-orders-jump">▤ طلباتي</button><button class="chip" id="staff-jump" hidden>لوحة التشغيل</button><button class="chip" id="staff-login-open">♟ دخول الموظفين</button><button class="chip" id="sign-out">⇥ خروج</button>
 </div></div>
-<div class="hero"><div class="hero-copy"><span class="hero-kicker">طازة كل صباح</span><h1>صباحك يبدأ بعيش طازة ☀️</h1><p>اختار مخبوزاتك وإحنا نوصلها لحد باب البيت</p></div><img class="hero-art" src="./assets/hero-bread.webp.PNG" alt="سلة عيش ومخبوزات لُقمة الطازة" loading="eager"></div><div class="search"><input id="search" placeholder="بتدور على إيه؟" autocomplete="off"></div>
+<div class="hero"><div class="hero-copy"><span class="hero-kicker">لُقمة.. طازة كل صباح</span><h1>صباحك يبدأ بعيش طازة</h1><p>مخبوزاتك الطازة لحد باب بيتك.. كل يوم بسهولة</p></div></div><div class="search"><input id="search" placeholder="بتدور على إيه؟" autocomplete="off"></div>
 </div></header>
 <main class="container" id="store-main" hidden>
 <div class="notice delivery-banner" id="store-notice"><img class="delivery-art" src="./assets/loqma-delivery.webp.PNG" alt="عربية توصيل لُقمة"><div class="delivery-copy"><b>التوصيل متاح حاليًا في أكتوبر الجديدة – غرب المطار</b><span class="cutoff-caption">◷ آخر موعد لاستقبال الطلبات اليوم الساعة 10:00 مساءً</span><div class="cutoff-countdown" id="cutoff-countdown" role="status" aria-live="off"><span class="cutoff-label">متبقي على إغلاق الطلبات</span><span class="cutoff-time" id="cutoff-time">--:--:--</span></div><span class="next-day-note" id="next-day-note" hidden>انتهى استقبال طلبات اليوم — طلبك الآن لليوم التالي 🌅</span></div></div>
