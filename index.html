@@ -89,7 +89,42 @@ header:after{content:"";position:absolute;width:240px;height:240px;border:1px so
 .product-admin-item .small-btn{padding:9px 15px}
 @media(max-width:390px){.product-create-grid{grid-template-columns:1fr}.hero{padding:14px}.hero:after{font-size:60px}}
 
-.product-edit-image{height:94px;display:flex;align-items:center;justify-content:center;background:#f1f5ef;border-radius:10px;margin:8px 0;overflow:hidden;color:var(--muted);font-size:11px}.product-edit-image img{height:100%;max-width:100%;object-fit:contain}.image-preview-wrap{height:130px;background:#eef3ec;border-radius:12px;display:grid;place-items:center;margin:8px 0;overflow:hidden}.image-preview-wrap img{max-height:125px;max-width:100%;object-fit:contain}.category-create-row{margin:12px 0 8px}.category-admin-list{display:grid;gap:8px;margin-top:12px}.category-admin-item{display:grid;grid-template-columns:1.5fr .6fr 1fr auto;gap:6px;align-items:center}.category-admin-item .filter-input{min-width:0;font-size:10px;padding:8px 5px}@media(max-width:430px){.category-admin-item{grid-template-columns:1fr 70px}.category-admin-item select{grid-column:1}.category-admin-item button{grid-column:2;grid-row:2}}</style>
+.product-edit-image{height:94px;display:flex;align-items:center;justify-content:center;background:#f1f5ef;border-radius:10px;margin:8px 0;overflow:hidden;color:var(--muted);font-size:11px}.product-edit-image img{height:100%;max-width:100%;object-fit:contain}.image-preview-wrap{height:130px;background:#eef3ec;border-radius:12px;display:grid;place-items:center;margin:8px 0;overflow:hidden}.image-preview-wrap img{max-height:125px;max-width:100%;object-fit:contain}.category-create-row{margin:12px 0 8px}.category-admin-list{display:grid;gap:8px;margin-top:12px}.category-admin-item{display:grid;grid-template-columns:1.5fr .6fr 1fr auto;gap:6px;align-items:center}.category-admin-item .filter-input{min-width:0;font-size:10px;padding:8px 5px}@media(max-width:430px){.category-admin-item{grid-template-columns:1fr 70px}.category-admin-item select{grid-column:1}.category-admin-item button{grid-column:2;grid-row:2}}
+/* Loqma delivery banner: responsive image area + live three-part countdown */
+#store-main .delivery-banner{
+ display:grid!important;grid-template-columns:minmax(118px,34%) minmax(0,1fr);
+ align-items:center;gap:14px;min-height:180px;padding:14px;
+ border:1px solid #d9e8c9;border-radius:25px;
+ background:linear-gradient(115deg,#eff8df 0%,#f8f8e9 54%,#e4f1d9 100%);
+ overflow:hidden;position:relative;
+}
+#store-main .delivery-art{grid-column:1;grid-row:1;display:flex;width:100%;height:145px;max-height:145px;min-width:0;align-items:center;justify-content:center;overflow:hidden;border-radius:18px;background:transparent}
+#store-main .delivery-art img{width:100%;height:100%;object-fit:contain;object-position:center;filter:drop-shadow(0 7px 7px #173d2930)}
+#store-main .delivery-copy{grid-column:2;grid-row:1;display:flex;flex-direction:column;gap:9px;min-width:0;text-align:right;color:#123f2e;font-size:clamp(12px,2.6vw,16px);line-height:1.65}
+#store-main .delivery-copy b{font-size:clamp(13px,2.8vw,17px);font-weight:900}
+#store-main .cutoff-caption{font-size:12px;color:#48664e}
+#store-main .cutoff-countdown{display:flex!important;align-items:center;gap:8px;flex-wrap:wrap;margin-top:3px}
+#store-main .cutoff-label{flex-basis:100%;font-size:12px;color:#345c40;font-weight:800}
+#store-main .cutoff-time{display:flex;gap:7px;background:transparent;border:0;box-shadow:none;padding:0;letter-spacing:0;direction:rtl}
+#store-main .count-unit{display:flex;min-width:55px;flex-direction:column;align-items:center;justify-content:center;padding:6px 8px;border-radius:13px;background:#07553a;color:#fff;border:2px solid #d9bd62;box-shadow:0 4px 10px #174a3520}
+#store-main .count-unit b{font-size:clamp(19px,4.4vw,27px);line-height:1.1;font-variant-numeric:tabular-nums}
+#store-main .count-unit small{font-size:10px;color:#f5dc85;font-weight:800}
+#store-main .next-day-note{font-size:12px;color:#8b6420;font-weight:900}
+#store-main .delivery-pin{display:none}
+@media(max-width:520px){
+ #store-main .delivery-banner{grid-template-columns:34% minmax(0,1fr);gap:8px;min-height:146px;padding:10px;border-radius:20px}
+ #store-main .delivery-art{height:112px;max-height:112px}
+ #store-main .delivery-copy{gap:6px;font-size:10px;line-height:1.5}
+ #store-main .delivery-copy b{font-size:11px}
+ #store-main .cutoff-caption,#store-main .cutoff-label{font-size:9px}
+ #store-main .cutoff-time{gap:4px}
+ #store-main .count-unit{min-width:42px;padding:5px 5px;border-radius:10px}
+ #store-main .count-unit b{font-size:18px}
+ #store-main .count-unit small{font-size:8px}
+ #store-main .next-day-note{font-size:9px}
+}
+
+</style>
 </head>
 <body class="locked">
 <div class="auth-gate" id="auth-gate"><div class="auth-card">
@@ -716,14 +751,15 @@ sb.auth.onAuthStateChange(async(event,session)=>{if(!authReady)return;const prev
   const update=()=>{
    try{
     const p=cairoParts();
+    // Use Cairo wall-clock time; orders close daily at 10:00 PM.
     const now=Date.UTC(p.year,p.month-1,p.day,p.hour,p.minute,p.second);
     const closed=p.hour>=22;
-    const targetDay=new Date(Date.UTC(p.year,p.month-1,p.day+(closed?1:0),22,0,0));
-    const remaining=Math.max(0,targetDay.getTime()-now);
+    const target=new Date(Date.UTC(p.year,p.month-1,p.day+(closed?1:0),22,0,0));
+    const remaining=Math.max(0,target.getTime()-now);
     const h=Math.floor(remaining/3600000),m=Math.floor((remaining%3600000)/60000),sec=Math.floor((remaining%60000)/1000);
-    timeNode.textContent=[h,m,sec].map(v=>String(v).padStart(2,"0")).join(":");
+    timeNode.innerHTML='<span class="count-unit"><b>'+String(h).padStart(2,"0")+'</b><small>ساعة</small></span><span class="count-unit"><b>'+String(m).padStart(2,"0")+'</b><small>دقيقة</small></span><span class="count-unit"><b>'+String(sec).padStart(2,"0")+'</b><small>ثانية</small></span>';
     const label=countdown.querySelector(".cutoff-label");
-    if(label)label.textContent=closed?"متبقي على استقبال طلبات اليوم التالي":"متبقي على إغلاق طلبات اليوم";
+    if(label)label.textContent=closed?"الطلبات التالية لليوم الثاني":"الوقت المتبقي لإغلاق طلبات اليوم";
     nextDay.hidden=!closed;
     countdown.hidden=false;
    }catch(error){timeNode.textContent="تعذر تحديث العداد";console.error("Loqma cutoff timer:",error)}
