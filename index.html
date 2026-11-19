@@ -385,7 +385,7 @@ function renderProfileAddresses(){
  host.innerHTML=savedAddresses.length?savedAddresses.map(a=>'<div class="admin-item"><b>'+esc(a.label||"عنوان التوصيل")+'</b> '+(a.is_default?'<span class="badge">العنوان الافتراضي</span>':'')+'<br>'+esc(addressLabel(a))+'</div>').join(""):"لم تحفظ عنوان توصيل بعد. أول عنوان تضيفه سيُحفظ تلقائيًا لاستخدامه في طلباتك القادمة.";
 }
 let customerAddressMap=null,customerAddressMarker=null,customerPin=null,customerPinDirty=false;
-const LOQMA_MAP_CENTER=[29.96,30.92];
+const LOQMA_MAP_CENTER=[29.8242806,30.7659496];
 function setCustomerPin(lat,lng,dirty,preserveMapView=false){
  customerPin={lat:Number(lat),lng:Number(lng)};customerPinDirty=!!dirty;
  if(!customerAddressMap)return;
