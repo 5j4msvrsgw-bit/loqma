@@ -974,9 +974,37 @@ async function linkFacebookAccount(btn,msg){
  }catch(e){msg.textContent="تعذر ربط فيسبوك: "+(e.message||"حدث خطأ.")+" — تأكد من إعدادات Facebook وRedirect URLs.";
  }finally{btn.disabled=false;}
 }
+async function startWebFacebookAuth(btn,msg){
+ btn.disabled=true;msg.textContent="جاري تجهيز تسجيل الدخول بفيسبوك…";
+ try{
+  const {data:sessionData,error:sessionError}=await sb.auth.getSession();
+  if(sessionError)throw sessionError;
+  const currentSession=sessionData.session;
+  let authResult;
+  if(currentSession){
+   const {data:userData,error:userError}=await sb.auth.getUser();
+   if(userError)throw userError;
+   const identities=userData.user?.identities||[];
+   if(identities.some(identity=>identity.provider==="facebook")){
+    msg.textContent="حسابك مرتبط بفيسبوك بالفعل. جاري فتح حسابك…";
+    return;
+   }
+   authResult=await sb.auth.linkIdentity({provider:"facebook",options:{redirectTo:window.location.origin+window.location.pathname}});
+  }else{
+   authResult=await sb.auth.signInWithOAuth({provider:"facebook",options:{redirectTo:window.location.origin+window.location.pathname}});
+  }
+  if(authResult.error)throw authResult.error;
+  if(!authResult.data?.url)throw Error("لم يتم إنشاء رابط تسجيل الدخول من Facebook.");
+  msg.textContent=currentSession?"أكمل ربط حسابك بفيسبوك…":"سجّل الدخول بحساب Facebook المرتبط بحسابك في لُقمة…";
+  window.location.assign(authResult.data.url);
+ }catch(e){
+  msg.textContent="تعذر المتابعة بفيسبوك: "+(e.message||"حدث خطأ. حاول مرة أخرى.");
+  btn.disabled=false;
+ }
+}
 async function startFacebookLogin(){
  const btn=$("facebook-login"),msg=$("auth-message");
- if(!window.Capacitor?.isNativePlatform?.())return linkFacebookAccount(btn,msg);
+ if(!window.Capacitor?.isNativePlatform?.())return startWebFacebookAuth(btn,msg);
  btn.disabled=true;msg.textContent="جاري فتح تسجيل الدخول الآمن…";
  try{
   const {App}=await import("https://esm.sh/@capacitor/app@8.0.0");
