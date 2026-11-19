@@ -330,7 +330,28 @@ $("open-cart").onclick=async()=>{try{await loadCheckoutAddresses()}catch(e){cons
 function renderCartRows(){$("cart-items").innerHTML=products.filter(p=>cart[p.id]).map(p=>`<div class="cart-row"><span>${esc(p.name)}<br>${cart[p.id]} × ${money(p.price)}</span><b>${money(p.price*cart[p.id])}</b></div>`).join("")}
 $("close-cart").onclick=()=>modal.classList.remove("show");modal.addEventListener("click",e=>{if(e.target===modal)modal.classList.remove("show")});
 $("clear-cart").onclick=()=>{clearCart();modal.classList.remove("show")};
-$("sign-out").onclick=()=>{alert("حسابك الحالي حساب ضيف مرتبط بطلباتك. لتجنب فقدان الوصول لطلباتك، تم إيقاف تسجيل الخروج من هذه النسخة.")};
+$("sign-out").onclick=async()=>{
+ const btn=$("sign-out");
+ if(btn.disabled)return;
+ btn.disabled=true;
+ try{
+  const {data,error}=await sb.auth.getUser();
+  if(error)throw error;
+  const current=data.user;
+  const hasFacebook=(current?.identities||[]).some(identity=>identity.provider==="facebook");
+  if(!current||current.is_anonymous||!hasFacebook){
+   alert("حسابك ما زال حساب ضيف أو لم يكتمل ربطه بفيسبوك. اربط فيسبوك أولاً حتى لا تفقد الوصول إلى طلباتك.");
+   return;
+  }
+  if(!window.confirm("تم ربط حسابك بفيسبوك. هل تريد تسجيل الخروج؟ يمكنك العودة لاحقًا باستخدام نفس حساب Facebook."))return;
+  const {error:signOutError}=await sb.auth.signOut();
+  if(signOutError)throw signOutError;
+ }catch(error){
+  alert("تعذر تسجيل الخروج: "+(error.message||"حدث خطأ. حاول مرة أخرى."));
+ }finally{
+  btn.disabled=false;
+ }
+};
 function syncCustomerFields(source){
  const name=source==="profile"?$("profile-name").value:$("checkout-name").value;
  const phone=source==="profile"?$("profile-phone").value:$("checkout-phone").value;
@@ -1033,7 +1054,7 @@ $("staff-login-form").onsubmit=async e=>{
  }catch(error){msg.textContent="تعذر الدخول: "+(error.message||"راجع البريد وكلمة المرور.");}
  finally{btn.disabled=false;}
 };
-sb.auth.onAuthStateChange(async(event,session)=>{if(!authReady)return;const previous=user?.id;user=session?.user||null;showStore(!!user);if(user){if(previous!==user.id)restoreCart();await loadStaffIdentity();loadProducts();loadProfile();loadWallet();loadNotifications()}else{staff=null;$("staff-jump").hidden=true;$("staff-panel").hidden=true;clearCart()}});
+sb.auth.onAuthStateChange(async(event,session)=>{if(!authReady)return;const previous=user?.id;user=session?.user||null;showStore(!!user);if(user){if(previous!==user.id)restoreCart();await loadStaffIdentity();loadProducts();loadProfile();loadWallet();loadNotifications()}else{staff=null;$("staff-jump").hidden=true;$("staff-panel").hidden=true;Object.keys(cart).forEach(k=>delete cart[k]);render()}});
 
 // Live daily order cutoff: 10:00 PM Cairo time.
 (function(){
