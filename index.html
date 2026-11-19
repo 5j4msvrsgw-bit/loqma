@@ -198,6 +198,9 @@ body{background-image:linear-gradient(180deg,rgba(3,55,34,.06),rgba(238,247,225,
 #store-main .truck-location{display:block!important;max-width:100%;padding:6px 9px;border:1px solid #c8dfb5;border-radius:18px;background:#fffdf0;color:#174b35;font-size:10px;font-weight:900;line-height:1.5;text-align:center;white-space:normal}
 @media(max-width:520px){#store-main .truck-art-frame .delivery-art{height:100px!important;max-height:100px!important;flex-basis:100px!important}}
 </style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css">
+<style>.loqma-map{width:100%;height:260px;border:1px solid #dce4da;border-radius:12px;overflow:hidden;z-index:1}.zone-map{height:380px}.map-help{font-size:11px;line-height:1.9;color:#52675b;margin:7px 0}.leaflet-container{font-family:Cairo,sans-serif}</style>
 </head>
 <body class="locked">
 <div class="auth-gate" id="auth-gate"><div class="auth-card">
@@ -240,6 +243,7 @@ body{background-image:linear-gradient(180deg,rgba(3,55,34,.06),rgba(238,247,225,
 <div class="panel"><h4>2) عنوان التوصيل</h4><div class="fields">
 <div><label for="saved-address-select">اختار عنوان التوصيل</label><select id="saved-address-select" class="filter-input"><option value="new">＋ إضافة عنوان جديد</option></select></div>
 <div class="notice" id="saved-address-note">جاري تحميل عناوينك المحفوظة…</div>
+<div class="panel" id="address-map-panel"><h4>📍 حدد موقع باب البيت على الخريطة</h4><p class="map-help" id="customer-map-status">اضغط على مكان منزلك على الخريطة، أو استخدم تحديد موقعي الحالي.</p><div id="customer-address-map" class="loqma-map"></div><div class="order-actions"><button class="secondary" type="button" id="use-my-location">استخدم موقعي الحالي</button><button class="primary" type="button" id="save-address-location" hidden>حفظ موقع العنوان</button></div><div class="result" id="customer-map-result"></div></div>
 <div id="new-address-fields">
 <div><label for="addr-street">الشارع *</label><input id="addr-street" maxlength="200" placeholder="اسم الشارع"></div>
 <div class="two"><div><label for="addr-building">رقم العمارة</label><input id="addr-building" maxlength="80"></div><div><label for="addr-floor">الدور</label><input id="addr-floor" maxlength="40"></div></div>
@@ -281,6 +285,8 @@ body{background-image:linear-gradient(180deg,rgba(3,55,34,.06),rgba(238,247,225,
 <button id="clear-cart" class="danger" style="margin-top:10px">إفراغ السلة</button>
 </div></div>
 <div class="drawer-shade" id="drawer-shade"><aside class="side-drawer"><div class="drawer-head"><span>قائمة لُقمة</span><button class="small-btn" id="close-drawer">إغلاق ×</button></div><div class="drawer-links" id="drawer-links"></div><div class="drawer-category-title">أقسام المخبوزات</div><div class="categories drawer-categories" id="drawer-categories"><button class="category active" data-cat="all">الكل</button></div></aside></div><div class="modal" id="notifications-modal"><div class="sheet"><div class="sheet-head"><h3>🔔 الإشعارات</h3><button id="close-notifications">إغلاق ×</button></div><div id="notifications-list"><div class="status">جاري تحميل الإشعارات…</div></div></div></div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
 <script>
 "use strict";
 const SUPABASE_URL="https://dvidxumpkgthubassfxm.supabase.co";
@@ -377,15 +383,70 @@ function renderProfileAddresses(){
  const host=$("profile-addresses");if(!host)return;
  host.innerHTML=savedAddresses.length?savedAddresses.map(a=>'<div class="admin-item"><b>'+esc(a.label||"عنوان التوصيل")+'</b> '+(a.is_default?'<span class="badge">العنوان الافتراضي</span>':'')+'<br>'+esc(addressLabel(a))+'</div>').join(""):"لم تحفظ عنوان توصيل بعد. أول عنوان تضيفه سيُحفظ تلقائيًا لاستخدامه في طلباتك القادمة.";
 }
+let customerAddressMap=null,customerAddressMarker=null,customerPin=null,customerPinDirty=false;
+const LOQMA_MAP_CENTER=[29.96,30.92];
+function setCustomerPin(lat,lng,dirty){
+ customerPin={lat:Number(lat),lng:Number(lng)};customerPinDirty=!!dirty;
+ if(!customerAddressMap)return;
+ if(!customerAddressMarker)customerAddressMarker=L.marker([lat,lng],{draggable:true}).addTo(customerAddressMap);else customerAddressMarker.setLatLng([lat,lng]);
+ customerAddressMarker.off("dragend").on("dragend",function(){const p=customerAddressMarker.getLatLng();setCustomerPin(p.lat,p.lng,true)});
+ customerAddressMap.setView([lat,lng],16);
+ const save=$("save-address-location"),isNew=$("saved-address-select").value==="new";if(save)save.hidden=isNew||!customerPinDirty;
+ $("customer-map-status").textContent="تم تحديد الموقع. اسحب العلامة لضبطها بدقة أو اضغط على نقطة أخرى.";
+ checkCustomerDeliveryZone(lat,lng);
+}
+async function checkCustomerDeliveryZone(lat,lng){
+ const out=$("customer-map-result");if(!out)return;out.textContent="جارٍ التحقق من نطاق التوصيل…";
+ const {data,error}=await sb.rpc("loqma_find_delivery_zone",{p_lat:lat,p_lng:lng});
+ if(error){out.textContent="تعذر التحقق الآن؛ سيتم التحقق مرة أخرى عند تأكيد الطلب.";return}
+ if(data&&data.length){out.innerHTML='<div class="success-result">✓ العنوان داخل نطاق التوصيل: <b>'+esc(data[0].area)+'</b></div>';return}
+ out.innerHTML='<div class="subtle-result">تم تحديد الموقع. سيتم حسم توفر الخدمة عند تأكيد الطلب حسب حدود المناطق المفعّلة.</div>';
+}
+function initCustomerAddressMap(){
+ if(customerAddressMap){setTimeout(()=>customerAddressMap.invalidateSize(),150);return}
+ if(!window.L){$("customer-map-status").textContent="تعذر تحميل الخريطة. تحقق من اتصال الإنترنت ثم أعد المحاولة.";return}
+ customerAddressMap=L.map("customer-address-map").setView(LOQMA_MAP_CENTER,13);
+ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(customerAddressMap);
+ customerAddressMap.on("click",e=>setCustomerPin(e.latlng.lat,e.latlng.lng,true));setTimeout(()=>customerAddressMap.invalidateSize(),250);
+}
 function updateAddressSelection(){
  const select=$("saved-address-select");if(!select)return;
  const id=select.value,chosen=savedAddresses.find(a=>a.id===id),fields=$("new-address-fields");
  if(fields)fields.hidden=id!=="new";
  $("saved-address-note").textContent=chosen?"العنوان المختار: "+addressLabel(chosen):"أدخل عنوانك مرة واحدة، وسيُحفظ لاستخدامه في طلباتك القادمة.";
+ $("address-map-panel").hidden=false;initCustomerAddressMap();
+ if(chosen&&chosen.latitude!=null&&chosen.longitude!=null){
+  setCustomerPin(chosen.latitude,chosen.longitude,false);
+  $("customer-map-status").textContent="الموقع المحفوظ لهذا العنوان. اضغط على الخريطة أو حرّك العلامة إذا احتجت لتعديله.";
+ }else{
+  customerPin=null;customerPinDirty=false;
+  if(customerAddressMarker){customerAddressMap.removeLayer(customerAddressMarker);customerAddressMarker=null}
+  if(customerAddressMap)customerAddressMap.setView(LOQMA_MAP_CENTER,13);
+  $("customer-map-status").textContent=chosen?"هذا العنوان لا يحتوي على موقع دقيق بعد. حدده على الخريطة ثم احفظه.":"اضغط على مكان منزلك على الخريطة، أو استخدم تحديد موقعي الحالي.";
+  $("customer-map-result").textContent="";
+ }
+ $("save-address-location").hidden=id==="new"||!customerPinDirty;
 }
+$("use-my-location").onclick=()=>{
+ if(!navigator.geolocation){$("customer-map-status").textContent="تحديد الموقع غير مدعوم في هذا الجهاز.";return}
+ $("customer-map-status").textContent="جارٍ تحديد موقعك…";
+ navigator.geolocation.getCurrentPosition(pos=>setCustomerPin(pos.coords.latitude,pos.coords.longitude,true),()=>{$("customer-map-status").textContent="لم نتمكن من تحديد موقعك. اسمح للمتصفح باستخدام الموقع أو اضغط على الخريطة يدويًا."},{enableHighAccuracy:true,timeout:15000,maximumAge:60000});
+};
+$("save-address-location").onclick=async()=>{
+ const id=$("saved-address-select").value;if(id==="new"||!customerPin)return;
+ const chosen=savedAddresses.find(a=>a.id===id);if(!chosen)return;
+ const {data:zones,error:zoneError}=await sb.rpc("loqma_find_delivery_zone",{p_lat:customerPin.lat,p_lng:customerPin.lng});
+ if(zoneError){$("customer-map-result").textContent="تعذر التحقق من المنطقة. حاول مرة أخرى.";return}
+ const zone=zones&&zones[0],patch={latitude:customerPin.lat,longitude:customerPin.lng,updated_at:new Date().toISOString()};
+ if(zone){patch.governorate=zone.governorate;patch.city=zone.city;patch.area=zone.area}
+ const {error}=await sb.from("addresses").update(patch).eq("id",id).eq("user_id",user.id);
+ if(error){$("customer-map-result").textContent="تعذر حفظ الموقع: "+error.message;return}
+ Object.assign(chosen,patch);customerPinDirty=false;$("save-address-location").hidden=true;
+ $("customer-map-result").innerHTML='<div class="success-result">تم حفظ موقع العنوان بنجاح.</div>';
+};
 async function loadCheckoutAddresses(){
  if(!user)return;
- const {data,error}=await sb.from("addresses").select("id,label,governorate,city,area,street,building,floor,apartment,landmark,delivery_notes,is_default,created_at").eq("user_id",user.id).eq("is_active",true).order("is_default",{ascending:false}).order("created_at",{ascending:false});
+ const {data,error}=await sb.from("addresses").select("id,label,governorate,city,area,street,building,floor,apartment,landmark,delivery_notes,latitude,longitude,is_default,created_at").eq("user_id",user.id).eq("is_active",true).order("is_default",{ascending:false}).order("created_at",{ascending:false});
  if(error){$("saved-address-note").textContent="تعذر تحميل العناوين: "+error.message;throw error}
  savedAddresses=data||[];
  const select=$("saved-address-select"),previous=select.value;
@@ -409,11 +470,18 @@ async function submitOrder(){
   const days=getDays();days.forEach((d,i)=>{if(!d.items.length)throw Error("اختار أصنافًا ليوم "+(i+1)+".");if(valueOf(d.items)<MIN_DAILY)throw Error("الحد الأدنى للمنتجات 30 جنيهًا في كل يوم توصيل.")});
   btn.disabled=true;btn.textContent="جاري تسجيل الطلب…";out.textContent="";
   let addressId=$("saved-address-select").value;
+  if(!customerPin)throw Error("حدد موقع عنوان التوصيل على الخريطة أولًا.");
   if(addressId==="new"){
    const street=$("addr-street").value.trim();if(!street)throw Error("اكتب اسم الشارع.");
-   const address={user_id:user.id,label:"المنزل",governorate:"الجيزة",city:"أكتوبر الجديدة",area:"غرب المطار",street,building:$("addr-building").value.trim()||null,floor:$("addr-floor").value.trim()||null,apartment:$("addr-apartment").value.trim()||null,landmark:$("addr-landmark").value.trim()||null,delivery_notes:$("addr-notes").value.trim()||null,is_default:savedAddresses.length===0,is_active:true};
+   const {data:zoneMatches,error:zoneError}=await sb.rpc("loqma_find_delivery_zone",{p_lat:customerPin.lat,p_lng:customerPin.lng});if(zoneError)throw zoneError;
+   const zone=zoneMatches&&zoneMatches[0];
+   const address={user_id:user.id,label:"المنزل",governorate:zone?.governorate||"الجيزة",city:zone?.city||"أكتوبر الجديدة",area:zone?.area||"غرب المطار",street,building:$("addr-building").value.trim()||null,floor:$("addr-floor").value.trim()||null,apartment:$("addr-apartment").value.trim()||null,landmark:$("addr-landmark").value.trim()||null,delivery_notes:$("addr-notes").value.trim()||null,latitude:customerPin.lat,longitude:customerPin.lng,is_default:savedAddresses.length===0,is_active:true};
    const {data:addr,error:addrErr}=await sb.from("addresses").insert(address).select("id").single();if(addrErr)throw addrErr;addressId=addr.id;
-  }else if(!savedAddresses.some(a=>a.id===addressId)){throw Error("عنوان التوصيل المختار غير موجود. حدّث العناوين وحاول مرة أخرى.")}
+  }else{
+   const saved=savedAddresses.find(a=>a.id===addressId);
+   if(!saved)throw Error("عنوان التوصيل المختار غير موجود. حدّث العناوين وحاول مرة أخرى.");
+   if(saved.latitude==null||saved.longitude==null||customerPinDirty)throw Error("احفظ موقع العنوان من الخريطة أولًا قبل تأكيد الطلب.");
+  }
   const {error:termsError}=await sb.from("terms_acceptances").insert({user_id:user.id,terms_version:"2026-11-18-v2"});if(termsError)throw Error("تعذر تسجيل موافقتك على الشروط: "+termsError.message);
   const type=$("subscription-type").value,{data,error}=await sb.rpc("loqma_place_subscription",{p_address_id:addressId,p_subscription_type:type,p_weekly_mode:type==="weekly"?$("weekly-mode").value:null,p_days:days,p_idempotency_key:crypto.randomUUID(),p_customer_notes:$("customer-notes").value.trim()||null});
   if(error)throw error;const total=Number(data.total_amount_piasters)/100;
@@ -800,7 +868,7 @@ function setStaffTabs(tabs){$("staff-tabs").innerHTML=tabs.map(t=>`<button class
 $("staff-tabs").addEventListener("click",e=>{const b=e.target.closest("[data-tab]");if(!b)return;adminTab=b.dataset.tab;loadStaff()});
 async function loadStaff(){
  if(!staff||!user)return;const role=staff.role;
- const tabs=role==="admin"?[{id:"orders",label:"الطلبات"},{id:"bakeries",label:"المخابز"},{id:"drivers",label:"المندوبون"},{id:"products",label:"الأصناف والأسعار"},{id:"settings",label:"إعدادات التوصيل"},{id:"topups",label:"شحن المحافظ"},{id:"messages",label:"رسائل وإشعارات"}]:role==="bakery"?[{id:"bakery",label:"طلبات المخبز"}]:[{id:"driver",label:"مهام التوصيل"}];
+ const tabs=role==="admin"?[{id:"orders",label:"الطلبات"},{id:"bakeries",label:"المخابز"},{id:"drivers",label:"المندوبون"},{id:"products",label:"الأصناف والأسعار"},{id:"zones",label:"مناطق التوصيل"},{id:"settings",label:"إعدادات التوصيل"},{id:"topups",label:"شحن المحافظ"},{id:"messages",label:"رسائل وإشعارات"}]:role==="bakery"?[{id:"bakery",label:"طلبات المخبز"}]:[{id:"driver",label:"مهام التوصيل"}];
  if(!tabs.some(t=>t.id===adminTab))adminTab=tabs[0].id;setStaffTabs(tabs);$("staff-title").textContent=role==="admin"?"إدارة لُقمة":role==="bakery"?"لوحة المخبز":"لوحة المندوب";
  const host=$("staff-content");host.innerHTML='<div class="status">جاري تحميل البيانات…</div>';
  if(role==="admin"){
@@ -808,6 +876,7 @@ async function loadStaff(){
   if(adminTab==="bakeries")return loadBakeries();
   if(adminTab==="drivers")return loadDrivers();
   if(adminTab==="products")return loadProductAdmin();
+  if(adminTab==="zones")return loadAdminZones();
   if(adminTab==="settings")return loadAdminSettings();
   if(adminTab==="topups")return loadAdminTopups();if(adminTab==="messages")return loadAdminMessages();
  }
@@ -906,6 +975,61 @@ async function loadProductAdmin(){
  $("create-category").onclick=async()=>{const name=$("new-category-name").value.trim(),display_order=Number($("new-category-order").value),out=$("category-result");try{if(!name)throw Error("اكتب اسم القسم.");if(!Number.isInteger(display_order)||display_order<0)throw Error("الترتيب غير صحيح.");const ins=await sb.from("product_categories").insert({name,slug:"cat-"+crypto.randomUUID(),display_order,is_active:true});if(ins.error)throw ins.error;await loadProducts();await loadProductAdmin()}catch(e){out.textContent="تعذر إضافة القسم: "+e.message}};
  host.querySelectorAll("[data-save-category]").forEach(btn=>btn.onclick=async()=>{const id=btn.dataset.saveCategory,name=$("cat-name-"+id).value.trim(),display_order=Number($("cat-order-"+id).value),is_active=$("cat-active-"+id).value==="true";try{if(!name)throw Error("اسم القسم مطلوب.");if(!Number.isInteger(display_order)||display_order<0)throw Error("الترتيب غير صحيح.");btn.disabled=true;const u=await sb.from("product_categories").update({name,display_order,is_active,updated_at:new Date().toISOString()}).eq("id",id);if(u.error)throw u.error;await loadProducts();await loadProductAdmin()}catch(e){alert("تعذر حفظ القسم: "+e.message);btn.disabled=false}});
  host.querySelectorAll("[data-save-product]").forEach(btn=>btn.onclick=async()=>{const id=btn.dataset.saveProduct,name=$("name-"+id).value.trim(),source_name=$("source-"+id).value.trim(),price=Number($("price-"+id).value),weight=$("weight-"+id).value,display_order=Number($("order-"+id).value),is_active=$("active-"+id).value==="true",category_id=$("category-"+id).value||null,file=$("image-"+id).files?.[0];try{if(!name||!source_name)throw Error("اسم المنتج والمصدر مطلوبان.");if(!Number.isFinite(price)||price<=0)throw Error("السعر غير صحيح.");if(weight!==""&&(!Number.isInteger(Number(weight))||Number(weight)<=0))throw Error("الوزن غير صحيح.");if(!Number.isInteger(display_order)||display_order<0)throw Error("الترتيب غير صحيح.");btn.disabled=true;const old=rows.find(p=>p.id===id),image_url=file?await uploadProductImage(file):(old?.image_url||null),u=await sb.from("product_catalog").update({product_name:name,source_name,price_piasters:Math.round(price*100),sale_unit:$("unit-"+id).value,weight_grams:weight===""?null:Number(weight),display_order,is_active,category_id,image_url,updated_at:new Date().toISOString()}).eq("id",id);if(u.error)throw u.error;await loadProducts();await loadProductAdmin()}catch(e){alert("تعذر حفظ المنتج: "+(e.message||"خطأ غير معروف"));btn.disabled=false}});
+}
+
+
+async function loadAdminZones(){
+ const host=$("staff-content"),{data,error}=await sb.from("delivery_zones").select("id,governorate,city,area,is_active,boundary_geojson,daily_delivery_fee_piasters,weekly_delivery_fee_piasters,daily_service_fee_piasters,weekly_service_fee_piasters,minimum_order_piasters,delivery_start_time,delivery_end_time,order_cutoff_time,created_at").order("created_at",{ascending:true});
+ if(error){host.innerHTML='<div class="warning">تعذر تحميل المناطق: '+esc(error.message)+'</div>';return}
+ const rows=data||[];
+ host.innerHTML='<div class="notice">ارسم حدود كل منطقة على الخريطة واحفظها. لا تُفعّل منطقة جديدة قبل رسم حدودها ومراجعتها. المنطقة التي لا تحتوي على حدود تظل على آلية التحقق النصية القديمة حتى ترسم حدودها.</div>'+
+ '<div class="panel"><div class="two"><div><label>اختيار منطقة موجودة</label><select id="zone-select" class="filter-input">'+rows.map(z=>'<option value="'+esc(z.id)+'">'+esc(z.city+' — '+z.area)+(z.is_active?' (مفعّلة)':' (متوقفة)')+'</option>').join('')+'</select></div><div style="display:flex;align-items:end"><button class="secondary" id="zone-new" type="button">＋ إضافة منطقة جديدة</button></div></div></div>'+
+ '<div class="panel"><h4>بيانات المنطقة</h4><div class="fields"><div class="two"><label>المحافظة<input id="zone-governorate" class="filter-input" value="الجيزة"></label><label>المدينة<input id="zone-city" class="filter-input" value="أكتوبر الجديدة"></label></div><label>اسم الحي أو الكمبوند<input id="zone-area" class="filter-input" placeholder="مثال: غرب المطار"></label><label><input id="zone-active" type="checkbox"> المنطقة تستقبل الطلبات</label><div class="two"><label>توصيل يومي (جنيه)<input id="zone-daily-delivery" type="number" min="0" step=".01" class="filter-input" value="5"></label><label>توصيل أسبوعي (جنيه)<input id="zone-weekly-delivery" type="number" min="0" step=".01" class="filter-input" value="20"></label></div><div class="two"><label>خدمة يومية (جنيه)<input id="zone-daily-service" type="number" min="0" step=".01" class="filter-input" value="1"></label><label>خدمة أسبوعية (جنيه)<input id="zone-weekly-service" type="number" min="0" step=".01" class="filter-input" value="1"></label></div><label>الحد الأدنى للمنتجات في كل يوم (جنيه)<input id="zone-minimum" type="number" min=".01" step=".01" class="filter-input" value="30"></label><div class="two"><label>بداية التوصيل<input id="zone-start" type="time" class="filter-input" value="06:00"></label><label>نهاية التوصيل<input id="zone-end" type="time" class="filter-input" value="08:00"></label></div><label>آخر موعد للطلب<input id="zone-cutoff" type="time" class="filter-input" value="22:00"></label></div></div>'+
+ '<div class="panel"><h4>🗺️ حدود التوصيل على الخريطة</h4><p class="map-help">استخدم أداة رسم المضلع من أدوات الخريطة لتحديد حدود المنطقة. يمكنك تعديل النقاط أو حذف الشكل وإعادة رسمه.</p><div id="admin-zone-map" class="loqma-map zone-map"></div><div class="order-actions"><button class="secondary" id="zone-use-location" type="button">توسيط الخريطة على موقعي</button><button class="danger" id="zone-clear-boundary" type="button">مسح الحدود</button></div><div id="zone-map-status" class="result">ارسم حدود المنطقة ثم احفظها.</div><button class="primary" id="zone-save" type="button" style="margin-top:12px">حفظ المنطقة والحدود</button><div id="zone-save-result" class="result"></div></div>'+
+ '<div class="panel"><h4>المناطق المسجلة</h4>'+ (rows.length?rows.map(z=>'<div class="admin-item"><b>'+esc(z.city+' — '+z.area)+'</b> '+(z.is_active?'<span class="badge">مفعّلة</span>':'<span class="badge">متوقفة</span>')+'<br><span class="muted">'+(z.boundary_geojson?'حدود جغرافية محفوظة':'لم تُرسم الحدود بعد')+' • يومي '+money(Number(z.daily_delivery_fee_piasters)/100)+' • أسبوعي '+money(Number(z.weekly_delivery_fee_piasters)/100)+'</span></div>').join(''):'<div class="empty">لا توجد مناطق.</div>')+'</div>';
+ let currentZone=rows[0]||null,zoneMap=null,zoneLayers=null;
+ function setField(id,value){$(id).value=value==null?"":String(value)}
+ function drawZoneMap(z){
+  if(!window.L||!L.Control.Draw){$("zone-map-status").textContent="تعذر تحميل أدوات الخريطة. تحقق من اتصال الإنترنت.";return}
+  if(zoneMap){zoneMap.remove();zoneMap=null}
+  zoneMap=L.map("admin-zone-map").setView(LOQMA_MAP_CENTER,13);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(zoneMap);
+  zoneLayers=new L.FeatureGroup();zoneMap.addLayer(zoneLayers);
+  if(z?.boundary_geojson){try{L.geoJSON(z.boundary_geojson).eachLayer(layer=>zoneLayers.addLayer(layer));if(zoneLayers.getLayers().length)zoneMap.fitBounds(zoneLayers.getBounds(),{padding:[15,15]});$("zone-map-status").textContent="تم تحميل الحدود المحفوظة. يمكنك تعديلها من أدوات الخريطة."}catch(e){$("zone-map-status").textContent="تعذر عرض الحدود الحالية؛ يمكنك رسمها من جديد."}}
+  else $("zone-map-status").textContent="لم تُرسم حدود لهذه المنطقة بعد.";
+  zoneMap.addControl(new L.Control.Draw({draw:{polygon:{allowIntersection:false,showArea:true},polyline:false,rectangle:false,circle:false,marker:false,circlemarker:false},edit:{featureGroup:zoneLayers,remove:true}}));
+  zoneMap.on(L.Draw.Event.CREATED,e=>{zoneLayers.clearLayers();zoneLayers.addLayer(e.layer);$("zone-map-status").textContent="تم رسم الحدود. اضغط حفظ المنطقة لتسجيلها."});
+  zoneMap.on(L.Draw.Event.EDITED,()=>{$("zone-map-status").textContent="تم تعديل الحدود. اضغط حفظ المنطقة لتسجيل التعديلات."});
+  zoneMap.on(L.Draw.Event.DELETED,()=>{$("zone-map-status").textContent="تم حذف الحدود من الخريطة. احفظ لإزالة النطاق الجغرافي."});
+  setTimeout(()=>zoneMap.invalidateSize(),250);
+ }
+ function showZone(z){
+  currentZone=z;setField("zone-governorate",z?.governorate||"الجيزة");setField("zone-city",z?.city||"أكتوبر الجديدة");setField("zone-area",z?.area||"");
+  $("zone-active").checked=!!z?.is_active;
+  setField("zone-daily-delivery",Number(z?.daily_delivery_fee_piasters??500)/100);setField("zone-weekly-delivery",Number(z?.weekly_delivery_fee_piasters??2000)/100);
+  setField("zone-daily-service",Number(z?.daily_service_fee_piasters??100)/100);setField("zone-weekly-service",Number(z?.weekly_service_fee_piasters??100)/100);
+  setField("zone-minimum",Number(z?.minimum_order_piasters??3000)/100);setField("zone-start",(z?.delivery_start_time||"06:00").slice(0,5));
+  setField("zone-end",(z?.delivery_end_time||"08:00").slice(0,5));setField("zone-cutoff",(z?.order_cutoff_time||"22:00").slice(0,5));drawZoneMap(z);
+ }
+ function startNewZone(){currentZone=null;$("zone-select").value="";showZone({governorate:"الجيزة",city:"أكتوبر الجديدة",area:"",is_active:false});$("zone-map-status").textContent="ارسم حدود المنطقة الجديدة قبل تفعيلها."}
+ if(rows.length){$("zone-select").value=rows[0].id;showZone(rows[0])}else startNewZone();
+ $("zone-select").onchange=()=>showZone(rows.find(z=>z.id===$("zone-select").value)||null);$("zone-new").onclick=startNewZone;
+ $("zone-clear-boundary").onclick=()=>{if(zoneLayers)zoneLayers.clearLayers();$("zone-map-status").textContent="تم مسح الحدود. احفظ لإزالة النطاق الجغرافي."};
+ $("zone-use-location").onclick=()=>{if(!navigator.geolocation){$("zone-map-status").textContent="تحديد الموقع غير مدعوم.";return}$("zone-map-status").textContent="جارٍ تحديد موقع الجهاز…";navigator.geolocation.getCurrentPosition(p=>{zoneMap.setView([p.coords.latitude,p.coords.longitude],15);$("zone-map-status").textContent="تم توسيط الخريطة على موقع الجهاز."},()=>{$("zone-map-status").textContent="تعذر تحديد الموقع. حرّك الخريطة يدويًا."},{enableHighAccuracy:true,timeout:15000})};
+ $("zone-save").onclick=async()=>{
+  const out=$("zone-save-result");out.textContent="جارٍ حفظ المنطقة…";$("zone-save").disabled=true;
+  try{
+   const name=$("zone-area").value.trim();if(!name)throw Error("اكتب اسم المنطقة.");
+   const geo=zoneLayers&&zoneLayers.toGeoJSON(),features=geo?.features||[],boundary=features.length?features[0].geometry:null;
+   if($("zone-active").checked&&!boundary&&!(currentZone&&currentZone.boundary_geojson))throw Error("ارسم حدود المنطقة على الخريطة قبل تفعيلها.");
+   const toP=id=>{const n=Number($(id).value);if(!Number.isFinite(n)||n<0)throw Error("راجع الرسوم والحد الأدنى.");return Math.round(n*100)};
+   const min=toP("zone-minimum");if(min<1)throw Error("الحد الأدنى يجب أن يكون أكبر من صفر.");
+   const args={p_zone_id:currentZone?.id||null,p_governorate:$("zone-governorate").value.trim(),p_city:$("zone-city").value.trim(),p_area:name,p_is_active:$("zone-active").checked,p_boundary_geojson:boundary,p_daily_delivery_fee_piasters:toP("zone-daily-delivery"),p_weekly_delivery_fee_piasters:toP("zone-weekly-delivery"),p_daily_service_fee_piasters:toP("zone-daily-service"),p_weekly_service_fee_piasters:toP("zone-weekly-service"),p_minimum_order_piasters:min,p_delivery_start_time:$("zone-start").value,p_delivery_end_time:$("zone-end").value,p_order_cutoff_time:$("zone-cutoff").value};
+   const {data,error}=await sb.rpc("loqma_admin_save_delivery_zone",args);if(error)throw error;
+   out.innerHTML='<div class="success-result">تم حفظ المنطقة وحدودها بنجاح.</div>';await loadAdminZones();
+  }catch(e){out.innerHTML='<div class="error-result">'+esc(e.message||"تعذر الحفظ")+'</div>'}
+  finally{$("zone-save").disabled=false}
+ };
 }
 
 async function loadAdminSettings(){const host=$("staff-content"),{data,error}=await sb.from("app_settings").select("*").limit(1).maybeSingle();if(error){host.innerHTML='<div class="warning">تعذر تحميل الإعدادات: '+esc(error.message)+'</div>';return}if(!data){host.innerHTML='<div class="warning">لم يتم العثور على سجل إعدادات التطبيق.</div>';return}host.innerHTML=`<div class="panel"><h4>حالة استقبال الطلبات</h4><p>${data.allow_orders?"استقبال الطلبات مفتوح":"استقبال الطلبات مغلق"}</p><button class="${data.allow_orders?"danger":"primary"}" id="toggle-orders">${data.allow_orders?"إغلاق استقبال الطلبات":"فتح استقبال الطلبات"}</button></div><div class="panel"><h4>مواعيد التشغيل</h4><div class="two"><label>بداية التوصيل<input class="filter-input" id="delivery-start" type="time" value="${esc(data.delivery_start_time||"06:00")}"></label><label>نهاية التوصيل<input class="filter-input" id="delivery-end" type="time" value="${esc(data.delivery_end_time||"08:00")}"></label><label>آخر موعد للطلب<input class="filter-input" id="cutoff-time" type="time" value="${esc(data.order_cutoff_time||"22:00")}"></label><label>رسوم التوصيل بالجنيه<input class="filter-input" id="delivery-fee" type="number" min="0" step=".01" value="${data.delivery_fee_piasters==null?"":Number(data.delivery_fee_piasters)/100}"></label><label>التوصيل اليومي (جنيه)<input class="filter-input" id="daily-delivery-fee" type="number" min="0" step=".01" value="${Number(data.daily_delivery_fee_piasters??500)/100}"></label><label>الخدمة اليومية (جنيه)<input class="filter-input" id="daily-service-fee" type="number" min="0" step=".01" value="${Number(data.daily_service_fee_piasters??100)/100}"></label><label>التوصيل الأسبوعي (جنيه)<input class="filter-input" id="weekly-delivery-fee" type="number" min="0" step=".01" value="${Number(data.weekly_delivery_fee_piasters??2000)/100}"></label><label>الخدمة الأسبوعية (جنيه)<input class="filter-input" id="weekly-service-fee" type="number" min="0" step=".01" value="${Number(data.weekly_service_fee_piasters??100)/100}"></label></div><button class="primary" id="save-settings" style="margin-top:10px">حفظ المواعيد والرسوم</button><div class="result" id="settings-result"></div></div>`;
