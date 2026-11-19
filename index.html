@@ -331,7 +331,7 @@ $("products").addEventListener("click",e=>{const b=e.target.closest("[data-actio
 $("drawer-categories").addEventListener("click",e=>{const b=e.target.closest("[data-cat]");if(!b)return;category=b.dataset.cat;renderCategories();render();closeDrawer()});
 $("search").addEventListener("input",render);
 const modal=$("modal");
-$("open-cart").onclick=async()=>{try{await loadCheckoutAddresses()}catch(e){console.warn("addresses",e)}renderCartRows();$("order-result").innerHTML="";$("place-order").disabled=false;$("place-order").textContent="تأكيد الطلب";refreshSummary();modal.classList.add("show")};
+$("open-cart").onclick=async()=>{try{await loadCheckoutAddresses()}catch(e){console.warn("addresses",e)}renderCartRows();$("order-result").innerHTML="";$("place-order").disabled=false;$("place-order").textContent="تأكيد الطلب";refreshSummary();modal.classList.add("show");setTimeout(()=>{if(customerAddressMap)customerAddressMap.invalidateSize()},300)};
 function renderCartRows(){$("cart-items").innerHTML=products.filter(p=>cart[p.id]).map(p=>`<div class="cart-row"><span>${esc(p.name)}<br>${cart[p.id]} × ${money(p.price)}</span><b>${money(p.price*cart[p.id])}</b></div>`).join("")}
 $("close-cart").onclick=()=>modal.classList.remove("show");modal.addEventListener("click",e=>{if(e.target===modal)modal.classList.remove("show")});
 $("clear-cart").onclick=()=>{clearCart();modal.classList.remove("show")};
@@ -399,7 +399,7 @@ async function checkCustomerDeliveryZone(lat,lng){
  const out=$("customer-map-result");if(!out)return;out.textContent="جارٍ التحقق من نطاق التوصيل…";
  const {data,error}=await sb.rpc("loqma_find_delivery_zone",{p_lat:lat,p_lng:lng});
  if(error){out.textContent="تعذر التحقق الآن؛ سيتم التحقق مرة أخرى عند تأكيد الطلب.";return}
- if(data&&data.length){out.innerHTML='<div class="success-result">✓ العنوان داخل نطاق التوصيل: <b>'+esc(data[0].area)+'</b></div>';return}
+ if(data&&data.length){const z=data[0];checkoutFees={dailyDelivery:Number(z.daily_delivery_fee_piasters),dailyService:Number(z.daily_service_fee_piasters),weeklyDelivery:Number(z.weekly_delivery_fee_piasters),weeklyService:Number(z.weekly_service_fee_piasters)};updateFeeOptions();refreshSummary();out.innerHTML='<div class="success-result">✓ العنوان داخل نطاق التوصيل: <b>'+esc(z.area)+'</b></div>';return}
  out.innerHTML='<div class="subtle-result">تم تحديد الموقع. سيتم حسم توفر الخدمة عند تأكيد الطلب حسب حدود المناطق المفعّلة.</div>';
 }
 function initCustomerAddressMap(){
