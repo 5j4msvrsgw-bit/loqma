@@ -243,7 +243,7 @@ body{background-image:linear-gradient(180deg,rgba(3,55,34,.06),rgba(238,247,225,
 <div class="panel"><h4>2) عنوان التوصيل</h4><div class="fields">
 <div><label for="saved-address-select">اختار عنوان التوصيل</label><select id="saved-address-select" class="filter-input"><option value="new">＋ إضافة عنوان جديد</option></select></div>
 <div class="notice" id="saved-address-note">جاري تحميل عناوينك المحفوظة…</div>
-<div class="panel" id="address-map-panel"><h4>📍 حدد موقع باب البيت على الخريطة</h4><p class="map-help" id="customer-map-status">اضغط على مكان منزلك على الخريطة، أو استخدم تحديد موقعي الحالي.</p><div id="customer-address-map" class="loqma-map"></div><div class="order-actions"><button class="secondary" type="button" id="use-my-location">استخدم موقعي الحالي</button><button class="primary" type="button" id="save-address-location" hidden>حفظ موقع العنوان</button></div><div class="result" id="customer-map-result"></div></div>
+<div class="panel" id="address-map-panel"><h4>📍 حدد موقع باب البيت على الخريطة</h4><div class="notice">خدمة لقمة متاحة حاليًا في مناطق محددة فقط. حدّد موقع منزلك للتأكد من توفر التوصيل قبل تأكيد الطلب.</div><p class="map-help" id="customer-map-status">اضغط على مكان منزلك على الخريطة، أو استخدم تحديد موقعي الحالي.</p><div id="customer-address-map" class="loqma-map"></div><div class="order-actions"><button class="secondary" type="button" id="use-my-location">استخدم موقعي الحالي</button><button class="primary" type="button" id="save-address-location" hidden>حفظ موقع العنوان</button></div><div class="result" id="customer-map-result"></div></div>
 <div id="new-address-fields">
 <div><label for="addr-street">الشارع *</label><input id="addr-street" maxlength="200" placeholder="اسم الشارع"></div>
 <div class="two"><div><label for="addr-building">رقم العمارة</label><input id="addr-building" maxlength="80"></div><div><label for="addr-floor">الدور</label><input id="addr-floor" maxlength="40"></div></div>
@@ -395,12 +395,19 @@ function setCustomerPin(lat,lng,dirty){
  $("customer-map-status").textContent="تم تحديد الموقع. اسحب العلامة لضبطها بدقة أو اضغط على نقطة أخرى.";
  checkCustomerDeliveryZone(lat,lng);
 }
+async function getDeliveryCoverageMessage(){
+ const {data,error}=await sb.from("delivery_zones").select("id,boundary_geojson").eq("is_active",true);
+ if(error)return "تعذر التحقق من نطاق التوصيل حاليًا. حاول مرة أخرى بعد قليل.";
+ const hasAnyBoundary=(data||[]).some(z=>!!z.boundary_geojson);
+ if(!hasAnyBoundary)return "نطاق التوصيل لم تُعتمد حدوده على الخريطة بعد. نعمل حاليًا على تحديد المناطق التي تخدمها لقمة. جرّب مرة أخرى قريبًا.";
+ return "نعتذر، عنوانك خارج نطاق التوصيل الحالي. لقمة لا توصل إلى هذه المنطقة حتى الآن.";
+}
 async function checkCustomerDeliveryZone(lat,lng){
  const out=$("customer-map-result");if(!out)return;out.textContent="جارٍ التحقق من نطاق التوصيل…";
  const {data,error}=await sb.rpc("loqma_find_delivery_zone",{p_lat:lat,p_lng:lng});
- if(error){out.textContent="تعذر التحقق الآن؛ سيتم التحقق مرة أخرى عند تأكيد الطلب.";return}
- if(data&&data.length){const z=data[0];checkoutFees={dailyDelivery:Number(z.daily_delivery_fee_piasters),dailyService:Number(z.daily_service_fee_piasters),weeklyDelivery:Number(z.weekly_delivery_fee_piasters),weeklyService:Number(z.weekly_service_fee_piasters)};updateFeeOptions();refreshSummary();out.innerHTML='<div class="success-result">✓ العنوان داخل نطاق التوصيل: <b>'+esc(z.area)+'</b></div>';return}
- out.innerHTML='<div class="subtle-result">تم تحديد الموقع. سيتم حسم توفر الخدمة عند تأكيد الطلب حسب حدود المناطق المفعّلة.</div>';
+ if(error){out.innerHTML='<div class="subtle-result">تعذر التحقق من نطاق التوصيل الآن. حاول مرة أخرى بعد قليل.</div>';return}
+ if(data&&data.length){const z=data[0];checkoutFees={dailyDelivery:Number(z.daily_delivery_fee_piasters),dailyService:Number(z.daily_service_fee_piasters),weeklyDelivery:Number(z.weekly_delivery_fee_piasters),weeklyService:Number(z.weekly_service_fee_piasters)};updateFeeOptions();refreshSummary();out.innerHTML='<div class="success-result">✓ التوصيل متاح في <b>'+esc(z.area)+'</b>. يمكنك متابعة الطلب.</div>';return}
+ out.innerHTML='<div class="subtle-result">'+esc(await getDeliveryCoverageMessage())+'</div>';
 }
 function initCustomerAddressMap(){
  if(customerAddressMap){setTimeout(()=>customerAddressMap.invalidateSize(),150);return}
@@ -442,7 +449,8 @@ $("save-address-location").onclick=async()=>{
  const {error}=await sb.from("addresses").update(patch).eq("id",id).eq("user_id",user.id);
  if(error){$("customer-map-result").textContent="تعذر حفظ الموقع: "+error.message;return}
  Object.assign(chosen,patch);customerPinDirty=false;$("save-address-location").hidden=true;
- $("customer-map-result").innerHTML='<div class="success-result">تم حفظ موقع العنوان بنجاح.</div>';
+ const coverageMessage=zone?"تم حفظ موقع العنوان بنجاح، والتوصيل متاح في هذه المنطقة.":await getDeliveryCoverageMessage();
+ $("customer-map-result").innerHTML='<div class="'+(zone?"success-result":"subtle-result")+'">'+esc(coverageMessage)+'</div>';
 };
 async function loadCheckoutAddresses(){
  if(!user)return;
@@ -471,10 +479,12 @@ async function submitOrder(){
   btn.disabled=true;btn.textContent="جاري تسجيل الطلب…";out.textContent="";
   let addressId=$("saved-address-select").value;
   if(!customerPin)throw Error("حدد موقع عنوان التوصيل على الخريطة أولًا.");
+  const {data:zoneMatches,error:zoneError}=await sb.rpc("loqma_find_delivery_zone",{p_lat:customerPin.lat,p_lng:customerPin.lng});
+  if(zoneError)throw Error("تعذر التحقق من نطاق التوصيل. حاول مرة أخرى بعد قليل.");
+  const zone=zoneMatches&&zoneMatches[0];
+  if(!zone){const coverageMessage=await getDeliveryCoverageMessage();$("customer-map-result").innerHTML='<div class="subtle-result">'+esc(coverageMessage)+'</div>';throw Error(coverageMessage);}
   if(addressId==="new"){
    const street=$("addr-street").value.trim();if(!street)throw Error("اكتب اسم الشارع.");
-   const {data:zoneMatches,error:zoneError}=await sb.rpc("loqma_find_delivery_zone",{p_lat:customerPin.lat,p_lng:customerPin.lng});if(zoneError)throw zoneError;
-   const zone=zoneMatches&&zoneMatches[0];
    const address={user_id:user.id,label:"المنزل",governorate:zone?.governorate||"الجيزة",city:zone?.city||"أكتوبر الجديدة",area:zone?.area||"غرب المطار",street,building:$("addr-building").value.trim()||null,floor:$("addr-floor").value.trim()||null,apartment:$("addr-apartment").value.trim()||null,landmark:$("addr-landmark").value.trim()||null,delivery_notes:$("addr-notes").value.trim()||null,latitude:customerPin.lat,longitude:customerPin.lng,is_default:savedAddresses.length===0,is_active:true};
    const {data:addr,error:addrErr}=await sb.from("addresses").insert(address).select("id").single();if(addrErr)throw addrErr;addressId=addr.id;
   }else{
