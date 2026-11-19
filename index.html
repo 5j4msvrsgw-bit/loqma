@@ -217,7 +217,7 @@ body{background-image:linear-gradient(180deg,rgba(3,55,34,.06),rgba(238,247,225,
 <main class="container" id="store-main" hidden>
 <div class="notice delivery-banner" id="store-notice"><div class="truck-art-frame"><img class="delivery-art" src="./loqma-delivery.jpg.jpg" alt="عربية توصيل لُقمة"><span class="truck-location">📍 أكتوبر الجديدة – غرب المطار</span></div><div class="delivery-copy"><b>التوصيل متاح حاليًا في أكتوبر الجديدة – غرب المطار</b><span class="cutoff-caption">◷ آخر موعد لاستقبال الطلبات اليوم الساعة 10:00 مساءً</span><div class="cutoff-countdown" id="cutoff-countdown" role="status" aria-live="off"><span class="cutoff-label">متبقي على إغلاق الطلبات</span><span class="cutoff-time" id="cutoff-time">--:--:--</span></div><span class="next-day-note" id="next-day-note" hidden>انتهى استقبال طلبات اليوم — طلبك الآن لليوم التالي 🌅</span></div></div>
 <div class="quick-actions"><button type="button" id="open-wallet-card">💳 المحفظة</button><button type="button" id="open-account-card">👤 بيانات حسابك</button><button type="button" id="open-my-orders">📦 متابعة طلباتي</button></div>
-<section class="panel" id="account-panel" hidden><div class="section" style="margin:0 0 10px"><h2>بيانات حسابك</h2><button class="small-btn" data-close-panel="account-panel">إغلاق</button></div><div class="fields"><div class="two"><div><label for="profile-name">الاسم</label><input id="profile-name" maxlength="100" placeholder="اسم العميل"></div><div><label for="profile-phone">رقم الموبايل</label><input id="profile-phone" type="tel" inputmode="tel" maxlength="20" placeholder="01xxxxxxxxx"></div></div><button class="primary" id="save-profile" type="button">حفظ البيانات</button><div class="result" id="profile-result"></div><div style="margin-top:16px"><h3 style="font-size:14px">عناوين التوصيل المحفوظة</h3><div id="profile-addresses" class="result">جاري تحميل العناوين…</div></div></div></section>
+<section class="panel" id="account-panel" hidden><div class="section" style="margin:0 0 10px"><h2>بيانات حسابك</h2><button class="small-btn" data-close-panel="account-panel">إغلاق</button></div><div class="fields"><div class="two"><div><label for="profile-name">الاسم</label><input id="profile-name" maxlength="100" placeholder="اسم العميل"></div><div><label for="profile-phone">رقم الموبايل</label><input id="profile-phone" type="tel" inputmode="tel" maxlength="20" placeholder="01xxxxxxxxx"></div></div><button class="primary" id="save-profile" type="button">حفظ البيانات</button><div class="panel" style="margin-top:12px"><h4>تأمين حسابك</h4><p style="font-size:11px;color:var(--muted);line-height:1.8;margin:0 0 9px">اربط حسابك بفيسبوك للاحتفاظ بحسابك وطلباتك عند تغيير الجهاز.</p><button class="primary" id="link-facebook-account" type="button" style="background:#1877f2">ربط حسابي بفيسبوك</button><div class="result" id="facebook-link-result" aria-live="polite"></div></div><div class="result" id="profile-result"></div><div style="margin-top:16px"><h3 style="font-size:14px">عناوين التوصيل المحفوظة</h3><div id="profile-addresses" class="result">جاري تحميل العناوين…</div></div></div></section>
 <section class="panel" id="wallet-panel" hidden><div class="section" style="margin:0 0 8px"><h2>محفظة لُقمة</h2><div><button class="small-btn" data-close-panel="wallet-panel">إغلاق</button> <button class="primary" id="wallet-refresh">تحديث الرصيد</button></div></div><div class="wallet-number" id="wallet-balance">جاري تحميل الرصيد…</div><div class="notice">الرصيد مخصص للطلبات داخل لُقمة ولا يمكن سحبه نقدًا.</div><h4>شحن المحفظة</h4><div class="fields"><div><label for="topup-amount">المبلغ بالجنيه</label><input id="topup-amount" type="number" min="1" max="10000000" step="0.01" placeholder="مثال: 100"></div><div><label for="topup-method">طريقة التحويل</label><select id="topup-method"><option value="vodafone_cash">فودافون كاش</option><option value="instapay">إنستاباي</option></select></div><div class="wallet-grid"><div><label>رقم فودافون كاش</label><div class="wallet-number" id="voda-number">—</div><button class="small-btn" data-copy="voda-number">نسخ الرقم</button></div><div><label>معرّف إنستاباي</label><div class="wallet-number" id="insta-number">—</div><button class="small-btn" data-copy="insta-number">نسخ المعرّف</button></div></div><div><label for="transfer-reference">رقم العملية / مرجع التحويل *</label><input id="transfer-reference" maxlength="120" placeholder="اكتب رقم العملية بعد التحويل"></div><div><label for="topup-proof">صورة إثبات التحويل (اختياري)</label><input id="topup-proof" type="file" accept="image/jpeg,image/png,image/webp"></div><button class="primary" id="submit-topup">إرسال طلب الشحن للمراجعة</button><div class="result" id="topup-result"></div></div><h4>آخر حركات المحفظة</h4><div id="wallet-history" class="result">لا توجد حركات بعد.</div><h4>طلبات الشحن السابقة</h4><div id="my-topups" class="result">لا توجد طلبات شحن.</div></section>
 <section class="panel" id="my-orders-panel" hidden><div class="section" style="margin:0 0 10px"><h2>طلباتي واشتراكاتي</h2><button class="small-btn" data-close-panel="my-orders-panel">إغلاق</button></div><div id="my-orders-list">جاري تحميل الطلبات…</div></section>
 <div class="section"><h2>اختار من المخبوزات</h2><span id="count">جاري تحميل الأصناف…</span></div>
@@ -934,21 +934,24 @@ async function startGuestLogin(){
  }catch(e){msg.textContent="تعذر فتح المتجر: "+(e.message||"حدث خطأ.")+" — تأكد من تفعيل Anonymous Sign-ins في Supabase.";}
  finally{btn.disabled=false;}
 }
-async function startFacebookLogin(){
- const btn=$("facebook-login"),msg=$("auth-message");btn.disabled=true;msg.textContent="جاري تجهيز تسجيل الدخول بفيسبوك…";
+async function linkFacebookAccount(btn,msg){
+ btn.disabled=true;msg.textContent="جاري تجهيز ربط حسابك بفيسبوك…";
  try{
-  let {data,error}=await sb.auth.getSession();if(error)throw error;
-  if(!data.session){
-   const guest=await sb.auth.signInAnonymously();if(guest.error)throw guest.error;
-  }
+  const {data,error}=await sb.auth.getSession();if(error)throw error;
+  if(!data.session)throw Error("انتهت جلستك. أعد فتح الموقع وحاول مرة أخرى.");
+  const {data:current,error:userError}=await sb.auth.getUser();if(userError)throw userError;
+  const identities=current.user?.identities||[];
+  if(identities.some(x=>x.provider==="facebook")){msg.textContent="حسابك مرتبط بفيسبوك بالفعل ✅";return;}
   const {data:linked,error:linkError}=await sb.auth.linkIdentity({provider:"facebook",options:{redirectTo:window.location.origin+window.location.pathname}});
   if(linkError)throw linkError;
-  if(linked?.url){window.location.assign(linked.url);return;}
+  if(linked?.url){msg.textContent="سيتم تحويلك إلى فيسبوك لإكمال الربط…";window.location.assign(linked.url);return;}
   msg.textContent="لم يبدأ تحويل فيسبوك. تحقق من إعدادات مزود Facebook في Supabase.";
- }catch(e){msg.textContent="تعذر تسجيل الدخول بفيسبوك: "+(e.message||"حدث خطأ.")+" — تأكد من إضافة رابط الموقع إلى Redirect URLs في Supabase.";
+ }catch(e){msg.textContent="تعذر ربط فيسبوك: "+(e.message||"حدث خطأ.")+" — تأكد من إعدادات Facebook وRedirect URLs.";
  }finally{btn.disabled=false;}
 }
+async function startFacebookLogin(){return linkFacebookAccount($("facebook-login"),$("auth-message"));}
 $("facebook-login").onclick=startFacebookLogin;
+$("link-facebook-account").onclick=()=>linkFacebookAccount($("link-facebook-account"),$("facebook-link-result"));
 $("guest-login").onclick=startGuestLogin;
 async function init(){
  try{
