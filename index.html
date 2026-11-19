@@ -975,15 +975,27 @@ async function startFacebookLogin(){
   const callback=async(url)=>{
    if(!url||!url.startsWith(redirectTo))return;
    try{
-    const parsed=new URL(url),params=new URLSearchParams(parsed.hash.replace(/^#/,""));
-    const errorDescription=params.get("error_description")||params.get("error");
-    if(errorDescription)throw Error(decodeURIComponent(errorDescription.replace(/\\+/g," ")));
-    const access_token=params.get("access_token"),refresh_token=params.get("refresh_token");
-    if(!access_token||!refresh_token)throw Error("لم تصل بيانات جلسة Facebook. حاول مرة أخرى.");
-    const {data,error}=await sb.auth.setSession({access_token,refresh_token});
-    if(error)throw error;
+    const parsed=new URL(url);
+    const query=new URLSearchParams(parsed.search);
+    const params=new URLSearchParams(parsed.hash.replace(/^#/,""));
+    const errorDescription=query.get("error_description")||query.get("error")||params.get("error_description")||params.get("error");
+    if(errorDescription)throw Error(errorDescription.replace(/\\+/g," "));
+    let session;
+    const code=query.get("code");
+    if(code){
+     const {data,error}=await sb.auth.exchangeCodeForSession(code);
+     if(error)throw error;
+     session=data.session;
+    }else{
+     const access_token=params.get("access_token"),refresh_token=params.get("refresh_token");
+     if(!access_token||!refresh_token)throw Error("لم تصل بيانات جلسة Facebook. حاول مرة أخرى.");
+     const {data,error}=await sb.auth.setSession({access_token,refresh_token});
+     if(error)throw error;
+     session=data.session;
+    }
+    if(!session)throw Error("لم يتم إنشاء جلسة تسجيل الدخول. حاول مرة أخرى.");
     await Browser.close().catch(()=>{});
-    await finishCustomerLogin(data.session);
+    await finishCustomerLogin(session);
     msg.textContent="تم تسجيل الدخول بنجاح ✅";
    }catch(e){msg.textContent="تعذر إكمال تسجيل الدخول: "+(e.message||"خطأ غير معروف");}
    finally{btn.disabled=false;}
