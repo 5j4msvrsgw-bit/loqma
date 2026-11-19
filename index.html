@@ -979,7 +979,7 @@ async function loadProductAdmin(){
 
 
 async function loadAdminZones(){
- const host=$("staff-content"),{data,error}=await sb.from("delivery_zones").select("id,governorate,city,area,is_active,boundary_geojson,daily_delivery_fee_piasters,weekly_delivery_fee_piasters,daily_service_fee_piasters,weekly_service_fee_piasters,minimum_order_piasters,delivery_start_time,delivery_end_time,order_cutoff_time,created_at").order("created_at",{ascending:true});
+ const host=$("staff-content"),{data,error}=await sb.from("delivery_zones").select("id,governorate,city,area,is_active,boundary_geojson,daily_delivery_fee_piasters,weekly_delivery_fee_piasters,daily_service_fee_piasters,weekly_service_fee_piasters,minimum_order_piasters,delivery_start_time,delivery_end_time,order_cutoff_time,created_at").order("is_active",{ascending:false}).order("created_at",{ascending:true});
  if(error){host.innerHTML='<div class="warning">تعذر تحميل المناطق: '+esc(error.message)+'</div>';return}
  const rows=data||[];
  host.innerHTML='<div class="notice">ارسم حدود كل منطقة على الخريطة واحفظها. لا تُفعّل منطقة جديدة قبل رسم حدودها ومراجعتها. المنطقة التي لا تحتوي على حدود تظل على آلية التحقق النصية القديمة حتى ترسم حدودها.</div>'+
@@ -1021,7 +1021,7 @@ async function loadAdminZones(){
   try{
    const name=$("zone-area").value.trim();if(!name)throw Error("اكتب اسم المنطقة.");
    const geo=zoneLayers&&zoneLayers.toGeoJSON(),features=geo?.features||[],boundary=features.length?features[0].geometry:null;
-   if($("zone-active").checked&&!boundary&&!(currentZone&&currentZone.boundary_geojson))throw Error("ارسم حدود المنطقة على الخريطة قبل تفعيلها.");
+   if($("zone-active").checked&&!boundary)throw Error("ارسم حدود المنطقة على الخريطة قبل تفعيلها.");
    const toP=id=>{const n=Number($(id).value);if(!Number.isFinite(n)||n<0)throw Error("راجع الرسوم والحد الأدنى.");return Math.round(n*100)};
    const min=toP("zone-minimum");if(min<1)throw Error("الحد الأدنى يجب أن يكون أكبر من صفر.");
    const args={p_zone_id:currentZone?.id||null,p_governorate:$("zone-governorate").value.trim(),p_city:$("zone-city").value.trim(),p_area:name,p_is_active:$("zone-active").checked,p_boundary_geojson:boundary,p_daily_delivery_fee_piasters:toP("zone-daily-delivery"),p_weekly_delivery_fee_piasters:toP("zone-weekly-delivery"),p_daily_service_fee_piasters:toP("zone-daily-service"),p_weekly_service_fee_piasters:toP("zone-weekly-service"),p_minimum_order_piasters:min,p_delivery_start_time:$("zone-start").value,p_delivery_end_time:$("zone-end").value,p_order_cutoff_time:$("zone-cutoff").value};
