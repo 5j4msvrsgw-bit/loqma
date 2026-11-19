@@ -386,12 +386,12 @@ function renderProfileAddresses(){
 }
 let customerAddressMap=null,customerAddressMarker=null,customerPin=null,customerPinDirty=false;
 const LOQMA_MAP_CENTER=[29.96,30.92];
-function setCustomerPin(lat,lng,dirty){
+function setCustomerPin(lat,lng,dirty,preserveMapView=false){
  customerPin={lat:Number(lat),lng:Number(lng)};customerPinDirty=!!dirty;
  if(!customerAddressMap)return;
  if(!customerAddressMarker)customerAddressMarker=L.marker([lat,lng],{draggable:true}).addTo(customerAddressMap);else customerAddressMarker.setLatLng([lat,lng]);
  customerAddressMarker.off("dragend").on("dragend",function(){const p=customerAddressMarker.getLatLng();setCustomerPin(p.lat,p.lng,true)});
- customerAddressMap.setView([lat,lng],16);
+ if(!preserveMapView)customerAddressMap.setView([lat,lng],16);
  const save=$("save-address-location"),isNew=$("saved-address-select").value==="new";if(save)save.hidden=isNew||!customerPinDirty;
  $("customer-map-status").textContent="تم تحديد الموقع. اسحب العلامة لضبطها بدقة أو اضغط على نقطة أخرى.";
  checkCustomerDeliveryZone(lat,lng);
@@ -417,14 +417,15 @@ function initCustomerAddressMap(){
  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(customerAddressMap);
  customerAddressMap.on("click",e=>setCustomerPin(e.latlng.lat,e.latlng.lng,true));setTimeout(()=>customerAddressMap.invalidateSize(),250);
 }
-function updateAddressSelection(){
+function updateAddressSelection(keepMapCenter=false){
  const select=$("saved-address-select");if(!select)return;
  const id=select.value,chosen=savedAddresses.find(a=>a.id===id),fields=$("new-address-fields");
  if(fields)fields.hidden=id!=="new";
  $("saved-address-note").textContent=chosen?"العنوان المختار: "+addressLabel(chosen):"أدخل عنوانك مرة واحدة، وسيُحفظ لاستخدامه في طلباتك القادمة.";
  $("address-map-panel").hidden=false;initCustomerAddressMap();
+ if(keepMapCenter&&customerAddressMap)customerAddressMap.setView(LOQMA_MAP_CENTER,13);
  if(chosen&&chosen.latitude!=null&&chosen.longitude!=null){
-  setCustomerPin(chosen.latitude,chosen.longitude,false);
+  setCustomerPin(chosen.latitude,chosen.longitude,false,keepMapCenter===true);
   $("customer-map-status").textContent="الموقع المحفوظ لهذا العنوان. اضغط على الخريطة أو حرّك العلامة إذا احتجت لتعديله.";
  }else{
   customerPin=null;customerPinDirty=false;
@@ -461,7 +462,7 @@ async function loadCheckoutAddresses(){
  const select=$("saved-address-select"),previous=select.value;
  select.innerHTML='<option value="new">＋ إضافة عنوان جديد</option>'+savedAddresses.map(a=>'<option value="'+esc(a.id)+'">'+esc(addressLabel(a))+(a.is_default?" — افتراضي":"")+'</option>').join("");
  const preferred=savedAddresses.find(a=>a.id===previous)||savedAddresses.find(a=>a.is_default)||savedAddresses[0];
- select.value=preferred?preferred.id:"new";updateAddressSelection();renderProfileAddresses();
+ select.value=preferred?preferred.id:"new";updateAddressSelection(true);renderProfileAddresses();
 }
 $("saved-address-select").addEventListener("change",updateAddressSelection);
 
