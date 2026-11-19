@@ -68,7 +68,7 @@ jobs:
               pos = s.find("</activity>")
               if pos < 0:
                   raise SystemExit("Android activity tag not found")
-              s = s[:pos] + intent + "\\n        " + s[pos:]
+              s = s[:pos] + intent + "\n        " + s[pos:]
               p.write_text(s)
           PY
 
