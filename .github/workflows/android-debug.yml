@@ -73,6 +73,31 @@ jobs:
               p.write_text(s)
           PY
 
+      - name: Generate Android launcher icons from Loqma logo
+        run: |
+          python3 -m pip install --quiet pillow
+          python3 - <<'PY'
+          from PIL import Image, ImageOps
+          from pathlib import Path
+          src = Image.open("assets/loqma-logo.webp.PNG").convert("RGBA")
+          sizes = {
+              "mipmap-mdpi": 48,
+              "mipmap-hdpi": 72,
+              "mipmap-xhdpi": 96,
+              "mipmap-xxhdpi": 144,
+              "mipmap-xxxhdpi": 192,
+          }
+          for folder, size in sizes.items():
+              outdir = Path("android/app/src/main/res") / folder
+              outdir.mkdir(parents=True, exist_ok=True)
+              canvas = Image.new("RGBA", (size, size), (255, 250, 240, 255))
+              logo = src.copy()
+              logo.thumbnail((int(size * 0.82), int(size * 0.82)), Image.Resampling.LANCZOS)
+              canvas.alpha_composite(logo, ((size-logo.width)//2, (size-logo.height)//2))
+              canvas.convert("RGB").save(outdir / "ic_launcher.png", quality=95)
+              canvas.convert("RGB").save(outdir / "ic_launcher_round.png", quality=95)
+          PY
+
       - name: Sync Android
         run: npx cap sync android
 
