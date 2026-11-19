@@ -56,21 +56,19 @@ jobs:
           from pathlib import Path
           p = Path("android/app/src/main/AndroidManifest.xml")
           s = p.read_text()
-          marker = "</application>"
           intent = '''
-                  <activity android:name="com.getcapacitor.BridgeActivity" android:exported="true">
-                      <intent-filter>
-                          <action android:name="android.intent.action.VIEW" />
-                          <category android:name="android.intent.category.DEFAULT" />
-                          <category android:name="android.intent.category.BROWSABLE" />
-                          <data android:scheme="com.loqma.app" android:host="auth-callback" />
-                      </intent-filter>
-                  </activity>
+                  <intent-filter>
+                      <action android:name="android.intent.action.VIEW" />
+                      <category android:name="android.intent.category.DEFAULT" />
+                      <category android:name="android.intent.category.BROWSABLE" />
+                      <data android:scheme="com.loqma.app" android:host="auth-callback" />
+                  </intent-filter>
           '''
           if 'android:scheme="com.loqma.app"' not in s:
-              if marker not in s:
-                  raise SystemExit("AndroidManifest.xml application tag not found")
-              s = s.replace(marker, intent + "\\n    " + marker, 1)
+              pos = s.find("</activity>")
+              if pos < 0:
+                  raise SystemExit("Android activity tag not found")
+              s = s[:pos] + intent + "\\n        " + s[pos:]
               p.write_text(s)
           PY
 
