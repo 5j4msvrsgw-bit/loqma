@@ -243,7 +243,7 @@ body{background-image:linear-gradient(180deg,rgba(3,55,34,.06),rgba(238,247,225,
 <div class="panel"><h4>2) عنوان التوصيل</h4><div class="fields">
 <div><label for="saved-address-select">اختار عنوان التوصيل</label><select id="saved-address-select" class="filter-input"><option value="new">＋ إضافة عنوان جديد</option></select></div>
 <div class="notice" id="saved-address-note">جاري تحميل عناوينك المحفوظة…</div>
-<div class="panel" id="address-map-panel"><h4>📍 حدد موقع باب البيت على الخريطة</h4><div class="notice">خدمة لقمة متاحة في مناطق محددة فقط. حدّد موقع عنوان التوصيل (البيت). لو كنت في العمل، لا تستخدم موقعك الحالي؛ اختر مكان البيت يدويًا على الخريطة أو اختر عنوان البيت المحفوظ.</div><p class="map-help" id="customer-map-status">اضغط على مكان البيت على الخريطة، أو استخدم موقعي الحالي فقط إذا كنت موجودًا في عنوان التوصيل.</p><div id="customer-address-map" class="loqma-map"></div><div class="order-actions"><button class="secondary" type="button" id="use-my-location">استخدم موقعي الحالي (لو أنت في البيت)</button><button class="primary" type="button" id="save-address-location" hidden>حفظ موقع العنوان</button></div><div class="result" id="customer-map-result"></div></div>
+<div class="panel" id="address-map-panel"><h4>📍 حدد موقع باب البيت على الخريطة</h4><div class="notice">خدمة لقمة متاحة في مناطق محددة فقط. حدّد موقع عنوان التوصيل (البيت). لو كنت في العمل، لا تستخدم موقعك الحالي؛ اختر مكان البيت يدويًا على الخريطة أو اختر عنوان البيت المحفوظ.</div><p class="map-help" id="customer-map-status">اضغط على مكان البيت على الخريطة، أو استخدم موقعي الحالي فقط إذا كنت موجودًا في عنوان التوصيل.</p><div id="customer-address-map" class="loqma-map"></div><div class="order-actions"><button class="primary" type="button" id="customer-map-satellite">صور الأقمار الصناعية</button><button class="secondary" type="button" id="customer-map-street">خريطة الشوارع</button></div><div class="order-actions"><button class="secondary" type="button" id="use-my-location">استخدم موقعي الحالي (لو أنت في البيت)</button><button class="primary" type="button" id="save-address-location" hidden>حفظ موقع العنوان</button></div><div class="result" id="customer-map-result"></div></div>
 <div id="new-address-fields">
 <div><label for="addr-label">اسم العنوان</label><select id="addr-label"><option value="المنزل">المنزل</option><option value="العمل">العمل</option><option value="عنوان آخر">عنوان آخر</option></select></div>
 <div><label for="addr-street">الشارع *</label><input id="addr-street" maxlength="200" placeholder="اسم الشارع"></div>
@@ -384,7 +384,7 @@ function renderProfileAddresses(){
  const host=$("profile-addresses");if(!host)return;
  host.innerHTML=savedAddresses.length?savedAddresses.map(a=>'<div class="admin-item"><b>'+esc(a.label||"عنوان التوصيل")+'</b> '+(a.is_default?'<span class="badge">العنوان الافتراضي</span>':'')+'<br>'+esc(addressLabel(a))+'</div>').join(""):"لم تحفظ عنوان توصيل بعد. أول عنوان تضيفه سيُحفظ تلقائيًا لاستخدامه في طلباتك القادمة.";
 }
-let customerAddressMap=null,customerAddressMarker=null,customerPin=null,customerPinDirty=false;
+let customerAddressMap=null,customerAddressMarker=null,customerPin=null,customerPinDirty=false,customerSatelliteLayer=null,customerStreetLayer=null,customerMapMode="satellite";
 const LOQMA_MAP_CENTER=[29.8242806,30.7659496];
 function setCustomerPin(lat,lng,dirty,preserveMapView=false){
  customerPin={lat:Number(lat),lng:Number(lng)};customerPinDirty=!!dirty;
@@ -413,8 +413,12 @@ async function checkCustomerDeliveryZone(lat,lng){
 function initCustomerAddressMap(){
  if(customerAddressMap){setTimeout(()=>customerAddressMap.invalidateSize(),150);return}
  if(!window.L){$("customer-map-status").textContent="تعذر تحميل الخريطة. تحقق من اتصال الإنترنت ثم أعد المحاولة.";return}
- customerAddressMap=L.map("customer-address-map").setView(LOQMA_MAP_CENTER,13);
- L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(customerAddressMap);
+ customerAddressMap=L.map("customer-address-map",{maxZoom:19}).setView(LOQMA_MAP_CENTER,16);
+ customerSatelliteLayer=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:19,attribution:"Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community"});
+ customerStreetLayer=L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap contributors"});
+ customerSatelliteLayer.addTo(customerAddressMap);customerMapMode="satellite";
+ $("customer-map-satellite").onclick=()=>{if(customerMapMode==="satellite")return;customerAddressMap.removeLayer(customerStreetLayer);customerSatelliteLayer.addTo(customerAddressMap);customerMapMode="satellite";$("customer-map-satellite").className="primary";$("customer-map-street").className="secondary"};
+ $("customer-map-street").onclick=()=>{if(customerMapMode==="street")return;customerAddressMap.removeLayer(customerSatelliteLayer);customerStreetLayer.addTo(customerAddressMap);customerMapMode="street";$("customer-map-street").className="primary";$("customer-map-satellite").className="secondary"};
  customerAddressMap.on("click",e=>setCustomerPin(e.latlng.lat,e.latlng.lng,true));setTimeout(()=>customerAddressMap.invalidateSize(),250);
 }
 function updateAddressSelection(keepMapCenter=false){
@@ -423,14 +427,14 @@ function updateAddressSelection(keepMapCenter=false){
  if(fields)fields.hidden=id!=="new";
  $("saved-address-note").textContent=chosen?"العنوان المختار: "+addressLabel(chosen):"أدخل عنوانك مرة واحدة، وسيُحفظ لاستخدامه في طلباتك القادمة.";
  $("address-map-panel").hidden=false;initCustomerAddressMap();
- if(keepMapCenter&&customerAddressMap)customerAddressMap.setView(LOQMA_MAP_CENTER,13);
+ if(keepMapCenter&&customerAddressMap)customerAddressMap.setView(LOQMA_MAP_CENTER,16);
  if(chosen&&chosen.latitude!=null&&chosen.longitude!=null){
   setCustomerPin(chosen.latitude,chosen.longitude,false,keepMapCenter===true);
   $("customer-map-status").textContent="الموقع المحفوظ لهذا العنوان. اضغط على الخريطة أو حرّك العلامة إذا احتجت لتعديله.";
  }else{
   customerPin=null;customerPinDirty=false;
   if(customerAddressMarker){customerAddressMap.removeLayer(customerAddressMarker);customerAddressMarker=null}
-  if(customerAddressMap)customerAddressMap.setView(LOQMA_MAP_CENTER,13);
+  if(customerAddressMap)customerAddressMap.setView(LOQMA_MAP_CENTER,16);
   $("customer-map-status").textContent=chosen?"هذا العنوان لا يحتوي على موقع دقيق بعد. حدده على الخريطة ثم احفظه.":"اضغط على مكان منزلك على الخريطة، أو استخدم تحديد موقعي الحالي.";
   $("customer-map-result").textContent="";
  }
