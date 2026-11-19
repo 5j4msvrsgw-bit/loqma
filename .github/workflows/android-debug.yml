@@ -98,6 +98,54 @@ jobs:
               canvas.convert("RGB").save(outdir / "ic_launcher_round.png", quality=95)
           PY
 
+      - name: Generate Android launcher icons from Loqma logo
+        run: |
+          python3 -m pip install --quiet pillow
+          python3 - <<'PY'
+          from PIL import Image
+          from pathlib import Path
+          src = Image.open("assets/loqma-logo.webp.PNG").convert("RGBA")
+          res = Path("android/app/src/main/res")
+          sizes = {
+              "mipmap-mdpi": 48,
+              "mipmap-hdpi": 72,
+              "mipmap-xhdpi": 96,
+              "mipmap-xxhdpi": 144,
+              "mipmap-xxxhdpi": 192,
+          }
+          for folder, size in sizes.items():
+              outdir = res / folder
+              outdir.mkdir(parents=True, exist_ok=True)
+              canvas = Image.new("RGBA", (size, size), (255, 250, 240, 255))
+              logo = src.copy()
+              logo.thumbnail((int(size * 0.82), int(size * 0.82)), Image.Resampling.LANCZOS)
+              canvas.alpha_composite(logo, ((size-logo.width)//2, (size-logo.height)//2))
+              canvas.save(outdir / "ic_launcher.png")
+              canvas.save(outdir / "ic_launcher_round.png")
+          # Adaptive icon foreground must have transparency and safe-zone padding.
+          fgdir = res / "drawable"
+          fgdir.mkdir(parents=True, exist_ok=True)
+          fg = Image.new("RGBA", (432, 432), (0, 0, 0, 0))
+          logo = src.copy()
+          logo.thumbnail((280, 280), Image.Resampling.LANCZOS)
+          fg.alpha_composite(logo, ((432-logo.width)//2, (432-logo.height)//2))
+          fg.save(fgdir / "loqma_launcher_foreground.png")
+          anydpi = res / "mipmap-anydpi-v26"
+          anydpi.mkdir(parents=True, exist_ok=True)
+          adaptive = '''<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+              <background android:drawable="@color/loqma_launcher_background" />
+              <foreground android:drawable="@drawable/loqma_launcher_foreground" />
+          </adaptive-icon>'''
+          (anydpi / "ic_launcher.xml").write_text(adaptive)
+          (anydpi / "ic_launcher_round.xml").write_text(adaptive)
+          values = res / "values"
+          values.mkdir(parents=True, exist_ok=True)
+          colors = values / "loqma_launcher_colors.xml"
+          colors.write_text('''<resources>
+              <color name="loqma_launcher_background">#FFFAF0</color>
+          </resources>''')
+          PY
+
       - name: Sync Android
         run: npx cap sync android
 
