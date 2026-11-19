@@ -202,8 +202,10 @@ body{background-image:linear-gradient(180deg,rgba(3,55,34,.06),rgba(238,247,225,
 <body class="locked">
 <div class="auth-gate" id="auth-gate"><div class="auth-card">
 <div style="font-size:40px">🥖</div><h1>أهلاً بيك في لُقمة</h1>
-<p>بنجهزلك حسابك تلقائيًا… لحظات وتقدر تختار مخبوزاتك.</p>
-<div class="auth-msg" id="auth-message" aria-live="polite">جاري فتح المتجر بأمان…</div>
+<p>سجّل دخولك بحساب فيسبوك واحتفظ بحسابك وطلباتك، أو تابع كضيف.</p>
+<button class="primary" id="facebook-login" type="button" style="width:100%;margin:12px 0;background:#1877f2">المتابعة باستخدام Facebook</button>
+<button class="secondary" id="guest-login" type="button" style="width:100%">المتابعة كضيف</button>
+<div class="auth-msg" id="auth-message" aria-live="polite">اختر طريقة الدخول للمتجر.</div>
 </div></div>
 <div class="staff-login-shade" id="staff-login-modal" hidden><div class="staff-login-card"><h3>دخول موظفي لُقمة</h3><p>الدخول مخصص لحسابات الإدارة والمندوبين المعتمدة فقط.</p><form id="staff-login-form"><label for="staff-login-email">البريد الإلكتروني</label><input id="staff-login-email" type="email" autocomplete="username" required placeholder="employee@example.com"><label for="staff-login-password">كلمة المرور</label><input id="staff-login-password" type="password" autocomplete="current-password" required minlength="8" placeholder="كلمة المرور"><div class="staff-login-actions"><button class="primary" type="submit" id="staff-login-submit">دخول الموظفين</button><button class="secondary" type="button" id="staff-login-cancel">إلغاء</button></div><div class="auth-msg" id="staff-login-message" aria-live="polite"></div></form></div></div>
 <header id="store-header" hidden><div class="container">
@@ -916,24 +918,43 @@ function openNotifications(){$("notifications-modal").classList.add("show");load
 async function loadAdminMessages(){const host=$("staff-content");host.innerHTML='<div class="panel"><h4>إرسال رسالة وإشعار</h4><div class="fields"><label>عنوان الرسالة<input id="message-title" maxlength="120" placeholder="مثال: تنبيه مهم"></label><label>نص الرسالة<textarea id="message-body" rows="4" maxlength="2000" placeholder="اكتب الرسالة التي ستظهر للمستخدمين"></textarea></label><label>إرسال إلى<select id="message-audience"><option value="all">العملاء والمندوبون</option><option value="customers">العملاء فقط</option><option value="drivers">المندوبون فقط</option></select></label><button class="primary" id="send-message">إرسال الإشعار</button><div id="message-result" class="result"></div></div></div>';$("send-message").onclick=async()=>{const title=$("message-title").value.trim(),body=$("message-body").value.trim(),audience=$("message-audience").value,btn=$("send-message");if(!title||!body){$("message-result").textContent="اكتب عنوان الرسالة ونصها أولًا.";return}btn.disabled=true;const {error}=await sb.from("notifications").insert({title,body,audience,created_by:user.id});btn.disabled=false;if(error){$("message-result").textContent="تعذر الإرسال: "+error.message;return}$("message-result").textContent="تم إرسال الرسالة بنجاح.";$("message-title").value="";$("message-body").value=""}}
 $("open-drawer").onclick=openDrawer;$("close-drawer").onclick=closeDrawer;$("drawer-shade").onclick=e=>{if(e.target.id==="drawer-shade")closeDrawer()};$("customer-bell").onclick=openNotifications;$("staff-bell").onclick=openNotifications;$("close-notifications").onclick=()=>$("notifications-modal").classList.remove("show");$("notifications-modal").addEventListener("click",e=>{if(e.target.id==="notifications-modal")$("notifications-modal").classList.remove("show")});
 
+async function finishCustomerLogin(session){
+ user=session?.user||null;
+ if(!user)throw Error("لم نتمكن من فتح حسابك. حاول مرة أخرى.");
+ authReady=true;showStore(true);restoreCart();await loadCheckoutFees();
+ await loadStaffIdentity();loadProducts();loadProfile();loadWallet();loadNotifications();
+ if(staff)$("staff-jump").hidden=false;
+}
+async function startGuestLogin(){
+ const btn=$("guest-login"),msg=$("auth-message");btn.disabled=true;msg.textContent="جاري تجهيز حسابك…";
+ try{
+  let {data,error}=await sb.auth.getSession();if(error)throw error;
+  if(!data.session){const guest=await sb.auth.signInAnonymously();if(guest.error)throw guest.error;data={session:guest.data.session};}
+  await finishCustomerLogin(data.session);
+ }catch(e){msg.textContent="تعذر فتح المتجر: "+(e.message||"حدث خطأ.")+" — تأكد من تفعيل Anonymous Sign-ins في Supabase.";}
+ finally{btn.disabled=false;}
+}
+async function startFacebookLogin(){
+ const btn=$("facebook-login"),msg=$("auth-message");btn.disabled=true;msg.textContent="جاري تجهيز تسجيل الدخول بفيسبوك…";
+ try{
+  let {data,error}=await sb.auth.getSession();if(error)throw error;
+  if(!data.session){
+   const guest=await sb.auth.signInAnonymously();if(guest.error)throw guest.error;
+  }
+  const {data:linked,error:linkError}=await sb.auth.linkIdentity({provider:"facebook",options:{redirectTo:window.location.origin+window.location.pathname}});
+  if(linkError)throw linkError;
+  if(linked?.url){window.location.assign(linked.url);return;}
+  msg.textContent="لم يبدأ تحويل فيسبوك. تحقق من إعدادات مزود Facebook في Supabase.";
+ }catch(e){msg.textContent="تعذر تسجيل الدخول بفيسبوك: "+(e.message||"حدث خطأ.")+" — تأكد من إضافة رابط الموقع إلى Redirect URLs في Supabase.";
+ }finally{btn.disabled=false;}
+}
+$("facebook-login").onclick=startFacebookLogin;
+$("guest-login").onclick=startGuestLogin;
 async function init(){
  try{
   const {data,error}=await sb.auth.getSession();if(error)throw error;
-  let session=data.session;
-  if(!session){
-   $("auth-message").textContent="جاري إنشاء حساب ضيف…";
-   const {data:guest,error:guestError}=await sb.auth.signInAnonymously();
-   if(guestError)throw guestError;
-   session=guest.session;
-  }
-  user=session?.user||null;
-  if(!user)throw Error("لم نتمكن من إنشاء حسابك. حاول تحديث الصفحة.");
-  authReady=true;showStore(true);restoreCart();await loadCheckoutFees();
-  await loadStaffIdentity();loadProducts();loadProfile();loadWallet();loadNotifications();
-  if(staff)$("staff-jump").hidden=false;
- }catch(e){
-  $("auth-message").textContent="تعذر فتح المتجر: "+(e.message||"حدث خطأ غير متوقع.")+" — تأكد من تفعيل Anonymous Sign-ins في Supabase.";
- }
+  if(data.session)await finishCustomerLogin(data.session);
+ }catch(e){$("auth-message").textContent="تعذر التحقق من الجلسة: "+(e.message||"حدث خطأ غير متوقع.");}
 }
 $("staff-login-open").onclick=()=>{$("staff-login-message").textContent="";$("staff-login-modal").hidden=false;$("staff-login-email").focus()};
 $("staff-login-cancel").onclick=()=>{$("staff-login-modal").hidden=true};
