@@ -949,7 +949,51 @@ async function linkFacebookAccount(btn,msg){
  }catch(e){msg.textContent="تعذر ربط فيسبوك: "+(e.message||"حدث خطأ.")+" — تأكد من إعدادات Facebook وRedirect URLs.";
  }finally{btn.disabled=false;}
 }
-async function startFacebookLogin(){return linkFacebookAccount($("facebook-login"),$("auth-message"));}
+async function startFacebookLogin(){
+ const btn=$("facebook-login"),msg=$("auth-message");
+ if(!window.Capacitor?.isNativePlatform?.())return linkFacebookAccount(btn,msg);
+ btn.disabled=true;msg.textContent="جاري فتح تسجيل الدخول الآمن…";
+ try{
+  const {App}=await import("https://esm.sh/@capacitor/app@8.0.0");
+  const {Browser}=await import("https://esm.sh/@capacitor/browser@8.0.0");
+  const redirectTo="com.loqma.app://auth-callback";
+  const {data:sessionData,error:sessionError}=await sb.auth.getSession();
+  if(sessionError)throw sessionError;
+  const currentSession=sessionData.session;
+  let authResult;
+  if(currentSession){
+   authResult=await sb.auth.linkIdentity({provider:"facebook",options:{redirectTo,skipBrowserRedirect:true}});
+  }else{
+   authResult=await sb.auth.signInWithOAuth({provider:"facebook",options:{redirectTo,skipBrowserRedirect:true}});
+  }
+  if(authResult.error)throw authResult.error;
+  if(!authResult.data?.url)throw Error("لم يتم إنشاء رابط تسجيل الدخول من Facebook.");
+  const callback=async(url)=>{
+   if(!url||!url.startsWith(redirectTo))return;
+   try{
+    const parsed=new URL(url),params=new URLSearchParams(parsed.hash.replace(/^#/,""));
+    const errorDescription=params.get("error_description")||params.get("error");
+    if(errorDescription)throw Error(decodeURIComponent(errorDescription.replace(/\\+/g," ")));
+    const access_token=params.get("access_token"),refresh_token=params.get("refresh_token");
+    if(!access_token||!refresh_token)throw Error("لم تصل بيانات جلسة Facebook. حاول مرة أخرى.");
+    const {data,error}=await sb.auth.setSession({access_token,refresh_token});
+    if(error)throw error;
+    await Browser.close().catch(()=>{});
+    await finishCustomerLogin(data.session);
+    msg.textContent="تم تسجيل الدخول بنجاح ✅";
+   }catch(e){msg.textContent="تعذر إكمال تسجيل الدخول: "+(e.message||"خطأ غير معروف");}
+   finally{btn.disabled=false;}
+  };
+  await App.addListener("appUrlOpen",event=>callback(event.url));
+  const launch=await App.getLaunchUrl();
+  if(launch?.url?.startsWith(redirectTo))await callback(launch.url);
+  await Browser.open({url:authResult.data.url});
+  msg.textContent="أكمل تسجيل الدخول في نافذة Facebook، وسيعود التطبيق تلقائيًا.";
+ }catch(e){
+  msg.textContent="تعذر تسجيل الدخول عبر التطبيق: "+(e.message||"حدث خطأ.")+" — تحقق من إعداد رابط التطبيق في Supabase.";
+  btn.disabled=false;
+ }
+}
 $("facebook-login").onclick=startFacebookLogin;
 $("link-facebook-account").onclick=()=>linkFacebookAccount($("link-facebook-account"),$("facebook-link-result"));
 $("guest-login").onclick=startGuestLogin;
